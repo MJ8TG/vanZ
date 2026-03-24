@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
-import { Plus, ToggleLeft, ToggleRight, Ticket, BarChart3, RefreshCcw } from 'lucide-react';
+import { Plus, ToggleLeft, ToggleRight, Ticket, BarChart3, RefreshCcw, X } from 'lucide-react';
 
 export default function AdminPromosPage() {
   const [promos, setPromos] = useState<any[]>([]);
@@ -81,46 +81,46 @@ export default function AdminPromosPage() {
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Code *</label>
-                <input type="text" required value={form.code} onChange={(e) => setForm({...form, code: e.target.value.toUpperCase()})} placeholder="VANZ10" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal uppercase" />
+                <label htmlFor="promo-code" className="block text-xs font-bold text-gray-500 mb-1">Code *</label>
+                <input id="promo-code" type="text" required value={form.code} onChange={(e) => setForm({...form, code: e.target.value.toUpperCase()})} placeholder="VANZ10" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal uppercase" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Type de Réduction *</label>
-                <select value={form.discount_type} onChange={(e) => setForm({...form, discount_type: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal">
+                <label htmlFor="promo-type" className="block text-xs font-bold text-gray-500 mb-1">Type de Réduction *</label>
+                <select id="promo-type" title="Type de réduction" value={form.discount_type} onChange={(e) => setForm({...form, discount_type: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal">
                    <option value="fixed">Montant Fixe (TND)</option>
                    <option value="percentage">Pourcentage (%)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Valeur *</label>
-                <input type="number" step="0.1" required value={form.discount_value} onChange={(e) => setForm({...form, discount_value: e.target.value})} placeholder="Ex: 10" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-value" className="block text-xs font-bold text-gray-500 mb-1">Valeur *</label>
+                <input id="promo-value" type="number" step="0.1" required value={form.discount_value} onChange={(e) => setForm({...form, discount_value: e.target.value})} placeholder="Ex: 10" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Stock (Vide = Illimité)</label>
-                <input type="number" value={form.max_uses} onChange={(e) => setForm({...form, max_uses: e.target.value})} placeholder="Ex: 100" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-max-uses" className="block text-xs font-bold text-gray-500 mb-1">Stock (Vide = Illimité)</label>
+                <input id="promo-max-uses" type="number" value={form.max_uses} onChange={(e) => setForm({...form, max_uses: e.target.value})} placeholder="Ex: 100" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Utilisation par Utilisateur</label>
-                <input type="number" min="1" value={form.uses_per_user} onChange={(e) => setForm({...form, uses_per_user: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-uses-per-user" className="block text-xs font-bold text-gray-500 mb-1">Utilisation par Utilisateur</label>
+                <input id="promo-uses-per-user" type="number" min="1" value={form.uses_per_user} onChange={(e) => setForm({...form, uses_per_user: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Montant Min Commande</label>
-                <input type="number" value={form.min_job_amount} onChange={(e) => setForm({...form, min_job_amount: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-min-amount" className="block text-xs font-bold text-gray-500 mb-1">Montant Min Commande</label>
+                <input id="promo-min-amount" type="number" value={form.min_job_amount} onChange={(e) => setForm({...form, min_job_amount: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Début de validité</label>
-                <input type="date" value={form.valid_from} onChange={(e) => setForm({...form, valid_from: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-valid-from" className="block text-xs font-bold text-gray-500 mb-1">Début de validité</label>
+                <input id="promo-valid-from" type="date" value={form.valid_from} onChange={(e) => setForm({...form, valid_from: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">Fin de validité</label>
-                <input type="date" value={form.valid_until} onChange={(e) => setForm({...form, valid_until: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
+                <label htmlFor="promo-valid-until" className="block text-xs font-bold text-gray-500 mb-1">Fin de validité</label>
+                <input id="promo-valid-until" type="date" value={form.valid_until} onChange={(e) => setForm({...form, valid_until: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal" />
               </div>
 
            </div>
@@ -173,18 +173,25 @@ export default function AdminPromosPage() {
                        <span>{promo.current_uses} consommés</span>
                        <span>{isUnlimited ? '∞' : `${promo.max_uses} MAX`}</span>
                      </div>
-                     {!isUnlimited && (
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                          <div className={`h-1.5 rounded-full ${percent > 90 ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${percent}%` }}></div>
-                        </div>
-                     )}
+                         <div className="w-full">
+                           <progress 
+                             max="100" 
+                             value={percent} 
+                             className={`w-full h-1.5 block rounded-full overflow-hidden [&::-webkit-progress-bar]:bg-gray-200 ${percent > 90 ? '[&::-webkit-progress-value]:bg-red-500' : '[&::-webkit-progress-value]:bg-green-500'}`}
+                           />
+                         </div>
                    </td>
                    <td className="px-6 py-4 text-xs text-gray-500">
                      <p>Du: {new Date(promo.valid_from).toLocaleDateString()}</p>
                      <p>Au: {promo.valid_until ? new Date(promo.valid_until).toLocaleDateString() : 'Jamais'}</p>
                    </td>
                    <td className="px-6 py-4">
-                     <button onClick={() => toggleStatus(promo.id, promo.is_active)} className={`flex items-center gap-1 font-bold ${promo.is_active ? 'text-green-500' : 'text-gray-400'}`}>
+                     <button 
+                       onClick={() => toggleStatus(promo.id, promo.is_active)} 
+                       className={`flex items-center gap-1 font-bold ${promo.is_active ? 'text-green-500' : 'text-gray-400'}`}
+                       title={promo.is_active ? "Désactiver le code" : "Activer le code"}
+                       aria-label={promo.is_active ? "Désactiver le code promo" : "Activer le code promo"}
+                     >
                         {promo.is_active ? <ToggleRight className="w-8 h-8"/> : <ToggleLeft className="w-8 h-8"/>}
                         <span className="text-xs uppercase">{promo.is_active ? 'Actif' : 'Inactif'}</span>
                      </button>

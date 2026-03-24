@@ -12,11 +12,7 @@ export default function CTABand() {
     <section className="py-16 md:py-20 bg-vanz-yellow relative overflow-hidden">
       {/* Background Pattern */}
       <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage: `radial-gradient(circle, #0B1021 1px, transparent 1px)`,
-          backgroundSize: "24px 24px",
-        }}
+        className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle,_#0B1021_1px,_transparent_1px)] bg-[length:24px_24px]"
       />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

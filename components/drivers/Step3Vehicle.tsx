@@ -35,6 +35,7 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           {vehicleTypes.map((type) => (
             <label
               key={type.id}
+              htmlFor={`vehicle-${type.id}`}
               className={`cursor-pointer border-2 rounded-xl p-3 text-center transition-all ${
                 data.vehicleType === type.id
                   ? "border-vanz-teal bg-vanz-teal/10 text-vanz-navy font-bold"
@@ -42,6 +43,7 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
               }`}
             >
               <input
+                id={`vehicle-${type.id}`}
                 type="radio"
                 name="vehicleType"
                 value={type.id}
@@ -58,8 +60,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("brand")}</label>
+          <label htmlFor="vehicle-brand" className="block text-sm font-semibold text-vanz-navy mb-2">{t("brand")}</label>
           <input
+            id="vehicle-brand"
             type="text"
             required
             value={data.brand}
@@ -68,8 +71,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("model")}</label>
+          <label htmlFor="vehicle-model" className="block text-sm font-semibold text-vanz-navy mb-2">{t("model")}</label>
           <input
+            id="vehicle-model"
             type="text"
             required
             value={data.model}
@@ -78,8 +82,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("year")}</label>
+          <label htmlFor="vehicle-year" className="block text-sm font-semibold text-vanz-navy mb-2">{t("year")}</label>
           <input
+            id="vehicle-year"
             type="number"
             min="1990"
             max={new Date().getFullYear() + 1}
@@ -90,8 +95,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("color")}</label>
+          <label htmlFor="vehicle-color" className="block text-sm font-semibold text-vanz-navy mb-2">{t("color")}</label>
           <input
+            id="vehicle-color"
             type="text"
             value={data.color}
             onChange={(e) => updateData({ color: e.target.value })}
@@ -99,8 +105,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("plate")}</label>
+          <label htmlFor="vehicle-plate" className="block text-sm font-semibold text-vanz-navy mb-2">{t("plate")}</label>
           <input
+            id="vehicle-plate"
             type="text"
             required
             pattern="[0-9]{1,3}\s?(TN|تونس)\s?[0-9]{1,4}"
@@ -111,8 +118,9 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("capacity")}</label>
+          <label htmlFor="vehicle-capacity" className="block text-sm font-semibold text-vanz-navy mb-2">{t("capacity")}</label>
           <input
+            id="vehicle-capacity"
             type="number"
             required
             min="100"

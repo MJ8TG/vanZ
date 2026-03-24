@@ -11,9 +11,10 @@ export default function WizardProgress({ steps, currentStep }: WizardProgressPro
       {/* Progress Bar (Desktop) */}
       <div className="hidden sm:flex items-center justify-between relative">
         <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 z-0 rounded" />
-        <div
-          className="absolute top-1/2 left-0 h-1 bg-vanz-teal -translate-y-1/2 z-0 transition-all duration-300 rounded"
-          style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+        <progress 
+          max="100" 
+          value={(currentStep / (steps.length - 1)) * 100} 
+          className="absolute top-1/2 left-0 w-full h-1 -translate-y-1/2 z-0 rounded overflow-hidden [&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-value]:bg-vanz-teal [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:duration-300"
         />
         
         {steps.map((label, index) => {
@@ -53,10 +54,11 @@ export default function WizardProgress({ steps, currentStep }: WizardProgressPro
           </span>
           <span className="text-sm font-semibold text-vanz-teal">{steps[currentStep]}</span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-vanz-teal transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+        <div className="w-full">
+          <progress 
+            max="100" 
+            value={((currentStep + 1) / steps.length) * 100} 
+            className="w-full h-2 block bg-gray-200 rounded-full overflow-hidden [&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-value]:bg-vanz-teal [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:duration-300"
           />
         </div>
       </div>

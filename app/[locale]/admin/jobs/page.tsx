@@ -121,7 +121,12 @@ export default function AdminJobsPage() {
               />
             </div>
             
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-vanz-teal">
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)} 
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-vanz-teal"
+              title="Filtrer par statut"
+            >
                <option value="">Tous les statuts</option>
                <option value="open">Ouvert</option>
                <option value="matched">Assigné</option>
@@ -130,8 +135,22 @@ export default function AdminJobsPage() {
                <option value="cancelled">Annulé</option>
             </select>
 
-            <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-            <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+            <input 
+              type="date" 
+              value={dateFrom} 
+              onChange={(e) => setDateFrom(e.target.value)} 
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" 
+              aria-label="Date de début"
+              title="Date de début"
+            />
+            <input 
+              type="date" 
+              value={dateTo} 
+              onChange={(e) => setDateTo(e.target.value)} 
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" 
+              aria-label="Date de fin"
+              title="Date de fin"
+            />
          </div>
 
          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors">
@@ -182,11 +201,16 @@ export default function AdminJobsPage() {
                           {job.status}
                         </span>
                      </td>
-                     <td className="px-6 py-4">
-                        <button onClick={() => setSelectedJob(job)} className="p-2 bg-vanz-ice hover:bg-gray-200 text-vanz-teal rounded-lg transition-colors">
+                      <td className="px-6 py-4">
+                        <button 
+                          onClick={() => setSelectedJob(job)} 
+                          className="p-2 bg-vanz-ice hover:bg-gray-200 text-vanz-teal rounded-lg transition-colors"
+                          title="Voir les détails"
+                          aria-label={`Voir les détails de la commande ${job.id.substring(0,6)}`}
+                        >
                            <FileText className="w-4 h-4" />
                         </button>
-                     </td>
+                      </td>
                    </tr>
                  ))
                )}
@@ -202,7 +226,12 @@ export default function AdminJobsPage() {
           <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl overflow-y-auto animate-[slide-in-right_300ms_ease-out]">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white/90 backdrop-blur">
                <h3 className="font-bold text-xl text-[#051E3C]">Détails #{selectedJob.id.substring(0,8)}</h3>
-               <button onClick={() => setSelectedJob(null)} className="p-2 hover:bg-gray-100 rounded-full">
+               <button 
+                 onClick={() => setSelectedJob(null)} 
+                 className="p-2 hover:bg-gray-100 rounded-full"
+                 title="Fermer"
+                 aria-label="Fermer les détails"
+               >
                  <X className="w-5 h-5" />
                </button>
             </div>

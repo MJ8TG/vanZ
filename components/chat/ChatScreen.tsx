@@ -188,7 +188,11 @@ export default function ChatScreen({ conversationId, jobId, currentUserId, curre
                 
                 {msg.type === 'voice' && (
                   <div className="flex items-center gap-2">
-                    <button className={`p-2 rounded-full ${isMe ? 'bg-white text-vanz-teal' : 'bg-gray-100 text-gray-500'}`}>
+                    <button 
+                      className={`p-2 rounded-full ${isMe ? 'bg-white text-vanz-teal' : 'bg-gray-100 text-gray-500'}`}
+                      aria-label="Lire le message vocal"
+                      title="Lire"
+                    >
                       <PlayCircle className="w-5 h-5" />
                     </button>
                     <span className="text-xs font-medium font-mono">{msg.media_duration}s</span>
@@ -249,7 +253,11 @@ export default function ChatScreen({ conversationId, jobId, currentUserId, curre
         {/* Input Bar */}
         <div className="p-4 flex items-center gap-3">
           {canSendMedia ? (
-            <button className="p-2 text-gray-400 hover:text-vanz-teal transition-colors rounded-full hover:bg-vanz-ice">
+            <button 
+              className="p-2 text-gray-400 hover:text-vanz-teal transition-colors rounded-full hover:bg-vanz-ice"
+              aria-label="Joindre une photo"
+              title="Joindre une photo"
+            >
                <ImageIcon className="w-5 h-5" />
             </button>
           ) : (
@@ -266,12 +274,15 @@ export default function ChatScreen({ conversationId, jobId, currentUserId, curre
             placeholder={canSendMedia ? "Écrivez un message..." : "Messages filtrés en phase d'offre..."}
             className="flex-1 bg-gray-50 border-transparent focus:bg-white focus:border-vanz-teal focus:ring-2 focus:ring-vanz-teal/20 rounded-xl px-4 py-3 outline-none text-sm transition-all"
             disabled={phase === 'archived'}
+            aria-label="Zone de saisie du message"
           />
           
           <button 
             disabled={!inputStr.trim() || phase === 'archived'}
             onClick={() => sendMessage(inputStr)}
             className="p-3 bg-vanz-teal text-white rounded-xl shadow-sm hover:shadow hover:bg-vanz-teal/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            aria-label="Envoyer le message"
+            title="Envoyer"
           >
             <Send className="w-5 h-5 ml-1" />
           </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from '@/i18n/routing';
+import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { datasql as supabase } from '@/lib/datasql';
 import { Loader2, ShieldCheck } from 'lucide-react';

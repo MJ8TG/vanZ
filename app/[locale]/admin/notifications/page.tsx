@@ -87,10 +87,12 @@ export default function AdminNotificationsPage() {
               
               <div className="grid grid-cols-2 gap-4">
                  <div>
-                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><Target className="w-3 h-3"/> Audience</label>
+                   <label htmlFor="audience-select" className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><Target className="w-3 h-3"/> Audience</label>
                    <select 
+                     id="audience-select"
                      value={form.audience} onChange={e => setForm({...form, audience: e.target.value})}
                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-vanz-teal font-medium text-gray-700"
+                     title="Choisir l'audience de la campagne"
                    >
                      <option value="all_users">Tous les utilisateurs</option>
                      <option value="all_clients">Tous les clients (Appli Client)</option>
@@ -103,10 +105,12 @@ export default function AdminNotificationsPage() {
                  </div>
 
                  <div>
-                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><Smartphone className="w-3 h-3"/> Canal de diffusion</label>
+                   <label htmlFor="channel-select" className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><Smartphone className="w-3 h-3"/> Canal de diffusion</label>
                    <select 
+                     id="channel-select"
                      value={form.channel} onChange={e => setForm({...form, channel: e.target.value})}
                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-vanz-teal font-medium text-gray-700"
+                     title="Choisir le canal de diffusion"
                    >
                      <option value="both">In-App Push + SMS (Max Reach)</option>
                      <option value="push">In-App Push Uniquement (Gratuit)</option>
@@ -117,8 +121,9 @@ export default function AdminNotificationsPage() {
 
               {(form.channel === 'push' || form.channel === 'both') && (
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><BellRing className="w-3 h-3"/> Titre (Notification Push)</label>
+                  <label htmlFor="notification-title" className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1"><BellRing className="w-3 h-3"/> Titre (Notification Push)</label>
                   <input 
+                    id="notification-title"
                     type="text" required 
                     value={form.title} onChange={e => setForm({...form, title: e.target.value})}
                     placeholder="Ex: -20% sur votre prochain trajet !"
@@ -128,8 +133,9 @@ export default function AdminNotificationsPage() {
               )}
 
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Contenu du message</label>
+                <label htmlFor="notification-body" className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Contenu du message</label>
                 <textarea 
+                  id="notification-body"
                   required rows={4}
                   value={form.body} onChange={e => setForm({...form, body: e.target.value})}
                   placeholder="Tapez votre message ici..."

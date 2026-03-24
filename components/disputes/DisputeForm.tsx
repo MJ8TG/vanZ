@@ -118,11 +118,13 @@ export function DisputeForm({ job, openerId, onSuccess }: DisputeFormProps) {
       </div>
       
       <div className="mb-4">
-        <label className="block text-sm font-semibold text-[#051E3C] mb-2">Motif du litige</label>
+        <label htmlFor="dispute-reason" className="block text-sm font-semibold text-[#051E3C] mb-2">Motif du litige</label>
         <select 
+          id="dispute-reason"
           value={reason} 
           onChange={e => setReason(e.target.value)}
           className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500 focus:outline-none font-medium"
+          title="Sélectionner le motif du litige"
         >
           {DISPUTE_REASONS.map(r => (
             <option key={r.value} value={r.value}>{r.label}</option>
@@ -131,8 +133,9 @@ export function DisputeForm({ job, openerId, onSuccess }: DisputeFormProps) {
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-semibold text-[#051E3C] mb-2">Description détaillée</label>
+        <label htmlFor="dispute-description" className="block text-sm font-semibold text-[#051E3C] mb-2">Description détaillée</label>
         <textarea 
+          id="dispute-description"
           placeholder="Décrivez précisément ce qui s'est passé..."
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -146,11 +149,13 @@ export function DisputeForm({ job, openerId, onSuccess }: DisputeFormProps) {
         <div className="flex gap-2 flex-wrap">
           {photos.map((file, idx) => (
              <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
-               <img src={URL.createObjectURL(file)} alt="preuve" className="w-full h-full object-cover" />
+               <img src={URL.createObjectURL(file)} alt={`Preuve ${idx + 1}`} className="w-full h-full object-cover" />
                <button 
                  type="button" 
                  onClick={() => removePhoto(idx)}
                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5"
+                 aria-label="Supprimer la photo"
+                 title="Supprimer"
                >
                  <X className="w-3 h-3" />
                </button>
@@ -161,7 +166,15 @@ export function DisputeForm({ job, openerId, onSuccess }: DisputeFormProps) {
             <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#2BBFDF] hover:bg-[#F0FBFC] transition">
               <UploadCloud className="w-6 h-6 mb-1"/>
               <span className="text-[10px] uppercase font-bold">Ajouter</span>
-              <input type="file" accept="image/*" multiple className="hidden" onChange={handlePhotoUpload} />
+              <input 
+                id="dispute-photo-upload"
+                type="file" 
+                accept="image/*" 
+                multiple 
+                className="hidden" 
+                onChange={handlePhotoUpload} 
+                aria-label="Télécharger des photos de preuve"
+              />
             </label>
           )}
         </div>

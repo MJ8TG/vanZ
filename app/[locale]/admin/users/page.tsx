@@ -198,7 +198,12 @@ export default function AdminUsersPage() {
                     <p className="text-xs text-gray-500">{selectedUser.role.toUpperCase()}</p>
                   </div>
                </div>
-               <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-gray-100 rounded-full">
+               <button 
+                 onClick={() => setSelectedUser(null)} 
+                 className="p-2 hover:bg-gray-100 rounded-full"
+                 title="Fermer"
+                 aria-label="Fermer les détails"
+               >
                  <X className="w-5 h-5" />
                </button>
             </div>

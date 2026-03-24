@@ -22,8 +22,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto animate-in slide-in-from-right-4 fade-in duration-300">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("firstName")}</label>
+          <label htmlFor="first-name" className="block text-sm font-semibold text-vanz-navy mb-2">{t("firstName")}</label>
           <input
+            id="first-name"
             type="text"
             required
             value={data.firstName}
@@ -32,8 +33,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("lastName")}</label>
+          <label htmlFor="last-name" className="block text-sm font-semibold text-vanz-navy mb-2">{t("lastName")}</label>
           <input
+            id="last-name"
             type="text"
             required
             value={data.lastName}
@@ -42,8 +44,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("email")}</label>
+          <label htmlFor="email-address" className="block text-sm font-semibold text-vanz-navy mb-2">{t("email")}</label>
           <input
+            id="email-address"
             type="email"
             value={data.email}
             onChange={(e) => updateData({ email: e.target.value })}
@@ -51,12 +54,14 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("city")}</label>
+          <label htmlFor="city-select" className="block text-sm font-semibold text-vanz-navy mb-2">{t("city")}</label>
           <select
+            id="city-select"
             required
             value={data.city}
             onChange={(e) => updateData({ city: e.target.value })}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            title={t("city")}
           >
             <option value="" disabled>-- {t("city")} --</option>
             {/* Note: In a real app we'd fetch cities or use translations for options. For now hardcode or use simple ones. */}
@@ -66,8 +71,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           </select>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("cin")}</label>
+          <label htmlFor="cin-number" className="block text-sm font-semibold text-vanz-navy mb-2">{t("cin")}</label>
           <input
+            id="cin-number"
             type="text"
             required
             maxLength={8}
@@ -78,8 +84,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("dob")}</label>
+          <label htmlFor="dob-field" className="block text-sm font-semibold text-vanz-navy mb-2">{t("dob")}</label>
           <input
+            id="dob-field"
             type="date"
             required
             value={data.dob}
@@ -88,8 +95,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-vanz-navy mb-2">{t("cinExpiry")}</label>
+          <label htmlFor="cin-expiry" className="block text-sm font-semibold text-vanz-navy mb-2">{t("cinExpiry")}</label>
           <input
+            id="cin-expiry"
             type="date"
             required
             value={data.cinExpiry}

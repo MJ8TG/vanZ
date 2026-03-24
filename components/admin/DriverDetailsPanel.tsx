@@ -39,7 +39,12 @@ export default function DriverDetailsPanel({ driver, onClose, onApprove, onRejec
             <h2 className="text-lg font-bold text-vanz-navy">Détails Chauffeur</h2>
             <p className="text-xs text-gray-500">ID: {driver.id}</p>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors">
+          <button 
+            onClick={onClose} 
+            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+            title="Fermer"
+            aria-label="Fermer les détails"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>

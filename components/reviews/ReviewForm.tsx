@@ -28,6 +28,8 @@ export function ReviewForm({ jobId, reviewerId, revieweeId, reviewerType, onSucc
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
+  
+  const isTagSelected = (tag: string) => selectedTags.includes(tag);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +73,8 @@ export function ReviewForm({ jobId, reviewerId, revieweeId, reviewerType, onSucc
             type="button" 
             onClick={() => setStars(star)}
             className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
+            aria-label={`Donner une note de ${star} étoiles sur 5`}
+            title={`${star} étoiles`}
           >
             <Star 
               className={`w-10 h-10 ${star <= stars ? 'fill-[#F5C800] text-[#F5C800]' : 'fill-transparent text-gray-300'}`} 
@@ -83,25 +87,34 @@ export function ReviewForm({ jobId, reviewerId, revieweeId, reviewerType, onSucc
       <div className="mb-6">
         <p className="text-sm font-semibold text-gray-500 mb-3">Points forts :</p>
         <div className="flex flex-wrap gap-2">
-          {availableTags.map(tag => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => toggleTag(tag)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors border ${
-                selectedTags.includes(tag) 
-                  ? 'bg-[#E8F8FA] text-[#2BBFDF] border-[#2BBFDF]' 
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
+          {availableTags.map(tag => {
+            const isSelected = selectedTags.includes(tag);
+            const buttonClass = `px-4 py-2 rounded-full text-sm font-semibold transition-colors border ${
+              isSelected 
+                ? 'bg-[#E8F8FA] text-[#2BBFDF] border-[#2BBFDF]' 
+                : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+            }`;
+
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                aria-label={`${tag} (${isSelected ? 'sélectionné' : 'non sélectionné'})`}
+                title={tag}
+                className={buttonClass}
+              >
+                {tag}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="mb-6">
+        <label htmlFor="review-comment" className="sr-only">Commentaire (facultatif)</label>
         <textarea 
+          id="review-comment"
           placeholder="Un commentaire supplémentaire ? (facultatif)"
           value={comment}
           onChange={e => setComment(e.target.value)}
@@ -113,6 +126,7 @@ export function ReviewForm({ jobId, reviewerId, revieweeId, reviewerType, onSucc
         onClick={handleSubmit}
         disabled={isSubmitting || stars === 0}
         className="w-full bg-[#051E3C] text-white py-4 rounded-xl font-bold hover:bg-[#0a2955] transition disabled:opacity-50"
+        title="Soumettre mon avis"
       >
         {isSubmitting ? 'Envoi...' : 'Soumettre mon avis'}
       </button>

@@ -82,15 +82,23 @@ export function DeliveryProofUpload({ jobId, driverId, onProofUploaded }: Delive
       {file ? (
         <div className="mb-6 relative w-32 h-32 mx-auto rounded-xl overflow-hidden shadow-sm">
           <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
-          <button onClick={() => setFile(null)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 text-xs">✕</button>
+          <button 
+            onClick={() => setFile(null)} 
+            className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 text-xs"
+            aria-label="Supprimer la photo"
+            title="Supprimer"
+          >
+            ✕
+          </button>
         </div>
       ) : (
-        <label className="block w-full bg-gray-50 text-[#051E3C] py-4 rounded-xl font-bold cursor-pointer hover:bg-gray-100 transition mb-4">
+        <label htmlFor="delivery-photo-input" className="block w-full bg-gray-50 text-[#051E3C] py-4 rounded-xl font-bold cursor-pointer hover:bg-gray-100 transition mb-4">
           Ouvrir l'appareil photo
           <input 
+             id="delivery-photo-input"
              type="file" 
              accept="image/*" 
-             capture="environment" 
+             {...({ capture: 'environment' } as any)}
              className="hidden" 
              onChange={(e) => setFile(e.target.files?.[0] || null)}
           />

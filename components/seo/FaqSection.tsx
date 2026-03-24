@@ -48,20 +48,46 @@ export default function FaqSection({ title, items }: FaqSectionProps) {
               key={index} 
               className="border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-white/5 transition-all duration-300"
             >
-              <button
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
-                aria-expanded={isOpen ? "true" : "false"}
-              >
-                <span className="font-bold text-lg text-vanz-navy dark:text-white">
-                  {item.question}
-                </span>
-                <span className="flex-shrink-0 ml-4 text-vanz-teal">
-                  {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                </span>
-              </button>
+              {isOpen ? (
+                <button
+                  onClick={() => setOpenIndex(null)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                  aria-expanded="true"
+                  aria-controls={`faq-answer-${index}`}
+                >
+                  <span 
+                    id={`faq-question-${index}`}
+                    className="font-bold text-lg text-vanz-navy dark:text-white"
+                  >
+                    {item.question}
+                  </span>
+                  <span className="flex-shrink-0 ml-4 text-vanz-teal">
+                    <ChevronUp size={24} />
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setOpenIndex(index)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                  aria-expanded="false"
+                  aria-controls={`faq-answer-${index}`}
+                >
+                  <span 
+                    id={`faq-question-${index}`}
+                    className="font-bold text-lg text-vanz-navy dark:text-white"
+                  >
+                    {item.question}
+                  </span>
+                  <span className="flex-shrink-0 ml-4 text-vanz-teal">
+                    <ChevronDown size={24} />
+                  </span>
+                </button>
+              )}
               
               <div 
+                id={`faq-answer-${index}`}
+                role="region"
+                aria-labelledby={`faq-question-${index}`}
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
                   isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                 }`}

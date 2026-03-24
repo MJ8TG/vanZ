@@ -49,7 +49,7 @@ export default function AdminSystemPage() {
       </div>
 
       <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8 text-center mt-8">
-         <p className="text-gray-400 font-medium">L'accès avancé aux logs système et à la console de la base de données nécessite une connexion directe via <a href="https://supabase.com" target="_blank" className="text-vanz-teal hover:underline">Supabase Dashboard</a>.</p>
+         <p className="text-gray-400 font-medium">L'accès avancé aux logs système et à la console de la base de données nécessite une connexion directe via <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-vanz-teal hover:underline">Supabase Dashboard</a>.</p>
       </div>
 
     </div>

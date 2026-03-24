@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
 import { GoogleMap, useJsApiLoader, Polyline, Marker } from '@react-google-maps/api';
-import { Phone, MessageCircle, X, Navigation } from 'lucide-react';
+import { Navigation, Maximize2, X, MessageSquare, Phone, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const MAP_STYLE = [
   { elementType: 'geometry', stylers: [{ color: '#e8e0d8' }] },
@@ -14,7 +15,11 @@ const MAP_STYLE = [
 ];
 
 const VanMarker = ({ heading }: { heading: number }) => (
-  <div style={{ transform: `rotate(${heading}deg)`, transition: 'transform 0.5s ease', position: 'absolute', left: '-16px', top: '-10px' }}>
+  <motion.div 
+    className="absolute -left-4 -top-2.5"
+    animate={{ rotate: heading }}
+    transition={{ duration: 0.5, ease: "easeOut" }}
+  >
     <svg width="32" height="20" viewBox="0 0 32 20">
       <rect x="1" y="4" width="28" height="14" rx="4" fill="white" stroke="#0B1021" strokeWidth="1"/>
       <rect x="14" y="5" width="12" height="8" rx="2" fill="#2BBFDF"/>
@@ -23,8 +28,8 @@ const VanMarker = ({ heading }: { heading: number }) => (
       <circle cx="29" cy="9" r="2" fill="#F5C800"/>
     </svg>
     {/* Pulse Animation Overlay */}
-    <div className="absolute -inset-4 bg-[#2BBFDF]/30 rounded-full animate-ping pointer-events-none" style={{ animationDuration: '1.5s' }} />
-  </div>
+    <div className="absolute -inset-4 bg-[#2BBFDF]/30 rounded-full animate-ping pointer-events-none" />
+  </motion.div>
 );
 
 const STATUS_LABELS: Record<string, string> = {
@@ -168,7 +173,12 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
         <MapContainer />
 
         {!isMapCentered && (
-          <button onClick={recenter} className="absolute bottom-6 right-4 bg-white rounded-full p-3 shadow-md z-10 text-[#051E3C] hover:bg-gray-50 aspect-square flex items-center justify-center transition-all">
+          <button 
+            onClick={recenter} 
+            className="absolute bottom-6 right-4 bg-white rounded-full p-3 shadow-md z-10 text-[#051E3C] hover:bg-gray-50 aspect-square flex items-center justify-center transition-all"
+            title="Recentrer sur le véhicule"
+            aria-label="Recentrer la carte sur le chauffeur"
+          >
             <Navigation className="w-5 h-5" />
           </button>
         )}
@@ -215,10 +225,11 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
               <span>POINT A</span>
               <span>POINT B</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden w-full mb-2">
-              <div 
-                className="h-full bg-gradient-to-r from-[#2BBFDF] to-[#1A99B4] rounded-full transition-all duration-1000" 
-                style={{ width: distanceRemaining ? `${Math.max(10, 100 - (distanceRemaining * 10))}%` : '5%' }} 
+            <div className="w-full">
+              <progress 
+                max="100" 
+                value={distanceRemaining ? Math.max(10, 100 - (distanceRemaining * 10)) : 5} 
+                className="w-full h-2 block rounded-full overflow-hidden [&::-webkit-progress-bar]:bg-gray-100 [&::-webkit-progress-value]:bg-gradient-to-r [&::-webkit-progress-value]:from-[#2BBFDF] [&::-webkit-progress-value]:to-[#1A99B4] [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:duration-1000"
               />
             </div>
             {distanceRemaining !== null && (
@@ -231,10 +242,17 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
             <a href={`tel:${driver.phone}`} className="flex-1 bg-[#F5C800] text-[#051E3C] py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#E0B800] transition filter drop-shadow-sm">
               <Phone className="w-5 h-5 fill-current" /> Appeler
             </a>
-            <button className="flex-1 bg-[#E8F8FA] text-[#2BBFDF] py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#D0F0F5] transition">
+            <button 
+              className="flex-1 bg-[#E8F8FA] text-[#2BBFDF] py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#D0F0F5] transition"
+              title="Envoyer un message au chauffeur"
+            >
               <MessageCircle className="w-5 h-5 fill-current" /> Chat
             </button>
-            <button className="flex-none aspect-square bg-red-50 text-red-500 p-3 rounded-xl font-bold flex items-center justify-center hover:bg-red-100 transition">
+            <button 
+              className="flex-none aspect-square bg-red-50 text-red-500 p-3 rounded-xl font-bold flex items-center justify-center hover:bg-red-100 transition"
+              title="Fermer le suivi"
+              aria-label="Quitter l'écran de suivi"
+            >
               <X className="w-6 h-6" />
             </button>
           </div>
