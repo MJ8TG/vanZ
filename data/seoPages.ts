@@ -9,6 +9,8 @@ export type SeoPageSlug =
   | "livraison-tunis-sousse"
   | "demenagement-tunis"
   | "demenagement-pas-cher"
+  | "demenagement-bureaux"
+  | "livraison-express"
   | "transport-meuble-ariana"
   | "transport-meuble-monastir"
   | "prix-transport-meuble-tunis";
@@ -30,6 +32,8 @@ export const seoPagesConfig: SeoPageConfig[] = [
   { slug: "livraison-tunis-sousse", translationKey: "livraisonTunisSousse", city: "Tunis-Sousse" },
   { slug: "demenagement-tunis", translationKey: "demenagementTunis", city: "Tunis" },
   { slug: "demenagement-pas-cher", translationKey: "demenagementPasCher", city: "Tunisie" },
+  { slug: "demenagement-bureaux", translationKey: "demenagementBureaux", city: "Tunis" },
+  { slug: "livraison-express", translationKey: "livraisonExpress", city: "Tunisie" },
   { slug: "transport-meuble-ariana", translationKey: "meubleAriana", city: "Ariana" },
   { slug: "transport-meuble-monastir", translationKey: "meubleMonastir", city: "Monastir" },
   { slug: "prix-transport-meuble-tunis", translationKey: "prixMeubleTunis", city: "Tunis" }

@@ -15,11 +15,11 @@ const HeroScene = dynamic(() => import("./HeroScene"), {
 });
 
 const SERVICE_CARDS = [
-  { labelKey: "moving", image: "/services/demenagement.png", large: true },
-  { labelKey: "furniture", image: "/services/furniture.png", large: true },
-  { labelKey: "intercity", image: "/services/intervilles.png", large: false },
-  { labelKey: "office", image: "/services/bureaux.png", large: false },
-  { labelKey: "express", image: "/services/express.png", large: false },
+  { labelKey: "moving", image: "/services/demenagement.png", slug: "demenagement-tunis", large: true },
+  { labelKey: "furniture", image: "/services/furniture.png", slug: "transport-meuble-tunis", large: true },
+  { labelKey: "intercity", image: "/services/intervilles.png", slug: "livraison-tunis-sfax", large: false },
+  { labelKey: "office", image: "/services/bureaux.png", slug: "demenagement-bureaux", large: false },
+  { labelKey: "express", image: "/services/express.png", slug: "livraison-express", large: false },
 ] as const;
 
 export default function HeroSection() {
@@ -87,22 +87,24 @@ export default function HeroSection() {
             <div className="grid grid-cols-2 gap-3">
               {/* Top 2 large cards */}
               {SERVICE_CARDS.filter(c => c.large).map((card) => (
-                <ServiceCard
-                  key={card.labelKey}
-                  label={tServices(card.labelKey)}
-                  image={card.image}
-                  large
-                />
+                <Link key={card.labelKey} href={`/${locale}/${card.slug}`}>
+                  <ServiceCard
+                    label={tServices(card.labelKey)}
+                    image={card.image}
+                    large
+                  />
+                </Link>
               ))}
               {/* Bottom 3 small cards */}
               <div className="col-span-2 grid grid-cols-3 gap-3">
                 {SERVICE_CARDS.filter(c => !c.large).map((card) => (
-                  <ServiceCard
-                    key={card.labelKey}
-                    label={tServices(card.labelKey)}
-                    image={card.image}
-                    large={false}
-                  />
+                  <Link key={card.labelKey} href={`/${locale}/${card.slug}`}>
+                    <ServiceCard
+                      label={tServices(card.labelKey)}
+                      image={card.image}
+                      large={false}
+                    />
+                  </Link>
                 ))}
               </div>
             </div>

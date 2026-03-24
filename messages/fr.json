@@ -281,6 +281,30 @@
       "faq2A": "La distance kilométrique, le temps passé dans les embouteillages, et surtout le besoin en main d'œuvre pour les étages.",
       "faq3Q": "Le prix annoncé sur VanZ peut-il changer le jour J ?",
       "faq3A": "Non, si votre description correspondait à la réalité (volume exact, mention des étages), le prix accepté est ferme et définitif."
+    },
+    "demenagementBureaux": {
+      "h1": "Déménagement de bureaux à Tunis — Professionnel et efficace",
+      "metaTitle": "Déménagement Bureaux Tunis | Transfert Entreprise | VanZ",
+      "metaDesc": "Confiez votre transfert d'entreprise à des experts. Déménagement de bureaux à Tunis : mobilier, informatique et archives. Devis gratuit sous 24h.",
+      "heroSubtitle": "Planifiez votre déménagement professionnel avec un minimum d'interruption pour votre activité.",
+      "faq1Q": "Gérez-vous le matériel informatique ?",
+      "faq1A": "Oui, nos chauffeurs partenaires sont habitués au transport de matériel sensible. Nous recommandons un emballage spécifique pour les écrans et serveurs.",
+      "faq2Q": "Déménagez-vous le weekend ?",
+      "faq2A": "Absolument, nous comprenons que les entreprises préfèrent déménager hors des heures de bureau pour ne pas impacter leur productivité.",
+      "faq3Q": "Pouvez-vous fournir une facture ?",
+      "faq3A": "Oui, toutes les prestations entreprises sur VanZ peuvent faire l'objet d'une facturation conforme pour votre comptabilité."
+    },
+    "livraisonExpress": {
+      "h1": "Livraison Express en Tunisie — Vos colis en quelques heures",
+      "metaTitle": "Livraison Express Tunisie | Coursier Rapide | VanZ",
+      "metaDesc": "Besoin d'envoyer un colis en urgence ? Découvrez notre service de livraison express en Tunisie. Coursiers disponibles immédiatement pour vos plis et paquets.",
+      "heroSubtitle": "La solution la plus rapide pour vos envois critiques à travers toute la Tunisie.",
+      "faq1Q": "Quel est le délai de livraison ?",
+      "faq1A": "Pour une livraison urbaine (intra-muros), comptez entre 1h et 3h. Pour une livraison nationale, le colis arrive le jour même.",
+      "faq2Q": "Quels types de colis acceptez-vous ?",
+      "faq2A": "Tout ce qui rentre dans une camionnette ou un utilitaire : du simple pli A4 au palette de marchandises urgente.",
+      "faq3Q": "Le suivi est-il disponible ?",
+      "faq3A": "Oui, vous pouvez suivre la position de votre coursier en temps réel depuis votre espace client VanZ."
     }
   },
   "blog": {
