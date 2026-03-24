@@ -87,24 +87,24 @@ export default function HeroSection() {
             <div className="grid grid-cols-2 gap-3">
               {/* Top 2 large cards */}
               {SERVICE_CARDS.filter(c => c.large).map((card) => (
-                <Link key={card.labelKey} href={`/${locale}/${card.slug}`}>
-                  <ServiceCard
-                    label={tServices(card.labelKey)}
-                    image={card.image}
-                    large
-                  />
-                </Link>
+                <ServiceCard
+                  key={card.labelKey}
+                  label={tServices(card.labelKey)}
+                  image={card.image}
+                  large
+                  href={`/${locale}/${card.slug}`}
+                />
               ))}
               {/* Bottom 3 small cards */}
               <div className="col-span-2 grid grid-cols-3 gap-3">
                 {SERVICE_CARDS.filter(c => !c.large).map((card) => (
-                  <Link key={card.labelKey} href={`/${locale}/${card.slug}`}>
-                    <ServiceCard
-                      label={tServices(card.labelKey)}
-                      image={card.image}
-                      large={false}
-                    />
-                  </Link>
+                  <ServiceCard
+                    key={card.labelKey}
+                    label={tServices(card.labelKey)}
+                    image={card.image}
+                    large={false}
+                    href={`/${locale}/${card.slug}`}
+                  />
                 ))}
               </div>
             </div>
@@ -115,9 +115,9 @@ export default function HeroSection() {
   );
 }
 
-function ServiceCard({ label, image, large }: { label: string; image: string; large: boolean }) {
+function ServiceCard({ label, image, large, href }: { label: string; image: string; large: boolean; href: string }) {
   return (
-    <button className="group relative rounded-2xl overflow-hidden bg-vanz-yellow shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    <Link href={href} className="group relative rounded-2xl overflow-hidden bg-vanz-yellow shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block h-full">
       {/* Image */}
       <div className={`relative w-full ${large ? "aspect-[4/3]" : "aspect-square"}`}>
         <Image
@@ -133,6 +133,6 @@ function ServiceCard({ label, image, large }: { label: string; image: string; la
         <span className="font-semibold text-vanz-navy text-sm truncate">{label}</span>
         <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-vanz-teal group-hover:translate-x-0.5 rtl:rotate-180 transition-all flex-shrink-0" />
       </div>
-    </button>
+    </Link>
   );
 }
