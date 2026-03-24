@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* VanZ Brand Colors */
+  --color-vanz-teal: #38B6FF;
+  --color-vanz-teal-dark: #2BA3E8;
+  --color-vanz-yellow: #F5C800;
+  --color-vanz-yellow-dark: #D4AD00;
+  --color-vanz-navy: #0B1021;
+  --color-vanz-navy-light: #131B36;
+  --color-vanz-ice: #F0F6FA;
+  --color-vanz-green: #22C55E;
+
+  /* Background & Foreground */
+  --color-background: var(--color-vanz-ice);
+  --color-foreground: var(--color-vanz-navy);
+
+  /* Fonts */
+  --font-sans: var(--font-nunito);
+  --font-heading: var(--font-nunito);
+
+  /* Animation durations */
+  --animate-duration-fast: 200ms;
+  --animate-duration-normal: 400ms;
+  --animate-duration-slow: 800ms;
+}
+
+/* Base styles */
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Headings — Nunito rounded for French */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* RTL (Arabic) — Use Cairo for everything */
+[dir="rtl"] {
+  text-align: right;
+  font-family: var(--font-cairo), system-ui, sans-serif;
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+[dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+}
+
+/* ===== Animations ===== */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(43, 191, 223, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(43, 191, 223, 0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ===== Swiper Overrides ===== */
+
+.swiper-pagination-bullet {
+  background: #38B6FF !important;
+  opacity: 0.4;
+  width: 10px;
+  height: 10px;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  width: 28px;
+  border-radius: 5px;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #38B6FF !important;
+  width: 44px !important;
+  height: 44px !important;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px !important;
+  font-weight: 700;
+}
+
+/* Dark theme swiper (for navy bg sections) */
+.swiper-dark .swiper-pagination-bullet {
+  background: #ffffff !important;
+  opacity: 0.4;
+}
+
+.swiper-dark .swiper-pagination-bullet-active {
+  opacity: 1 !important;
+}
+
+/* ===== Scrollbar ===== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-vanz-ice);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #38B6FF;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2BA3E8;
+}
+
+/* ===== Selection ===== */
+
+::selection {
+  background: rgba(56, 182, 255, 0.3);
+  color: var(--color-vanz-navy);
+}
