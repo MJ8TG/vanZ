@@ -16,12 +16,12 @@ export default function Navbar() {
   const [servicesOpen, setServicesOpen] = useState(false);
 
   const services = [
-    { key: "moving", icon: Truck },
-    { key: "furniture", icon: Sofa },
-    { key: "parcel", icon: Package },
-    { key: "intercity", icon: ArrowLeftRight },
-    { key: "office", icon: Building2 },
-    { key: "express", icon: Zap },
+    { key: "moving", icon: Truck, slug: "demenagement-tunis" },
+    { key: "furniture", icon: Sofa, slug: "transport-meuble-tunis" },
+    { key: "parcel", icon: Package, slug: "demenagement-pas-cher" },
+    { key: "intercity", icon: ArrowLeftRight, slug: "livraison-tunis-sfax" },
+    { key: "office", icon: Building2, slug: "demenagement-bureaux" },
+    { key: "express", icon: Zap, slug: "livraison-express" },
   ] as const;
 
   return (
@@ -55,10 +55,10 @@ export default function Navbar() {
 
               {servicesOpen && (
                 <div className="absolute top-full mt-2 ltr:left-0 rtl:right-0 w-64 bg-white rounded-xl shadow-xl shadow-black/10 border border-gray-100 py-2 animate-[fade-in-up_200ms_ease-out]">
-                  {services.map(({ key, icon: Icon }) => (
+                  {services.map(({ key, icon: Icon, slug }) => (
                     <Link
                       key={key}
-                      href={`/${locale}`}
+                      href={`/${locale}/${slug}`}
                       className="flex items-center gap-3 px-4 py-2.5 text-vanz-navy hover:bg-vanz-ice transition-colors duration-150"
                     >
                       <Icon className="w-5 h-5 text-vanz-teal" />
@@ -120,12 +120,15 @@ export default function Navbar() {
             </button>
             {servicesOpen && (
               <div className="ltr:pl-4 rtl:pr-4 space-y-1">
-                {services.map(({ key, icon: Icon }) => (
+                {services.map(({ key, icon: Icon, slug }) => (
                   <Link
                     key={key}
-                    href={`/${locale}`}
+                    href={`/${locale}/${slug}`}
                     className="flex items-center gap-3 px-3 py-2.5 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
-                    onClick={() => setMobileOpen(false)}
+                    onClick={() => {
+                        setMobileOpen(false);
+                        setServicesOpen(false);
+                    }}
                   >
                     <Icon className="w-5 h-5 text-vanz-yellow" />
                     <span className="text-sm">{tServices(key)}</span>

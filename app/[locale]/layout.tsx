@@ -66,6 +66,7 @@ export default async function LocaleLayout({
       lang={locale}
       dir={dir}
       className={`${cairo.variable} ${nunito.variable} ${jakarta.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
