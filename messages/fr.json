@@ -360,5 +360,35 @@
     "confirmDesc": "Votre dossier est en cours de vérification. Nous vous contacterons sous 48h.",
     "pendingBadge": "En cours de vérification",
     "whatsappSupport": "Support WhatsApp"
+  },
+  "invite": {
+    "landingTitle": "Invitation VanZ - 10 TND offerts",
+    "landingDesc": "Rejoignez VanZ aujourd'hui.",
+    "invitedBy": "{name} vous a invité !",
+    "creditValue": "10",
+    "creditCurrency": "TND",
+    "landingBody": "Utilisez le code de {name} lors de votre inscription sur l'application VanZ et recevez 10 TND de crédit pour votre premier transport.",
+    "yourPromoCode": "Votre code promo",
+    "downloadApp": "Télécharger l'App (Bientôt)",
+    "validityNote": "Valable uniquement pour les nouveaux utilisateurs lors de leur première commande.",
+    
+    "dashboardTitle": "Invitez & Gagnez",
+    "clientSubtitle": "Invitez un ami à déménager avec VanZ — vous gagnez tous les deux 10 TND.",
+    "driverSubtitle": "Invitez un ami à utiliser VanZ — gagnez 10 TND sur votre prochain job.",
+    "driverBonus": "Bonus Chauffeurs : Invitez un autre chauffeur → gagnez 20 TND après ses 3 premiers jobs.",
+    "yourCodeLabel": "Votre code de parrainage",
+    "shareWhatsApp": "Partager sur WhatsApp",
+    
+    "referralCodeLabel": "Code de parrainage (Optionnel)",
+    "referralPlaceholder": "ABC12",
+    "signupCTA": "S'inscrire sur le web",
+    
+    "statsTitle": "Vos Statistiques",
+    "statInvited": "Amis inscrits",
+    "statPending": "Bonus en attente",
+    "statEarned": "TND Gagnés",
+    
+    "whatsappShareClient": "Salut ! J'utilise VanZ pour mes déménagements et livraisons. Inscris-toi avec mon code {code} et gagne 10 TND sur ta première commande ! 👉 https://vanz.tn/invite/{code}",
+    "whatsappShareDriver": "Salut ! Rejoins VanZ avec mon code {code}. C'est une super appli pour les transports. Gagne 10 TND sur ton premier trajet ! 👉 https://vanz.tn/invite/{code}"
   }
 }

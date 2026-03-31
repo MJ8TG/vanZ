@@ -5,31 +5,45 @@ import crypto from 'crypto';
 export async function GET(req: Request) {
   try {
     const testId = crypto.randomBytes(4).toString('hex');
-    const clientEmail = `e2e_client_${testId}@test.vanz`;
-    const driverEmail = `e2e_driver_${testId}@test.vanz`;
+    const clientEmail = `e2e_client_permanent@vanz.tn`;
+    const driverEmail = `e2e_driver_permanent@vanz.tn`;
+    const password = "password123";
     
     const logs: string[] = [];
     const pushLog = (msg: string) => { logs.push(msg); console.log(msg); };
 
-    pushLog("[1/5] Registering Mock Identities...");
+    pushLog("[1/5] Preparing Mock Identities...");
     
-    // Auth Signups via Anon Key
-    const { data: authClient, error: cErr } = await supabase.auth.signUp({
-      email: clientEmail,
-      password: "password123",
-      options: { data: { role: 'client', first_name: 'Test', last_name: 'Client', phone: `+21699000${testId.substring(0,3)}` } }
-    });
-    if (cErr) throw new Error("Client Mock Failed: " + cErr.message);
+    // Auth Sign-in or Sign-up
+    let clientId, driverId;
 
-    const { data: authDriver, error: dErr } = await supabase.auth.signUp({
-      email: driverEmail,
-      password: "password123",
-      options: { data: { role: 'driver', first_name: 'Test', last_name: 'Driver', phone: `+21699111${testId.substring(0,3)}` } }
-    });
-    if (dErr) throw new Error("Driver Mock Failed: " + dErr.message);
+    const { data: cAuth, error: cErr } = await supabase.auth.signInWithPassword({ email: clientEmail, password });
+    if (cErr) {
+      pushLog("Registering new client...");
+      const { data: cSign, error: csErr } = await supabase.auth.signUp({
+        email: clientEmail,
+        password,
+        options: { data: { role: 'client', first_name: 'Test', last_name: 'Client', phone: '+21699000001' } }
+      });
+      if (csErr) throw new Error("Client Mock Failed: " + csErr.message);
+      clientId = cSign.user?.id;
+    } else {
+      clientId = cAuth.user?.id;
+    }
 
-    const clientId = authClient.user?.id;
-    const driverId = authDriver.user?.id;
+    const { data: dAuth, error: dErr } = await supabase.auth.signInWithPassword({ email: driverEmail, password });
+    if (dErr) {
+      pushLog("Registering new driver...");
+      const { data: dSign, error: dsErr } = await supabase.auth.signUp({
+        email: driverEmail,
+        password,
+        options: { data: { role: 'driver', first_name: 'Test', last_name: 'Driver', phone: '+21699000002' } }
+      });
+      if (dsErr) throw new Error("Driver Mock Failed: " + dsErr.message);
+      driverId = dSign.user?.id;
+    } else {
+      driverId = dAuth.user?.id;
+    }
 
     pushLog(`✅ Identities Generated. Client: ${clientId} | Driver: ${driverId}`);
 
@@ -89,7 +103,14 @@ export async function GET(req: Request) {
        pushLog(`✅ Job Commission Check executed. Raw calculation logged (Edge Function may be handling differently or pending).`);
     }
 
-    return NextResponse.json({ success: true, logs });
+    return NextResponse.json({ 
+      success: true, 
+      logs,
+      credentials: {
+        client: { email: clientEmail, password: "password123" },
+        driver: { email: driverEmail, password: "password123" }
+      }
+    });
 
   } catch(e: any) {
     return NextResponse.json({ success: false, error: e.message });

@@ -45,3 +45,12 @@ www_anyvan_com.html
 vanz_agent_brief*.html
 push_error.txt
 lint_output.txt
+build_output.txt
+
+# vscode
+.vscode/
+
+# media and temporary images
+*.mp4
+Gemini_Generated_Image_*.png
+image (4).png

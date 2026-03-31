@@ -360,5 +360,35 @@
     "confirmDesc": "ملفك قيد المراجعة. سنتصل بك خلال 48 ساعة.",
     "pendingBadge": "قيد المراجعة",
     "whatsappSupport": "دعم واتساب"
+  },
+  "invite": {
+    "landingTitle": "دعوة VanZ - احصل على 10 د.ت",
+    "landingDesc": "انضم إلى VanZ اليوم.",
+    "invitedBy": "لقد دعاك {name}!",
+    "creditValue": "10",
+    "creditCurrency": "د.ت",
+    "landingBody": "استخدم رمز {name} عند تسجيلك في تطبيق VanZ واحصل على 10 د.ت كرصيد لرحلتك الأولى.",
+    "yourPromoCode": "الرمز الترويجي الخاص بك",
+    "downloadApp": "تحميل التطبيق (قريباً)",
+    "validityNote": "صالح فقط للمستخدمين الجدد في طلبهم الأول.",
+    
+    "dashboardTitle": "ادعُ واربح",
+    "clientSubtitle": "ادعُ صديقاً للنقل مع VanZ — وستربحان معاً 10 د.ت.",
+    "driverSubtitle": "ادعُ صديقاً لاستخدام VanZ — واربح 10 د.ت في طلبك القادم.",
+    "driverBonus": "مكافأة السائقين: ادعُ سائقاً آخر → واربح 20 د.ت بعد أول 3 رحلات له.",
+    "yourCodeLabel": "رمز الدعوة الخاص بك",
+    "shareWhatsApp": "شارك عبر واتساب",
+    
+    "referralCodeLabel": "رمز الإحالة (اختياري)",
+    "referralPlaceholder": "ABC12",
+    "signupCTA": "سجل الآن",
+    
+    "statsTitle": "إحصائياتك",
+    "statInvited": "الأصدقاء المسجلين",
+    "statPending": "مكافأة قيد الانتظار",
+    "statEarned": "د.ت مكتسبة",
+    
+    "whatsappShareClient": "مرحباً! أستخدم VanZ لنقل أغراضي. سجل باستخدام رمزي {code} واحصل على 10 د.ت في طلبك الأول! 👉 https://vanz.tn/invite/{code}",
+    "whatsappShareDriver": "مرحباً! انضم إلى VanZ باستخدام رمزي {code}. إنه تطبيق رائع للنقل. احصل على 10 د.ت في رحلتك الأولى! 👉 https://vanz.tn/invite/{code}"
   }
 }

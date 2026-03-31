@@ -8,6 +8,8 @@ import Step2Identity from "@/components/drivers/Step2Identity";
 import Step3Vehicle from "@/components/drivers/Step3Vehicle";
 import Step4Documents from "@/components/drivers/Step4Documents";
 import Step5Confirmation from "@/components/drivers/Step5Confirmation";
+import { datasql } from "@/lib/datasql";
+import { Loader2 } from "lucide-react";
 
 export interface DriverFormData {
   phone: string;
@@ -26,14 +28,15 @@ export interface DriverFormData {
   color: string;
   plate: string;
   capacity: string;
-  // Files simulated as boolean or strings for now to indicate uploaded status
-  cinFrontUploaded: boolean;
-  cinBackUploaded: boolean;
-  docCarteGrise: boolean;
-  docAssurance: boolean;
-  docPermis: boolean;
-  docVisite: boolean;
-  docVehicle: boolean;
+  // File paths stored as strings after upload to Supabase Storage
+  cinFrontUrl: string;
+  cinBackUrl: string;
+  docCarteGrise: string;
+  docAssurance: string;
+  docPermis: string;
+  docVisite: string;
+  docVehicle: string;
+  appliedReferralCode: string;
 }
 
 const initialData: DriverFormData = {
@@ -53,19 +56,22 @@ const initialData: DriverFormData = {
   color: "",
   plate: "",
   capacity: "",
-  cinFrontUploaded: false,
-  cinBackUploaded: false,
-  docCarteGrise: false,
-  docAssurance: false,
-  docPermis: false,
-  docVisite: false,
-  docVehicle: false,
+  cinFrontUrl: "",
+  cinBackUrl: "",
+  docCarteGrise: "",
+  docAssurance: "",
+  docPermis: "",
+  docVisite: "",
+  docVehicle: "",
+  appliedReferralCode: "",
 };
 
 export default function DriverSignupPage() {
   const t = useTranslations("driverSignup");
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<DriverFormData>(initialData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const steps = [
     t("step1"),
@@ -79,7 +85,40 @@ export default function DriverSignupPage() {
     setFormData((prev) => ({ ...prev, ...fields }));
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  const nextStep = async () => {
+    if (currentStep === 3) {
+      // Logic to submit to backend BEFORE showing confirmation
+      await handleFinalSubmit();
+    } else {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError("");
+    
+    try {
+      const { data: { user } } = await datasql.auth.getUser();
+      if (!user) throw new Error("Vous devez être connecté (Étape 1).");
+
+      const response = await fetch('/api/drivers/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, userId: user.id })
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Une erreur est survenue.");
+
+      setCurrentStep(4); // Move to success step
+    } catch (err: any) {
+      setSubmitError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
   const renderStep = () => {
@@ -109,8 +148,23 @@ export default function DriverSignupPage() {
 
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10">
           <WizardProgress steps={steps} currentStep={currentStep} />
-          <div className="mt-8 transition-all duration-300">
-            {renderStep()}
+          
+          {submitError && (
+             <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-bold animate-in shake">
+               ⚠️ {submitError}
+             </div>
+          )}
+
+          <div className={`mt-8 transition-all duration-300 ${isSubmitting ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
+            {isSubmitting ? (
+               <div className="py-20 flex flex-col items-center justify-center">
+                  <Loader2 className="w-12 h-12 text-vanz-teal animate-spin mb-4" />
+                  <p className="text-vanz-navy font-black text-lg">Envoi de votre dossier...</p>
+                  <p className="text-gray-400 font-medium">Ne fermez pas cette page</p>
+               </div>
+            ) : (
+               renderStep()
+            )}
           </div>
         </div>
       </div>

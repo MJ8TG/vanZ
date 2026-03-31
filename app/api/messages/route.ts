@@ -8,6 +8,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const PHONE_REGEX = /(\+216|00216|0[2-9]\d{7})/;
+const URL_REGEX = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi;
 
 export async function POST(req: Request) {
   try {
@@ -27,8 +28,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Conversation introuvable" }, { status: 404 });
     }
 
-    // 2. Anti-abuse filter logic
-    if (conv.phase === 'pre_bid' && PHONE_REGEX.test(content)) {
+    // 2. Anti-abuse filter logic (No phone/URLs in pre-bid)
+    const isSensitive = PHONE_REGEX.test(content) || URL_REGEX.test(content);
+    if (conv.phase === 'pre_bid' && isSensitive && type === 'text') {
       // Increment violation count directly in DB
       await supabaseAdmin
         .from('conversations')
@@ -36,7 +38,7 @@ export async function POST(req: Request) {
         .eq('id', conversation_id);
 
       return NextResponse.json(
-        { error: "BLOCKED: phone number sharing not allowed before acceptance" }, 
+        { error: "CONTENU BLOQUÉ: Partage de coordonnées non autorisé avant l'acceptation de l'offre." }, 
         { status: 400 }
       );
     }

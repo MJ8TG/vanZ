@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { datasql } from "@/lib/datasql";
-import { Star, MessageCircle, Check } from "lucide-react";
+import { Star, MessageCircle, Check, Loader2, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 export interface Bid {
   id: string;
@@ -20,51 +22,118 @@ export interface Bid {
   };
 }
 
-export default function BidsList({ jobId }: { jobId: string }) {
+interface BidsListProps {
+  jobId: string;
+  clientId: string;
+}
+
+export default function BidsList({ jobId, clientId }: BidsListProps) {
   const [bids, setBids] = useState<Bid[]>([]);
+  const [acceptingBidId, setAcceptingBidId] = useState<string | null>(null);
+  const [acceptedBidId, setAcceptedBidId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const locale = useLocale();
 
   useEffect(() => {
-    // Note: The real-time channel subscription filters precisely to this jobId
+    // Fetch existing bids
+    const fetchBids = async () => {
+      const { data } = await datasql
+        .from('bids')
+        .select('id, amount, note, estimated_duration_minutes, driver_id, status')
+        .eq('job_id', jobId)
+        .eq('status', 'pending')
+        .order('amount', { ascending: true });
+
+      if (data) {
+        // Fetch driver details for each bid
+        const enriched = await Promise.all(data.map(async (bid) => {
+          const { data: driver } = await datasql
+            .from('users')
+            .select('first_name, last_name')
+            .eq('id', bid.driver_id)
+            .single();
+
+          const { data: driverProfile } = await datasql
+            .from('drivers')
+            .select('vehicle_type')
+            .eq('id', bid.driver_id)
+            .single();
+
+          const { data: reviews } = await datasql
+            .from('reviews')
+            .select('stars')
+            .eq('reviewee_id', bid.driver_id);
+
+          const avgRating = reviews && reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.stars, 0) / reviews.length
+            : 4.5;
+
+          return {
+            ...bid,
+            driver: {
+              first_name: driver?.first_name || 'Chauffeur',
+              last_name: driver?.last_name || '',
+              vehicle_type: driverProfile?.vehicle_type || 'Van',
+              rating: Math.round(avgRating * 10) / 10,
+              jobs_count: reviews?.length || 0,
+            }
+          } as Bid;
+        }));
+
+        setBids(enriched);
+      }
+    };
+    fetchBids();
+
+    // Realtime subscription for new bids
     const channel = datasql
       .channel(`public:bids:job_id=eq.${jobId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'bids', filter: `job_id=eq.${jobId}` },
-        (payload) => {
-          // In production, you would fetch the remote joined `driver` relation via ID instead of mocking
-          // Because Realtime payloads only contain the base table (bids) columns.
-          // For UX purposes, we map a mock payload layout.
-          const newBid = {
-            ...payload.new,
+        async (payload) => {
+          const newBidRaw = payload.new;
+
+          // Fetch driver info for the new bid
+          const { data: driver } = await datasql
+            .from('users')
+            .select('first_name, last_name')
+            .eq('id', newBidRaw.driver_id)
+            .single();
+
+          const { data: driverProfile } = await datasql
+            .from('drivers')
+            .select('vehicle_type')
+            .eq('id', newBidRaw.driver_id)
+            .single();
+
+          const newBid: Bid = {
+            ...newBidRaw as any,
             driver: {
-              first_name: "Chauffeur",
-              last_name: payload.new.driver_id ? payload.new.driver_id.substring(0, 4) : "X",
-              vehicle_type: "Camionnette",
-              rating: 4.8, 
-              jobs_count: 15,
+              first_name: driver?.first_name || 'Chauffeur',
+              last_name: driver?.last_name || '',
+              vehicle_type: driverProfile?.vehicle_type || 'Van',
+              rating: 4.8,
+              jobs_count: 0,
             }
-          } as Bid;
+          };
 
           setBids((current) => {
             const updated = [...current, newBid];
-            // Sort by amount ASC (lowest first) automatically
             return updated.sort((a, b) => a.amount - b.amount);
           });
         }
       )
       .subscribe();
 
-    // Critical Cleanup Block to prevent duplicate stacking!
-    return () => { 
-      datasql.removeChannel(channel); 
-    };
+    return () => { datasql.removeChannel(channel); };
   }, [jobId]);
 
-  // Exact Badge Condition: lowest amount + rating >= 4.5 + jobs_count >= 10
+  // "Meilleure offre" badge logic
   const isBest = (bid: Bid) => {
     if (bids.length === 0) return false;
     const lowestAmount = Math.min(...bids.map(b => b.amount));
-    
     return (
       bid.amount === lowestAmount &&
       bid.driver.rating >= 4.5 &&
@@ -72,13 +141,73 @@ export default function BidsList({ jobId }: { jobId: string }) {
     );
   };
 
+  // Accept bid handler
+  const handleAcceptBid = async (bid: Bid) => {
+    setAcceptingBidId(bid.id);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/jobs/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_id: jobId,
+          bid_id: bid.id,
+          client_id: clientId
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de l'acceptation.");
+      }
+
+      setAcceptedBidId(bid.id);
+
+      // Redirect to messages after 2 seconds
+      setTimeout(() => {
+        if (data.data?.conversation_id) {
+          router.push(`/${locale}/messages?conv=${data.data.conversation_id}`);
+        } else {
+          router.push(`/${locale}/messages`);
+        }
+      }, 2000);
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setAcceptingBidId(null);
+    }
+  };
+
+  if (acceptedBidId) {
+    const accepted = bids.find(b => b.id === acceptedBidId);
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center"
+      >
+        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h3 className="text-xl font-black text-green-800 mb-2">Offre Acceptée !</h3>
+        <p className="text-green-600 font-medium mb-1">
+          {accepted?.driver.first_name} {accepted?.driver.last_name} — {accepted?.amount} TND
+        </p>
+        <p className="text-sm text-green-500 animate-pulse font-bold mt-4">
+          Redirection vers la discussion...
+        </p>
+      </motion.div>
+    );
+  }
+
   if (bids.length === 0) {
     return (
       <div className="p-8 text-center bg-gray-50 border border-gray-100 rounded-2xl flex flex-col items-center justify-center">
         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 animate-pulse">
           <Star className="w-6 h-6 text-gray-300" />
         </div>
-        <p className="text-gray-500 font-medium">En attente d'offres...</p>
+        <p className="text-gray-500 font-medium">En attente d&apos;offres...</p>
         <p className="text-sm text-gray-400 mt-1">Les offres des chauffeurs apparaîtront ici en temps réel.</p>
       </div>
     );
@@ -86,9 +215,16 @@ export default function BidsList({ jobId }: { jobId: string }) {
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="bg-red-50 text-red-600 border border-red-100 p-4 rounded-xl text-sm font-medium">
+          {error}
+        </div>
+      )}
+
       <AnimatePresence>
         {bids.map((bid) => {
           const best = isBest(bid);
+          const isAccepting = acceptingBidId === bid.id;
           
           return (
             <motion.div
@@ -130,13 +266,21 @@ export default function BidsList({ jobId }: { jobId: string }) {
 
               {bid.note && (
                 <p className="text-gray-600 text-sm mb-5 bg-white p-3 rounded-xl border border-gray-100 italic">
-                  "{bid.note}"
+                  &quot;{bid.note}&quot;
                 </p>
               )}
 
               <div className="flex items-center gap-3 mt-2">
-                <button className="flex-1 bg-vanz-teal hover:bg-[#20A8C5] text-white font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow active:scale-[0.98] flex items-center justify-center gap-2">
-                  <Check className="w-5 h-5" /> Accepter
+                <button 
+                  onClick={() => handleAcceptBid(bid)}
+                  disabled={isAccepting || !!acceptingBidId}
+                  className="flex-1 bg-vanz-teal hover:bg-[#20A8C5] text-white font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAccepting ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Acceptation...</>
+                  ) : (
+                    <><Check className="w-5 h-5" /> Accepter</>
+                  )}
                 </button>
                 <button className="bg-vanz-ice hover:bg-gray-200 text-vanz-navy font-semibold py-3 px-6 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 border border-transparent hover:border-gray-300">
                   <MessageCircle className="w-5 h-5" /> Message

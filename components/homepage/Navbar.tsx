@@ -3,9 +3,12 @@
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X, ChevronDown, Truck, Package, Building2, Zap, ArrowLeftRight, Sofa } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, ChevronDown, Truck, Package, Building2, Zap, ArrowLeftRight, Sofa, MessageCircle, ClipboardList } from "lucide-react";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import MessageBell from "@/components/chat/MessageBell";
+import { datasql } from "@/lib/datasql";
+
 
 export default function Navbar() {
   const t = useTranslations("nav");
@@ -14,6 +17,22 @@ export default function Navbar() {
   const otherLocale = locale === "fr" ? "ar" : "fr";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isDriver, setIsDriver] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await datasql.auth.getUser();
+      if (user) {
+        setIsSignedIn(true);
+        // Check if driver
+        const { data: profile } = await datasql.from('users').select('role').eq('id', user.id).single();
+        if (profile?.role === 'driver') setIsDriver(true);
+      }
+    };
+    checkAuth();
+  }, []);
+
 
   const services = [
     { key: "moving", icon: Truck, slug: "demenagement-tunis" },
@@ -69,22 +88,39 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Login */}
-            <Link href={`/${locale}/download`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200">{t("login")}</Link>
+            {/* Auth Links / Dashboard */}
+            {isSignedIn ? (
+              <div className="flex items-center gap-2">
+                {isDriver && (
+                  <Link href={`/${locale}/chauffeur/missions`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200">
+                    Trouver une mission
+                  </Link>
+                )}
+                <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
+                  Mes Missions
+                </Link>
+              </div>
+            ) : (
+              <>
+                <Link href={`/${locale}/login`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200">{t("login")}</Link>
+                <Link
+                  href={`/${locale}/signup`}
+                  className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200"
+                >
+                  S'inscrire
+                </Link>
+              </>
+            )}
 
-            {/* Become Driver */}
-            <Link
-              href={`/${locale}/devenir-chauffeur`}
-              className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200"
-            >
-              {t("becomeDriver")}
-            </Link>
+
+            {/* Message Bell */}
+            <MessageBell />
 
             {/* Notification Bell */}
             <NotificationBell />
 
             {/* Post Job CTA */}
-            <Link href={`/${locale}/download`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-semibold text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30">{t("postJob")}</Link>
+            <Link href={`/${locale}/nouveau-job`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-semibold text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30">{t("postJob")}</Link>
 
             {/* Language Toggle */}
             <Link
@@ -137,18 +173,55 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Links */}
-            <Link href={`/${locale}/download`} className="block px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors" onClick={() => setMobileOpen(false)}>{t("login")}</Link>
-            <Link
-              href={`/${locale}/devenir-chauffeur`}
-              className="block px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
-              {t("becomeDriver")}
+            {/* Messages */}
+            <Link href={`/${locale}/messages`} className="flex items-center gap-3 px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors" onClick={() => setMobileOpen(false)}>
+              <MessageCircle className="w-5 h-5 text-vanz-yellow" />
+              Messages
             </Link>
 
+            {/* Auth Links / Dashboard */}
+            {isSignedIn ? (
+              <>
+                {isDriver && (
+                  <Link
+                    href={`/${locale}/chauffeur/missions`}
+                    className="flex items-center gap-3 px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Truck className="w-5 h-5 text-vanz-yellow" />
+                    Trouver une mission
+                  </Link>
+                )}
+                <Link
+                  href={`/${locale}/mes-missions`}
+                  className="flex items-center gap-3 px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <ClipboardList className="w-5 h-5 text-vanz-yellow" />
+                  Mes Missions
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href={`/${locale}/login`}
+                  className="block px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {t("login")}
+                </Link>
+                <Link
+                  href={`/${locale}/signup`}
+                  className="block px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  S'inscrire
+                </Link>
+              </>
+            )}
+
             {/* CTA */}
-            <Link href={`/${locale}/download`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-bold text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>{t("postJob")}</Link>
+            <Link href={`/${locale}/nouveau-job`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-bold text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>{t("postJob")}</Link>
 
             {/* Language */}
             <Link

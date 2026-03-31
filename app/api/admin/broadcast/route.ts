@@ -41,7 +41,6 @@ async function sendPush(supabase: any, user_id: string, title: string, body: str
 }
 
 export async function POST(req: Request) {
-  const supabase = supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

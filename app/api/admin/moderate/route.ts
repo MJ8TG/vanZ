@@ -22,7 +22,6 @@ async function sendSms(to: string, body: string) {
 }
 
 export async function POST(req: Request) {
-  const supabase = supabase;
 
   // Auth Guard
   const { data: { user } } = await supabase.auth.getUser();

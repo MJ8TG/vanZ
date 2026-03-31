@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { DriverFormData } from "@/app/[locale]/devenir-chauffeur/page";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { datasql as supabase } from "@/lib/datasql";
 
 interface Props {
   data: DriverFormData;
@@ -13,9 +15,40 @@ interface Props {
 }
 
 export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Props) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onNext();
+    setLoading(true);
+    setError("");
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Session expirée. Veuillez recommencer.");
+
+      const { error: driverError } = await supabase
+        .from('drivers')
+        .update({
+          vehicle_type: data.vehicleType,
+          vehicle_brand: data.brand,
+          vehicle_model: data.model,
+          vehicle_year: parseInt(data.year),
+          vehicle_color: data.color,
+          vehicle_plate: data.plate,
+          vehicle_capacity: parseInt(data.capacity)
+        })
+        .eq('id', user.id);
+
+      if (driverError) throw driverError;
+
+      onNext();
+    } catch (err: any) {
+      console.error(err);
+      setError("Erreur lors de l'enregistrement du véhicule.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const vehicleTypes = [
@@ -27,6 +60,11 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto animate-in slide-in-from-right-4 fade-in duration-300">
+      {error && (
+        <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-medium rounded-r-lg">
+          {error}
+        </div>
+      )}
       
       {/* Vehicle Type Radio */}
       <div>
@@ -36,7 +74,7 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             <label
               key={type.id}
               htmlFor={`vehicle-${type.id}`}
-              className={`cursor-pointer border-2 rounded-xl p-3 text-center transition-all ${
+              className={`cursor-pointer border-2 rounded-xl p-3 text-center transition-all ${loading ? 'opacity-50 pointer-events-none' : ''} ${
                 data.vehicleType === type.id
                   ? "border-vanz-teal bg-vanz-teal/10 text-vanz-navy font-bold"
                   : "border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100"
@@ -51,6 +89,7 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
                 onChange={(e) => updateData({ vehicleType: e.target.value })}
                 className="hidden"
                 required
+                disabled={loading}
               />
               <span className="text-sm block">{type.label}</span>
             </label>
@@ -65,9 +104,10 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             id="vehicle-brand"
             type="text"
             required
+            disabled={loading}
             value={data.brand}
             onChange={(e) => updateData({ brand: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none disabled:opacity-50"
           />
         </div>
         <div>
@@ -76,9 +116,10 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             id="vehicle-model"
             type="text"
             required
+            disabled={loading}
             value={data.model}
             onChange={(e) => updateData({ model: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none disabled:opacity-50"
           />
         </div>
         <div>
@@ -89,9 +130,10 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             min="1990"
             max={new Date().getFullYear() + 1}
             required
+            disabled={loading}
             value={data.year}
             onChange={(e) => updateData({ year: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none disabled:opacity-50"
           />
         </div>
         <div>
@@ -99,9 +141,10 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
           <input
             id="vehicle-color"
             type="text"
+            disabled={loading}
             value={data.color}
             onChange={(e) => updateData({ color: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none disabled:opacity-50"
           />
         </div>
         <div>
@@ -110,11 +153,12 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             id="vehicle-plate"
             type="text"
             required
+            disabled={loading}
             pattern="[0-9]{1,3}\s?(TN|تونس)\s?[0-9]{1,4}"
             placeholder={t("platePlaceholder")}
             value={data.plate}
             onChange={(e) => updateData({ plate: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none uppercase font-semibold tracking-wider"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none uppercase font-semibold tracking-wider disabled:opacity-50"
           />
         </div>
         <div>
@@ -123,11 +167,12 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
             id="vehicle-capacity"
             type="number"
             required
+            disabled={loading}
             min="100"
             max="10000"
             value={data.capacity}
             onChange={(e) => updateData({ capacity: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-vanz-teal outline-none disabled:opacity-50"
           />
         </div>
       </div>
@@ -136,17 +181,23 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 py-3.5 bg-gray-100 text-vanz-navy font-bold rounded-xl hover:bg-gray-200 transition-all flex justify-center items-center gap-2"
+          disabled={loading}
+          className="flex-1 py-3.5 bg-gray-100 text-vanz-navy font-bold rounded-xl hover:bg-gray-200 transition-all flex justify-center items-center gap-2 disabled:opacity-50"
         >
           <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           {t("back")}
         </button>
         <button
           type="submit"
-          className="flex-1 py-3.5 bg-vanz-yellow text-vanz-navy font-bold rounded-xl hover:brightness-105 transition-all flex justify-center items-center gap-2"
+          disabled={loading || !data.vehicleType || !data.brand || !data.model || !data.year || !data.plate || !data.capacity}
+          className="flex-1 py-3.5 bg-vanz-yellow text-vanz-navy font-bold rounded-xl hover:brightness-105 transition-all flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-vanz-yellow/10"
         >
-          {t("next")}
-          <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+            <>
+              {t("next")}
+              <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+            </>
+          )}
         </button>
       </div>
     </form>

@@ -21,5 +21,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return (
+    <html lang="fr" className={`${cairo.variable} ${jakarta.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
+        {children}
+      </body>
+    </html>
+  );
 }

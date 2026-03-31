@@ -1,7 +1,7 @@
 "use client";
 
 import { DriverFormData } from "@/app/[locale]/devenir-chauffeur/page";
-import { CheckCircle, MessageCircle } from "lucide-react";
+import { CheckCircle, MessageCircle, Clock, ShieldCheck, MapPin, Truck } from "lucide-react";
 
 interface Props {
   data: DriverFormData;
@@ -10,61 +10,80 @@ interface Props {
   t: any;
 }
 
-export default function Step5Confirmation({ data, onBack, t }: Props) {
-  // In a real scenario, this step should perhaps trigger the API call on load,
-  // or the previous step's onSubmit would trigger the API call before moving here.
-  // For now, it's a visual confirmation.
-
+export default function Step5Confirmation({ data, t }: Props) {
   return (
-    <div className="max-w-md mx-auto text-center animate-in zoom-in-95 fade-in duration-500 py-8">
+    <div className="max-w-xl mx-auto text-center animate-in zoom-in-95 fade-in duration-700 py-12">
       
-      <div className="flex justify-center mb-6">
-        <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-4 ring-8 ring-green-50">
-          <CheckCircle className="w-10 h-10" />
+      <div className="flex justify-center mb-8 relative">
+        <div className="absolute inset-0 bg-vanz-teal/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
+        <div className="relative w-24 h-24 bg-vanz-teal text-white rounded-full flex items-center justify-center mb-4 ring-8 ring-vanz-teal/10 shadow-xl shadow-vanz-teal/20">
+          <CheckCircle className="w-12 h-12" />
         </div>
       </div>
       
-      <h2 className="text-2xl font-black text-vanz-navy mb-3">
-        {t("confirmTitle")}
+      <h2 className="text-3xl font-black text-vanz-navy mb-4">
+        {t("confirmTitle") || "Candidature Envoyée !"}
       </h2>
       
-      <p className="text-gray-600 mb-8 px-4 text-base leading-relaxed">
-        {t("confirmDesc")}
+      <p className="text-gray-600 mb-10 px-6 text-lg leading-relaxed max-w-lg mx-auto">
+        {t("confirmDesc") || "Merci pour votre inscription. Notre équipe examine actuellement vos documents. Vous recevrez une notification d'ici 24-48h."}
       </p>
 
-      <div className="bg-vanz-ice rounded-2xl p-6 mb-8 text-left border border-vanz-teal/20">
-        <div className="flex items-center justify-between font-bold text-sm mb-4">
-          <span className="text-vanz-navy uppercase tracking-wider">Status:</span>
-          <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs">
-            {t("pendingBadge")}
-          </span>
-        </div>
-        
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between border-b pb-2">
-            <span className="text-gray-500">{t("phone")}:</span>
-            <span className="font-semibold text-vanz-navy">+216 {data.phone}</span>
+      <div className="grid grid-cols-1 gap-4 mb-10 text-left">
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-vanz-navy/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <ShieldCheck className="w-24 h-24 text-vanz-navy" />
           </div>
-          <div className="flex justify-between border-b pb-2">
-            <span className="text-gray-500">{t("firstName")} {t("lastName")}:</span>
-            <span className="font-semibold text-vanz-navy">{data.firstName} {data.lastName}</span>
+          
+          <div className="flex items-center justify-between font-bold text-sm mb-8">
+            <div className="flex items-center gap-2 text-vanz-navy">
+              <Clock className="w-5 h-5 text-vanz-teal" />
+              <span className="uppercase tracking-widest text-xs">Statut du Dossier</span>
+            </div>
+            <span className="bg-vanz-yellow/20 text-vanz-navy px-4 py-1.5 rounded-full text-xs font-black border border-vanz-yellow/30 animate-pulse">
+              {t("pendingBadge") || "EN ATTENTE"}
+            </span>
           </div>
-          <div className="flex justify-between border-b pb-2">
-            <span className="text-gray-500">{t("vehicleType")}:</span>
-            <span className="font-semibold text-vanz-navy">{data.vehicleType}</span>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-tighter text-gray-400 font-bold flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> Ville
+              </span>
+              <p className="font-bold text-vanz-navy text-base">{data.city}</p>
+            </div>
+            
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-tighter text-gray-400 font-bold flex items-center gap-1">
+                <Truck className="w-3 h-3" /> Véhicule
+              </span>
+              <p className="font-bold text-vanz-navy text-base">{data.brand} {data.model}</p>
+            </div>
+
+            <div className="space-y-1 md:col-span-2 pt-2 border-t border-gray-50">
+              <span className="text-[10px] uppercase tracking-tighter text-gray-400 font-bold">Identité</span>
+              <p className="font-bold text-vanz-navy text-base">{data.firstName} {data.lastName}</p>
+              <p className="text-sm text-gray-500 font-medium">+216 {data.phone}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <a
-        href={`https://wa.me/21655123456?text=Bonjour, je viens de soumettre mon dossier chauffeur sur VanZ. Mon numéro est le ${data.phone}.`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full bg-[#25D366] text-white font-bold py-4 rounded-xl hover:brightness-105 active:scale-95 transition-all flex justify-center items-center gap-2 shadow-lg shadow-green-500/20"
-      >
-        <MessageCircle className="w-5 h-5" />
-        {t("whatsappSupport")}
-      </a>
+      <div className="space-y-4">
+        <a
+          href={`https://wa.me/21655123456?text=Bonjour, je viens de soumettre mon dossier chauffeur sur VanZ. Mon numéro est le ${data.phone}.`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl hover:brightness-105 active:scale-95 transition-all flex justify-center items-center gap-3 shadow-xl shadow-green-500/20 group"
+        >
+          <MessageCircle className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+          {t("whatsappSupport") || "Contacter le support WhatsApp"}
+        </a>
+        
+        <p className="text-[11px] text-gray-400 font-medium">
+          Réf: DRV-{data.phone.slice(-4)}-{new Date().getFullYear()}
+        </p>
+      </div>
       
     </div>
   );

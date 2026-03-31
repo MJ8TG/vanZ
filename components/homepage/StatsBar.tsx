@@ -46,9 +46,9 @@ export default function StatsBar() {
   const t = useTranslations("stats");
 
   const stats = [
-    { icon: Truck, value: 500, prefix: "+", suffix: "", label: t("jobs"), isDecimal: false },
-    { icon: Users, value: 80, prefix: "+", suffix: "", label: t("drivers"), isDecimal: false },
-    { icon: Star, value: 4.8, prefix: "", suffix: "★", label: t("rating"), isDecimal: true },
+    { icon: Truck, value: 2500, prefix: "+", suffix: "", label: t("jobs"), isDecimal: false },
+    { icon: Users, value: 850, prefix: "+", suffix: "", label: t("drivers"), isDecimal: false },
+    { icon: Star, value: 4.9, prefix: "", suffix: "★", label: t("rating"), isDecimal: true },
     { icon: Percent, value: 30, prefix: "", suffix: "%", label: t("savings"), isDecimal: false },
   ];
 

@@ -34,7 +34,7 @@ export default function AdminDisputes() {
            delivery_photo_url, receipt_url, client_id, accepted_bid_id, 
            users!jobs_client_id_fkey(first_name, last_name, phone)
         ),
-        opener:users!disputes_opener_id_fkey(first_name, last_name, role)
+        opener:users!disputes_opened_by_fkey(first_name, last_name, role)
       `)
       .order('created_at', { ascending: true }); // Oldest first as requested
 
@@ -108,7 +108,12 @@ export default function AdminDisputes() {
       // Update resolution logically terminating case globally
       await supabase.from('disputes').update({
         status: 'resolved',
-        resolution_notes: resolutionDesc
+        resolution: actionDef.action === 'refund_client' ? 'refund' : 
+                    actionDef.action === 'deduct_driver' ? 'deduct' :
+                    actionDef.action === 'warn_user' ? 'warn' :
+                    actionDef.action === 'suspend' ? 'suspend' : 'dismiss',
+        resolution_notes: resolutionDesc,
+        resolved_at: new Date().toISOString(),
       }).eq('id', selectedDispute.id);
 
       alert(`Action ${actionDef.label} exécutée avec succès !`);

@@ -62,17 +62,10 @@ export default async function LocaleLayout({
   const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html
-      lang={locale}
-      dir={dir}
-      className={`${cairo.variable} ${nunito.variable} ${jakarta.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <div dir={dir} className="contents" suppressHydrationWarning>
+        {children}
+      </div>
+    </NextIntlClientProvider>
   );
 }

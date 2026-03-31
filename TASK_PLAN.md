@@ -139,14 +139,14 @@
 - [x] Client bid display: sorted by price ASC, "Meilleure offre" badge for best, sort by price/rating/time
 - [x] 48h auto-expiry for jobs with no accepted bid
 
-### [ ] 2.3 Messaging System
-- [ ] Two-phase chat: pre-bid (text + quick replies only) → post-acceptance (all types enabled)
-- [ ] Message types: text, voice (WebM/MP4), photo (JPEG/PNG 5MB), location (lat/lng), system
-- [ ] System messages auto-injected on: bid received, bid accepted, payment set, driver en route, driver arrived, job completed
-- [ ] 9 quick replies (bilingual FR + AR), contextual by phase + sender_type
-- [ ] **Anti-abuse**: phone number regex filter in pre-bid, block WhatsApp/Telegram handles, flag after 3 violations
-- [ ] Supabase Realtime subscriptions for messages INSERT + bids INSERT
-- [ ] Payment agreement flow in chat after bid acceptance
+### [x] 2.3 Messaging System ✅
+- [x] Two-phase chat: pre-bid (text + quick replies only) → post-acceptance (all types enabled)
+- [x] Message types: text, voice (WebM/MP4), photo (JPEG/PNG 5MB), location (lat/lng), system
+- [x] System messages auto-injected on: bid received, bid accepted, payment set, driver en route, driver arrived, job completed
+- [x] 9 quick replies (bilingual FR + AR), contextual by phase + sender_type
+- [x] **Anti-abuse**: phone number regex filter in pre-bid, block WhatsApp/Telegram handles, flag after 3 violations
+- [x] Supabase Realtime subscriptions for messages INSERT + bids INSERT
+- [x] Payment agreement flow in chat after bid acceptance
 
 ### [ ] 2.4 Supabase Edge Functions
 - [ ] `driver-status-change` — on INSERT (pending) alert admin SMS, on UPDATE (approved) SMS driver, on UPDATE (rejected) SMS with reason

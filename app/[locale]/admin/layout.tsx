@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { datasql as supabase } from '@/lib/datasql';
 import Link from 'next/link';
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
-import { LayoutDashboard, Users, UserCog, Briefcase, Ticket, HandCoins, Send, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, Users, UserCog, Briefcase, Ticket, HandCoins, Send, LogOut, Loader2, AlertTriangle, Truck } from "lucide-react";
+
+const IS_DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 
 export default function AdminLayout({
   children,
@@ -13,51 +15,88 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
   
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState('');
+  const [isDevBypass, setIsDevBypass] = useState(false);
+
+  // If we're on the login page, just render children directly (no auth check)
+  const isLoginPage = pathname?.includes('/admin/login');
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/admin/login');
-        return;
-      }
-
-      const { data: adminUser } = await supabase
-        .from('admin_users')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (!adminUser || adminUser.role !== 'admin') {
-        await supabase.auth.signOut();
-        router.push('/admin/login');
-        return;
-      }
-
-      setUserEmail(user.email || '');
+    if (isLoginPage) {
       setLoading(false);
+      return;
+    }
+
+    // Dev mode: skip Supabase auth entirely
+    if (IS_DEV_MODE) {
+      setUserEmail('dev@vanz.tn');
+      setIsDevBypass(true);
+      setLoading(false);
+      return;
+    }
+
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push(`/${locale}/admin/login`);
+          return;
+        }
+
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (!adminUser || adminUser.role !== 'admin') {
+          await supabase.auth.signOut();
+          router.push(`/${locale}/admin/login`);
+          return;
+        }
+
+        setUserEmail(user.email || '');
+        setLoading(false);
+      } catch (err) {
+        console.error('Admin auth check failed:', err);
+        if (IS_DEV_MODE) {
+          setUserEmail('dev@vanz.tn');
+          setIsDevBypass(true);
+          setLoading(false);
+        } else {
+          router.push(`/${locale}/admin/login`);
+        }
+      }
     };
     checkAuth();
-  }, [router]);
+  }, [router, locale, isLoginPage]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/admin/login');
+    if (!IS_DEV_MODE) {
+      await supabase.auth.signOut();
+    }
+    router.push(`/${locale}/admin/login`);
   };
 
   const navLinks = [
-    { href: `/admin`, icon: LayoutDashboard, label: "Métriques" },
-    { href: `/admin/jobs`, icon: Briefcase, label: "Missions" },
-    { href: `/admin/users`, icon: Users, label: "Utilisateurs" },
-    { href: `/admin/promos`, icon: Ticket, label: "Codes Promo" },
-    { href: `/admin/withdrawals`, icon: HandCoins, label: "Paiements" },
-    { href: `/admin/notifications`, icon: Send, label: "Marketing" },
-    { href: `/admin/system`, icon: UserCog, label: "Système" }
+    { href: `/${locale}/admin`, icon: LayoutDashboard, label: "Métriques" },
+    { href: `/${locale}/admin/jobs`, icon: Briefcase, label: "Missions" },
+    { href: `/${locale}/admin/drivers`, icon: Truck, label: "Chauffeurs" },
+    { href: `/${locale}/admin/users`, icon: Users, label: "Utilisateurs" },
+    { href: `/${locale}/admin/promos`, icon: Ticket, label: "Codes Promo" },
+    { href: `/${locale}/admin/withdrawals`, icon: HandCoins, label: "Paiements" },
+    { href: `/${locale}/admin/notifications`, icon: Send, label: "Marketing" },
+    { href: `/${locale}/admin/system`, icon: UserCog, label: "Système" }
   ];
+
+  // Login page renders without sidebar
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#051E3C]"><Loader2 className="w-8 h-8 text-vanz-teal animate-spin" /></div>;
@@ -92,6 +131,12 @@ export default function AdminLayout({
       </aside>
 
       <main className="flex-1 flex flex-col min-h-screen">
+        {isDevBypass && (
+          <div className="bg-amber-500 text-amber-950 text-center text-xs font-bold py-1.5 px-4 flex items-center justify-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5" />
+            MODE DÉVELOPPEMENT — Auth Supabase désactivée. Définir NEXT_PUBLIC_DEV_MODE=false pour activer.
+          </div>
+        )}
         <header className="bg-white border-b border-gray-200 h-16 flex items-center px-8 shadow-sm">
           <h1 className="text-lg font-bold text-gray-800">Console Administration</h1>
           <div className="ml-auto flex items-center gap-4">
