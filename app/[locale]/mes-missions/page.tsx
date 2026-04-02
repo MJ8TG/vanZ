@@ -11,7 +11,7 @@ import ReportIssueModal from '@/components/jobs/ReportIssueModal';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { DeliveryProofUpload } from '@/components/jobs/DeliveryProofUpload';
 import { 
-  Package, MapPin, CalendarDays, Loader2, Navigation, MessageCircle, Star, FileText, CheckCircle2, AlertTriangle, X
+  Package, MapPin, CalendarDays, Loader2, Navigation, MessageCircle, Star, FileText, CheckCircle2, AlertTriangle, X, Truck
 } from 'lucide-react';
 
 export default function MesMissionsPage() {
@@ -20,6 +20,7 @@ export default function MesMissionsPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<'client' | 'driver' | null>(null);
   const [activeTab, setActiveTab] = useState<'open' | 'active' | 'completed'>('open');
 
   const [disputeModalOpen, setDisputeModalOpen] = useState(false);
@@ -38,39 +39,51 @@ export default function MesMissionsPage() {
       }
       setUserId(user.id);
 
-      // Find jobs where user is either client OR driver
-      const { data: userBids } = await datasql
-        .from('bids')
-        .select('job_id')
-        .eq('driver_id', user.id);
+      // Fetch Profile to get Role
+      const { data: profile } = await datasql.from('users').select('role').eq('id', user.id).single();
+      const userRole = profile?.role || 'client';
+      setRole(userRole);
+
+      // Find jobs based on role
+      let jobsData = [];
+      let jobsErr = null;
+
+      if (userRole === 'client') {
+        const { data, error } = await datasql
+          .from('jobs')
+          .select(`
+            id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_budget, client_id, created_at, accepted_bid_id, driver_payout,
+            reviews(id, reviewer_id, stars),
+            bids:bids(id, amount, status, driver_id, driver:users(first_name, last_name, phone_number, vehicle_type, rating))
+          `)
+          .eq('client_id', user.id)
+          .order('created_at', { ascending: false });
+        jobsData = data || [];
+        jobsErr = error;
+      } else {
+        // Driver View: Jobs I bid on OR jobs I'm assigned to
+        const { data: userBids } = await datasql.from('bids').select('job_id').eq('driver_id', user.id);
+        const biddedJobIds = userBids?.map(b => b.job_id) || [];
         
-      const biddedJobIds = userBids?.map(b => b.job_id) || [];
-      const orQuery = biddedJobIds.length > 0 
-        ? `client_id.eq.${user.id},id.in.(${biddedJobIds.join(',')})`
-        : `client_id.eq.${user.id}`;
+        const { data, error } = await datasql
+          .from('jobs')
+          .select(`
+            id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_budget, client_id, created_at, accepted_bid_id, driver_payout,
+            reviews(id, reviewer_id, stars),
+            bids:bids(id, amount, status, driver_id, driver:users(first_name, last_name, phone_number, vehicle_type, rating))
+          `)
+          .or(`id.in.(${biddedJobIds.length > 0 ? biddedJobIds.join(',') : '""'}),accepted_bid_id.is.not.null`) // Fallback to avoid empty IN clause
+          .order('created_at', { ascending: false });
+          
+        // Filter to only show if driver has a bid or is the accepted driver
+        jobsData = (data || []).filter(j => 
+            biddedJobIds.includes(j.id) || 
+            j.bids?.some((b: any) => b.id === j.accepted_bid_id && b.driver_id === user.id)
+        );
+        jobsErr = error;
+      }
 
-      const { data: jobsData, error } = await datasql
-        .from('jobs')
-        .select(`
-          id, 
-          status, 
-          service_type, 
-          pickup_address, 
-          dropoff_address, 
-          scheduled_at, 
-          client_budget, 
-          client_id,
-          created_at,
-          accepted_bid_id,
-          driver_payout,
-          reviews(id, reviewer_id, stars),
-          bids:bids(
-            id, amount, status, driver_id, driver:users(first_name, last_name, phone_number, vehicle_type, rating) )
-        `)
-        .or(orQuery)
-        .order('created_at', { ascending: false });
-
-      if (!error && jobsData) {
+      if (!jobsErr) {
         setJobs(jobsData);
       }
       setLoading(false);
@@ -146,62 +159,92 @@ export default function MesMissionsPage() {
       
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-black text-vanz-navy">Tableau de bord</h1>
-            <p className="text-gray-500 font-medium mt-1">Gérez vos missions et vos offres</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+          <div className="flex items-center gap-4">
+             <div className="w-16 h-16 bg-vanz-teal/10 rounded-[1.5rem] flex items-center justify-center">
+                 {role === 'driver' ? <Truck className="w-8 h-8 text-vanz-teal" /> : <Package className="w-8 h-8 text-vanz-teal" />}
+             </div>
+             <div>
+                <h1 className="text-3xl font-black text-vanz-navy">
+                  {role === 'driver' ? 'Espace Chauffeur' : 'Mes Expéditions'}
+                </h1>
+                <p className="text-gray-500 font-medium">
+                  {role === 'driver' ? 'Gérez vos gains et missions' : 'Suivez vos demandes de transport'}
+                </p>
+             </div>
           </div>
-          <button 
-            onClick={() => router.push(`/${locale}/nouveau-job`)}
-            className="px-6 py-3 bg-vanz-yellow text-vanz-navy font-bold rounded-xl shadow-md hover:scale-105 transition-transform"
-          >
-            + Nouvelle Mission
-          </button>
+          {role === 'client' ? (
+            <button 
+              onClick={() => router.push(`/${locale}/nouveau-job`)}
+              className="px-6 py-4 bg-vanz-yellow text-vanz-navy font-black rounded-2xl shadow-lg shadow-vanz-yellow/20 hover:scale-105 transition-all flex items-center gap-2"
+            >
+              + Nouvelle Annonce
+            </button>
+          ) : (
+            <button 
+              onClick={() => router.push(`/${locale}/chauffeur/missions`)}
+              className="px-6 py-4 bg-vanz-navy text-white font-black rounded-2xl shadow-lg shadow-vanz-navy/20 hover:scale-105 transition-all flex items-center gap-2"
+            >
+              🚚 Marché des Missions
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
-        <div className="flex p-1 bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 w-full md:w-max">
+        <div className="flex p-1 bg-white rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 mb-10 w-full overflow-x-auto">
           <button
             onClick={() => setActiveTab('open')}
-            className={`flex-1 md:px-8 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'open' ? 'bg-vanz-navy text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+            className={`flex-1 min-w-[120px] px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'open' ? 'bg-vanz-navy text-white shadow-xl' : 'text-gray-400 hover:text-vanz-navy hover:bg-gray-50'
             }`}
           >
-            Ouvertes 
+            {role === 'driver' ? '🏷️ Mes Offres' : '📣 Ouvertes'}
             {jobs.filter(j => j.status === 'open').length > 0 && (
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs">{jobs.filter(j => j.status === 'open').length}</span>
+              <span className="px-2 py-0.5 rounded-full bg-vanz-yellow text-vanz-navy text-[10px] font-black">{jobs.filter(j => j.status === 'open').length}</span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('active')}
-            className={`flex-1 md:px-8 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'active' ? 'bg-vanz-teal text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+            className={`flex-1 min-w-[120px] px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'active' ? 'bg-vanz-teal text-white shadow-xl' : 'text-gray-400 hover:text-vanz-teal hover:bg-gray-50'
             }`}
           >
-            En Cours
+            ⚡ En Cours
             {jobs.filter(j => ['matched', 'in_progress'].includes(j.status)).length > 0 && (
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs">{jobs.filter(j => ['matched', 'in_progress'].includes(j.status)).length}</span>
+              <span className="px-2 py-0.5 rounded-full bg-white text-vanz-teal text-[10px] font-black">{jobs.filter(j => ['matched', 'in_progress'].includes(j.status)).length}</span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('completed')}
-            className={`flex-1 md:px-8 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'completed' ? 'bg-vanz-navy text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+            className={`flex-1 min-w-[120px] px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'completed' ? 'bg-vanz-navy text-white shadow-xl' : 'text-gray-400 hover:text-vanz-navy hover:bg-gray-50'
             }`}
           >
-            Historique
+            📁 Historique
           </button>
         </div>
 
         {/* Jobs List */}
         <div className="space-y-6">
           {filteredJobs.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-sm">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="w-10 h-10 text-gray-300" />
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 p-16 text-center shadow-sm">
+              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+                {role === 'driver' ? '🚚' : '📦'}
               </div>
-              <h3 className="text-xl font-black text-vanz-navy mb-2">Aucune mission ici</h3>
-              <p className="text-gray-500 font-medium">Vous n'avez pas de missions dans cette catégorie.</p>
+              <h3 className="text-2xl font-black text-vanz-navy mb-3">Aucune mission ici</h3>
+              <p className="text-gray-500 font-medium max-w-xs mx-auto mb-8">
+                {role === 'driver' 
+                  ? "Vous n'avez pas encore d'offres en cours. Allez sur le marché pour trouver du travail !"
+                  : "Vous n'avez pas encore publié d'annonces dans cette catégorie."}
+              </p>
+              {role === 'driver' && (
+                 <button 
+                   onClick={() => router.push(`/${locale}/chauffeur/missions`)}
+                   className="px-8 py-4 bg-vanz-teal text-white font-black rounded-2xl shadow-lg shadow-vanz-teal/20 hover:scale-105 transition-all"
+                 >
+                   Voir le Marché des Missions
+                 </button>
+              )}
             </div>
           ) : (
             filteredJobs.map((job) => (

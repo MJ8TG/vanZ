@@ -39,6 +39,7 @@ async function generateReferralCode(firstName: string): Promise<string> {
 }
 
 function SignupForm() {
+  const [role, setRole] = useState<'client' | 'driver'>("client");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -82,7 +83,7 @@ function SignupForm() {
           firstName: "Test",
           lastName: "User",
           phone: testPhone,
-          role: "client"
+          role: role
         })
       });
       
@@ -151,7 +152,7 @@ function SignupForm() {
         last_name: lastName,
         phone: formattedPhone,
         email: email,
-        role: "client",
+        role: role,
         referral_code: referralCode,
       });
 
@@ -208,11 +209,34 @@ function SignupForm() {
         <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden p-8 animate-in fade-in slide-in-from-bottom-8 duration-500 border border-gray-100">
            
           <div className="flex flex-col items-center mb-8">
-             <div className="w-16 h-16 bg-vanz-yellow/10 text-vanz-yellow rounded-full flex items-center justify-center mb-4">
-                 <UserPlus className="w-8 h-8" />
-             </div>
              <h1 className="text-3xl font-black text-vanz-navy">Créer un compte</h1>
-             <p className="text-sm font-medium text-gray-400 mt-2">Rejoignez VanZ en tant que Client</p>
+             <p className="text-sm font-medium text-gray-400 mt-2">
+               {role === 'client' ? 'Rejoignez VanZ en tant que Client' : 'Rejoignez VanZ en tant que Chauffeur'}
+             </p>
+          </div>
+
+          {/* Role Selection Toggle */}
+          <div className="flex p-1 bg-gray-50 rounded-2xl border-2 border-gray-100 mb-8 w-full">
+            <button
+              type="button"
+              onClick={() => setRole('client')}
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                role === 'client' ? 'bg-vanz-navy text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
+              }`}
+            >
+              <ArrowRight className={`w-4 h-4 transition-transform ${role === 'client' ? 'rotate-0' : '-rotate-45 opacity-0'}`} />
+              📦 Client
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('driver')}
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                role === 'driver' ? 'bg-vanz-teal text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
+              }`}
+            >
+              <ArrowRight className={`w-4 h-4 transition-transform ${role === 'driver' ? 'rotate-0' : '-rotate-45 opacity-0'}`} />
+              🚚 Chauffeur
+            </button>
           </div>
 
           {error && (

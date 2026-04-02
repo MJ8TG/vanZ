@@ -91,13 +91,17 @@ export default function Navbar() {
             {/* Auth Links / Dashboard */}
             {isSignedIn ? (
               <div className="flex items-center gap-2">
-                {isDriver && (
-                  <Link href={`/${locale}/chauffeur/missions`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200">
-                    Trouver une mission
+                {isDriver ? (
+                  <Link href={`/${locale}/chauffeur/missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+                    <Truck className="w-4 h-4" /> Le Marché
+                  </Link>
+                ) : (
+                  <Link href={`/${locale}/nouveau-job`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+                    <Package className="w-4 h-4" /> Publier Job
                   </Link>
                 )}
-                <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
-                  Mes Missions
+                <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
+                  Tableau de bord
                 </Link>
               </div>
             ) : (
@@ -112,15 +116,22 @@ export default function Navbar() {
               </>
             )}
 
-
             {/* Message Bell */}
             <MessageBell />
 
             {/* Notification Bell */}
             <NotificationBell />
 
-            {/* Post Job CTA */}
-            <Link href={`/${locale}/nouveau-job`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-semibold text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30">{t("postJob")}</Link>
+            {/* Role-Specific Primary CTA */}
+            {isDriver ? (
+              <Link href={`/${locale}/chauffeur/missions`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
+                 🚚 Marché des Missions
+              </Link>
+            ) : (
+              <Link href={`/${locale}/nouveau-job`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
+                {isSignedIn ? '📦 Publier un job' : '🚀 Devenir Chauffeur'}
+              </Link>
+            )}
 
             {/* Language Toggle */}
             <Link
@@ -220,8 +231,16 @@ export default function Navbar() {
               </>
             )}
 
-            {/* CTA */}
-            <Link href={`/${locale}/nouveau-job`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-bold text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>{t("postJob")}</Link>
+            {/* Role-Specific Primary CTA Mobile */}
+            {isDriver ? (
+              <Link href={`/${locale}/chauffeur/missions`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
+                🚚 Marché des Missions
+              </Link>
+            ) : (
+              <Link href={`/${locale}/nouveau-job`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
+                 {isSignedIn ? '📦 Publier un job' : '🚀 Devenir Chauffeur'}
+              </Link>
+            )}
 
             {/* Language */}
             <Link
