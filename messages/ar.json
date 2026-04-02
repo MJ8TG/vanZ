@@ -84,7 +84,19 @@
   "reviews": {
     "title": "ماذا يقول عملاؤنا",
     "star": "نجمة",
-    "stars": "نجوم"
+    "stars": "نجوم",
+    "modalTitle": "شكراً لثقتكم بنا!",
+    "modalSubtitle": "كيف كانت تجربتك في النقل مع {name}؟",
+    "rateDriver": "قيم سائقك",
+    "placeholder": "كلمة قصيرة عن التجربة (اختياري)...",
+    "submit": "إرسال التقييم",
+    "skip": "لاحقاً",
+    "tagsTitle": "ما الذي أعجبك بشكل خاص؟",
+    "tagPunctual": "منضبط",
+    "tagCareful": "حريص",
+    "tagCommunicative": "متواصل جيد",
+    "tagProfessional": "محترف",
+    "success": "شكراً لك! تقييمك يساعد مجتمع VanZ."
   },
   "cities": {
     "title": "متوفر في كل أنحاء تونس",

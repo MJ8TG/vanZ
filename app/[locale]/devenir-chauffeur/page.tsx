@@ -72,6 +72,7 @@ export default function DriverSignupPage() {
   const [formData, setFormData] = useState<DriverFormData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [driverStatus, setDriverStatus] = useState<"pending" | "approved">("pending");
 
   const steps = [
     t("step1"),
@@ -111,6 +112,7 @@ export default function DriverSignupPage() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Une erreur est survenue.");
 
+      setDriverStatus(result.status || "pending");
       setCurrentStep(4); // Move to success step
     } catch (err: any) {
       setSubmitError(err.message);
@@ -132,7 +134,7 @@ export default function DriverSignupPage() {
       case 3:
         return <Step4Documents data={formData} updateData={updateData} onNext={nextStep} onBack={prevStep} t={t} />;
       case 4:
-        return <Step5Confirmation data={formData} onBack={prevStep} t={t} />;
+        return <Step5Confirmation data={formData} onBack={prevStep} t={t} status={driverStatus} />;
       default:
         return null;
     }

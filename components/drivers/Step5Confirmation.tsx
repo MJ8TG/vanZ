@@ -2,15 +2,18 @@
 
 import { DriverFormData } from "@/app/[locale]/devenir-chauffeur/page";
 import { CheckCircle, MessageCircle, Clock, ShieldCheck, MapPin, Truck } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface Props {
   data: DriverFormData;
   onBack: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
+  status?: "pending" | "approved";
 }
 
-export default function Step5Confirmation({ data, t }: Props) {
+export default function Step5Confirmation({ data, t, status }: Props) {
+  const locale = useLocale();
   return (
     <div className="max-w-xl mx-auto text-center animate-in zoom-in-95 fade-in duration-700 py-12">
       
@@ -22,11 +25,17 @@ export default function Step5Confirmation({ data, t }: Props) {
       </div>
       
       <h2 className="text-3xl font-black text-vanz-navy mb-4">
-        {t("confirmTitle") || "Candidature Envoyée !"}
+        {status === 'approved' 
+          ? "Compte Activé !" 
+          : (t("confirmTitle") || "Candidature Envoyée !")
+        }
       </h2>
       
       <p className="text-gray-600 mb-10 px-6 text-lg leading-relaxed max-w-lg mx-auto">
-        {t("confirmDesc") || "Merci pour votre inscription. Notre équipe examine actuellement vos documents. Vous recevrez une notification d'ici 24-48h."}
+        {status === 'approved'
+          ? "Félicitations ! Votre compte est prêt. Vous pouvez dès maintenant consulter les missions disponibles."
+          : (t("confirmDesc") || "Merci pour votre inscription. Notre équipe examine actuellement vos documents. Vous recevrez une notification d'ici 24-48h.")
+        }
       </p>
 
       <div className="grid grid-cols-1 gap-4 mb-10 text-left">
@@ -40,9 +49,13 @@ export default function Step5Confirmation({ data, t }: Props) {
               <Clock className="w-5 h-5 text-vanz-teal" />
               <span className="uppercase tracking-widest text-xs">Statut du Dossier</span>
             </div>
-            <span className="bg-vanz-yellow/20 text-vanz-navy px-4 py-1.5 rounded-full text-xs font-black border border-vanz-yellow/30 animate-pulse">
-              {t("pendingBadge") || "EN ATTENTE"}
-            </span>
+            <span className={`px-4 py-1.5 rounded-full text-xs font-black border animate-pulse ${
+                status === 'approved' 
+                  ? 'bg-green-50 text-green-700 border-green-200' 
+                  : 'bg-vanz-yellow/20 text-vanz-navy border-vanz-yellow/30'
+              }`}>
+               {status === 'approved' ? "APPROUVÉ ✅" : (t("pendingBadge") || "EN ATTENTE")}
+             </span>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
@@ -70,15 +83,24 @@ export default function Step5Confirmation({ data, t }: Props) {
       </div>
 
       <div className="space-y-4">
-        <a
-          href={`https://wa.me/21655123456?text=Bonjour, je viens de soumettre mon dossier chauffeur sur VanZ. Mon numéro est le ${data.phone}.`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl hover:brightness-105 active:scale-95 transition-all flex justify-center items-center gap-3 shadow-xl shadow-green-500/20 group"
-        >
-          <MessageCircle className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-          {t("whatsappSupport") || "Contacter le support WhatsApp"}
-        </a>
+         {status === 'approved' ? (
+           <a
+             href={`/${locale}/mes-missions`}
+             className="w-full bg-vanz-teal text-white font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all flex justify-center items-center gap-3 shadow-xl shadow-vanz-teal/20"
+           >
+             Accéder à mon tableau de bord 🚚
+           </a>
+         ) : (
+           <a
+             href={`https://wa.me/21655123456?text=Bonjour, je viens de soumettre mon dossier chauffeur sur VanZ. Mon numéro est le ${data.phone}.`}
+             target="_blank"
+             rel="noopener noreferrer"
+             className="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl hover:brightness-105 active:scale-95 transition-all flex justify-center items-center gap-3 shadow-xl shadow-green-500/20 group"
+           >
+             <MessageCircle className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+             {t("whatsappSupport") || "Contacter le support WhatsApp"}
+           </a>
+         )}
         
         <p className="text-[11px] text-gray-400 font-medium">
           Réf: DRV-{data.phone.slice(-4)}-{new Date().getFullYear()}

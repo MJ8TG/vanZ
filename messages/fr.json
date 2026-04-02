@@ -84,7 +84,19 @@
   "reviews": {
     "title": "Ce que disent nos clients",
     "star": "étoile",
-    "stars": "étoiles"
+    "stars": "étoiles",
+    "modalTitle": "Merci pour votre confiance !",
+    "modalSubtitle": "Comment s'est passé votre transport avec {name} ?",
+    "rateDriver": "Notez votre chauffeur",
+    "placeholder": "Un petit mot sur l'expérience (optionnel)...",
+    "submit": "Envoyer l'avis",
+    "skip": "Plus tard",
+    "tagsTitle": "Qu'avez-vous particulièrement apprécié ?",
+    "tagPunctual": "Ponctuel",
+    "tagCareful": "Soigneux",
+    "tagCommunicative": "Communicatif",
+    "tagProfessional": "Professionnel",
+    "success": "Merci ! Votre avis aide la communauté VanZ."
   },
   "cities": {
     "title": "Disponible dans toute la Tunisie",

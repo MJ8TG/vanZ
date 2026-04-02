@@ -57,6 +57,57 @@ function SignupForm() {
   const router = useRouter();
   const locale = useLocale();
 
+  const handleTestFill = async () => {
+    setFirstName("Test");
+    setLastName("User");
+    const testEmail = `test_${Math.floor(Math.random() * 1000)}@vanz.tn`;
+    const testPassword = "Password123!";
+    const testPhone = "55123456";
+    
+    setEmail(testEmail);
+    setPhone(testPhone);
+    setPassword(testPassword);
+    
+    setLoading(true);
+    setError("");
+    
+    try {
+      // 1. Force Signup via Admin API
+      const response = await fetch("/api/dev/force-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: testEmail,
+          password: testPassword,
+          firstName: "Test",
+          lastName: "User",
+          phone: testPhone,
+          role: "client"
+        })
+      });
+      
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.error || "Force Signup Failed");
+      
+      // 2. Auto-Login with the newly created account
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: testEmail,
+        password: testPassword
+      });
+      
+      if (signInErr) throw signInErr;
+      
+      // 3. Success! Redirect to dashboard
+      router.push(`/${locale}/mes-missions`);
+      
+    } catch (err: any) {
+      console.error("Force Signup Bypass failed:", err);
+      setError("Bypass failed: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -138,7 +189,13 @@ function SignupForm() {
       router.push(`/${locale}/mes-missions`);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Impossible de créer le compte pour le moment.");
+      
+      // Specifically handle Supabase rate limit errors
+      if (err.message?.toLowerCase().includes("rate limit") || err.code === "over_rate_limit") {
+        setError("Trop de tentatives. Veuillez patienter environ 60 secondes pour des raisons de sécurité.");
+      } else {
+        setError(err.message || "Impossible de créer le compte pour le moment.");
+      }
     } finally {
       setLoading(false);
     }
@@ -293,8 +350,17 @@ function SignupForm() {
                 </>
               )}
             </button>
-          </form>
 
+            {process.env.NODE_ENV === 'development' && (
+              <button
+                type="button"
+                onClick={handleTestFill}
+                className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-2xl border-2 border-dashed border-gray-300 hover:bg-gray-200 transition-colors text-sm"
+              >
+                ⚡ Remplissage Test (Dev Only)
+              </button>
+            )}
+          </form>
           <p className="mt-8 text-center text-sm font-medium text-gray-500">
             Vous avez déjà un compte ?{' '}
             <Link href={`/${locale}/login`} className="text-vanz-yellow hover:text-vanz-navy font-bold transition-colors underline decoration-2 underline-offset-4 decoration-vanz-yellow/30 hover:decoration-vanz-navy">

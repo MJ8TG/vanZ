@@ -18,6 +18,52 @@ export default function LoginPage() {
   const router = useRouter();
   const locale = useLocale();
 
+  const handleTestFill = async () => {
+    const testEmail = "test@vanz.tn";
+    const testPassword = "Password123!";
+    
+    setEmail(testEmail);
+    setPassword(testPassword);
+    setLoading(true);
+    setError("");
+
+    try {
+      // 1. First, try to FORCE create/confirm the account (Dev Only)
+      // This ensures the login works even if the user wasn't registered yet
+      await fetch("/api/dev/force-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: testEmail,
+          password: testPassword,
+          firstName: "Dev",
+          lastName: "Tester",
+          phone: "00000000",
+          role: "client"
+        })
+      });
+
+      // 2. Now perform the standard login
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: testEmail,
+        password: testPassword,
+      });
+
+      if (signInErr) throw signInErr;
+
+      // 3. Success!
+      router.push(`/${locale}/mes-missions`);
+
+    } catch (err: any) {
+      console.error("Test login bypass failed:", err);
+      // Even if signup fails (already exists), standard login proceeds via next tick if we didn't push.
+      // But we just pushed if successful or errored. 
+      setError("Bypass failed: " + (err.message || "Unknown error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -35,7 +81,7 @@ export default function LoginPage() {
         // Redirect to user dashboard after successful login
         router.push(`/${locale}/mes-missions`);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("Les identifiants fournis sont incorrects."); // Safe user message
     } finally {
       setLoading(false);
@@ -112,6 +158,16 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {process.env.NODE_ENV === "development" && (
+              <button
+                type="button"
+                onClick={handleTestFill}
+                className="w-full bg-gray-50 text-vanz-navy font-bold py-3 rounded-2xl border-2 border-dashed border-gray-200 hover:bg-gray-100 transition-colors text-sm"
+              >
+                ⚡ Compte de Test (Dev Only)
+              </button>
+            )}
           </form>
 
           <p className="mt-8 text-center text-sm font-medium text-gray-500">

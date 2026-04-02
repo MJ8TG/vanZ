@@ -97,8 +97,8 @@ export async function POST(req: Request) {
         doc_permis: docPermis,
         doc_visite_technique: docVisite,
         
-        // Initial Status
-        status: 'pending' 
+        // Initial Status - Auto-approve on local development
+        status: process.env.NODE_ENV === 'development' ? 'approved' : 'pending' 
       });
 
     if (driverError) {
@@ -126,7 +126,10 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true, 
+      status: process.env.NODE_ENV === 'development' ? 'approved' : 'pending' 
+    });
   } catch (err: any) {
     console.error('[API_DRIVER_SIGNUP]', err);
     return NextResponse.json({ error: err.message || "Erreur lors de l'inscription." }, { status: 500 });
