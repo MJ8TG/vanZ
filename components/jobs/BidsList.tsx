@@ -54,13 +54,13 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
             .from('users')
             .select('first_name, last_name')
             .eq('id', bid.driver_id)
-            .single();
+            .maybeSingle();
 
           const { data: driverProfile } = await datasql
             .from('drivers')
             .select('vehicle_type')
             .eq('id', bid.driver_id)
-            .single();
+            .maybeSingle();
 
           const { data: reviews } = await datasql
             .from('reviews')
@@ -102,13 +102,13 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
             .from('users')
             .select('first_name, last_name')
             .eq('id', newBidRaw.driver_id)
-            .single();
+            .maybeSingle();
 
           const { data: driverProfile } = await datasql
             .from('drivers')
             .select('vehicle_type')
             .eq('id', newBidRaw.driver_id)
-            .single();
+            .maybeSingle();
 
           const newBid: Bid = {
             ...newBidRaw as any,

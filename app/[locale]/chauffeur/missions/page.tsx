@@ -70,6 +70,19 @@ export default function DriverFeedPage() {
         setLoading(false);
         return;
       }
+
+      // 🚨 Protect Route: Only fully registered and APPROVED drivers can access the market
+      const { data: driverAcc } = await datasql
+        .from('drivers')
+        .select('status')
+        .eq('id', user.id)
+        .single();
+
+      if (!driverAcc || driverAcc.status !== 'approved') {
+        router.push(`/${locale}/chauffeur/signup`);
+        return;
+      }
+
       setIsDriver(true);
       if (profile?.city) setDriverCity(profile.city);
       fetchJobs(user.id, locationFilter, radiusKm, driverCoords, profile?.city);

@@ -1,7 +1,7 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const frPath = 'c:/Users/user/Desktop/vanZ/messages/fr.json';
-const arPath = 'c:/Users/user/Desktop/vanZ/messages/ar.json';
+const frPath = './messages/fr.json';
+const arPath = './messages/ar.json';
 
 const fr = JSON.parse(fs.readFileSync(frPath, 'utf8'));
 const ar = JSON.parse(fs.readFileSync(arPath, 'utf8'));

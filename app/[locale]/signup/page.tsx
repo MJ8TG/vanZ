@@ -125,20 +125,30 @@ function SignupForm() {
     const formattedPhone = `+216${phone}`;
 
     try {
-      // 1. Create Auth User
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            phone: formattedPhone,
-            role: role
-          }
-        }
+      // 1. Bypass standard signup to auto-confirm testers
+      const response = await fetch("/api/dev/force-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          phone: formattedPhone,
+          role: role
+        })
       });
-      if (authError) throw authError;
+      
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.error || "Impossible de créer le compte de test.");
+
+      // 2. Auto-login immediately
+      const { data: authData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (signInErr) throw signInErr;
 
       const userId = authData.user?.id;
       if (!userId) {

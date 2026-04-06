@@ -40,6 +40,18 @@ export default function DriverDashboardPage() {
            router.push(`/${locale}/mes-missions`);
            return;
         }
+
+        // 🚨 Protect Route: Only fully registered and APPROVED drivers can access the Dashboard
+        const { data: driverAcc } = await datasql
+          .from('drivers')
+          .select('status')
+          .eq('id', user.id)
+          .single();
+
+        if (!driverAcc || driverAcc.status !== 'approved') {
+          router.push(`/${locale}/chauffeur/signup`);
+          return;
+        }
         
         setProfile(userProfile);
 

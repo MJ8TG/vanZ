@@ -1,0 +1,118 @@
+﻿
+> vanz@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.2.1 (Turbopack)
+- Environments: .env.local
+
+node.exe : ÔÜá The 
+"middleware" file 
+convention is deprecated. 
+Please use "proxy" 
+instead. Learn more: https:
+//nextjs.org/docs/messages/
+middleware-to-proxy
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:\
+Users\user\AppData\Roaming\
+n ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (ÔÜá  
+   The "middle...leware-   
+ to-proxy:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 19.1s
+  Running TypeScript ...
+  Finished TypeScript in 23.4s ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/15) ...
+  Generating static pages using 11 workers (3/15) 
+  Generating static pages using 11 workers (7/15) 
+  Generating static pages using 11 workers (11/15) 
+Ô£ô Generating static pages using 11 workers (15/15) in 609ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /_not-found
+Ôö£ ãÆ /[locale]
+Ôö£ ÔùÅ /[locale]/[slug]
+Ôö£ ãÆ /[locale]/accord-chauffeur
+Ôö£ ãÆ /[locale]/admin
+Ôö£ ãÆ /[locale]/admin/chauffeurs
+Ôö£ ãÆ /[locale]/admin/disputes
+Ôö£ ãÆ /[locale]/admin/drivers
+Ôö£ ãÆ /[locale]/admin/jobs
+Ôö£ ãÆ /[locale]/admin/login
+Ôö£ ãÆ /[locale]/admin/notifications
+Ôö£ ãÆ /[locale]/admin/promos
+Ôö£ ãÆ /[locale]/admin/system
+Ôö£ ãÆ /[locale]/admin/users
+Ôö£ ãÆ /[locale]/admin/withdrawals
+Ôö£ ãÆ /[locale]/blog
+Ôö£ ÔùÅ /[locale]/blog/[slug]
+Ôö£ ãÆ /[locale]/chauffeur/dashboard
+Ôö£ ãÆ /[locale]/chauffeur/missions
+Ôö£ ãÆ /[locale]/chauffeur/tracker/[jobId]
+Ôö£ ãÆ /[locale]/conditions-utilisation
+Ôö£ ãÆ /[locale]/cookies
+Ôö£ ãÆ /[locale]/devenir-chauffeur
+Ôö£ ãÆ /[locale]/download
+Ôö£ ãÆ /[locale]/invite/[code]
+Ôö£ ãÆ /[locale]/login
+Ôö£ ãÆ /[locale]/mes-missions
+Ôö£ ãÆ /[locale]/messages
+Ôö£ ãÆ /[locale]/nouveau-job
+Ôö£ ãÆ /[locale]/politique-annulation
+Ôö£ ãÆ /[locale]/politique-confidentialite
+Ôö£ ãÆ /[locale]/profil
+Ôö£ ãÆ /[locale]/profil/invite
+Ôö£ ãÆ /[locale]/signup
+Ôö£ ãÆ /[locale]/suivi/[jobId]
+Ôö£ ãÆ /[locale]/test-login
+Ôö£ ãÆ /api/admin/broadcast
+Ôö£ ãÆ /api/admin/drivers/moderate
+Ôö£ ãÆ /api/admin/moderate
+Ôö£ ãÆ /api/bids/create
+Ôö£ ãÆ /api/dev/force-signup
+Ôö£ ãÆ /api/drivers/signup
+Ôö£ ãÆ /api/jobs/accept
+Ôö£ ãÆ /api/jobs/complete
+Ôö£ ãÆ /api/jobs/payment-method
+Ôö£ ãÆ /api/jobs/update-status
+Ôö£ ãÆ /api/messages
+Ôöö ãÆ /api/test-e2e
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ÔùÅ  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ãÆ  (Dynamic)  server-rendered on demand
+
+
+> vanz@0.1.0 postbuild
+> next-sitemap
+
+Ô£¿ [next-sitemap] Loading next-sitemap config: file:///C:/Users/user/Desktop/vanZ/next-sitemap.config.js
+Ô£à [next-sitemap] Generation completed
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé (index)       Ôöé Values Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé indexSitemaps Ôöé 1      Ôöé
+Ôöé sitemaps      Ôöé 0      Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö┤ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+-----------------------------------------------------
+ SITEMAP INDICES 
+-----------------------------------------------------
+
+   Ôùï https://vanz.tn/sitemap.xml
+
+
