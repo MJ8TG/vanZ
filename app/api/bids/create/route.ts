@@ -48,6 +48,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Vous avez déjà fait une offre pour cette mission.' }, { status: 409 });
     }
 
+    // 2.5 Auto-create drivers profile if missing (Testing phase safety net)
+    const { data: driverProfile } = await supabase
+      .from('drivers')
+      .select('id')
+      .eq('id', driver_id)
+      .maybeSingle();
+
+    if (!driverProfile) {
+      const dummyPlate = `TEST-${Math.floor(1000 + Math.random() * 9000)}-TN`;
+      const dummyCin = `123${Math.floor(10000 + Math.random() * 90000)}`;
+      await supabase.from('drivers').insert({
+        id: driver_id,
+        cin_number: dummyCin,
+        cin_expiry: '2030-01-01',
+        date_of_birth: '1990-01-01',
+        vehicle_type: 'van',
+        vehicle_plate: dummyPlate,
+        status: 'approved'
+      });
+    }
+
     // 3. Create the bid
     const { data: newBid, error: insertErr } = await supabase
       .from('bids')

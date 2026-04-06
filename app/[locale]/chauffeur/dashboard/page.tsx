@@ -41,17 +41,17 @@ export default function DriverDashboardPage() {
            return;
         }
 
-        // 🚨 Protect Route: Only fully registered and APPROVED drivers can access the Dashboard
-        const { data: driverAcc } = await datasql
-          .from('drivers')
-          .select('status')
-          .eq('id', user.id)
-          .single();
-
-        if (!driverAcc || driverAcc.status !== 'approved') {
-          router.push(`/${locale}/signup`);
-          return;
-        }
+        // 🚨 TESTING PHASE: Driver approval check disabled for beta testing
+        // const { data: driverAcc } = await datasql
+        //   .from('drivers')
+        //   .select('status')
+        //   .eq('id', user.id)
+        //   .single();
+        //
+        // if (!driverAcc || driverAcc.status !== 'approved') {
+        //   router.push(`/${locale}/signup`);
+        //   return;
+        // }
         
         setProfile(userProfile);
 
