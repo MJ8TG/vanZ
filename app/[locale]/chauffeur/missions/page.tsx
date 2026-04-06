@@ -79,7 +79,7 @@ export default function DriverFeedPage() {
         .single();
 
       if (!driverAcc || driverAcc.status !== 'approved') {
-        router.push(`/${locale}/chauffeur/signup`);
+        router.push(`/${locale}/signup`);
         return;
       }
 
