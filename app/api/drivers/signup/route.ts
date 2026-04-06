@@ -97,8 +97,8 @@ export async function POST(req: Request) {
         doc_permis: docPermis,
         doc_visite_technique: docVisite,
         
-        // Initial Status - Auto-approve on local development
-        status: process.env.NODE_ENV === 'development' ? 'approved' : 'pending' 
+        // TESTING PHASE: Auto-approve all drivers
+        status: 'approved'
       });
 
     if (driverError) {
@@ -128,7 +128,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      status: process.env.NODE_ENV === 'development' ? 'approved' : 'pending' 
+      status: 'approved'
     });
   } catch (err: any) {
     console.error('[API_DRIVER_SIGNUP]', err);

@@ -56,49 +56,21 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Session expirée. Veuillez recommencer.");
-
-      // 1. Update Users table
-      const { error: userError } = await supabase
-        .from('users')
-        .update({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          city: data.city,
-          role: 'driver'
-        })
-        .eq('id', user.id);
-
-      if (userError) throw userError;
-
-      // 2. Initial Upsert in Drivers table
-      const { error: driverError } = await supabase
-        .from('drivers')
-        .upsert({
-          id: user.id,
-          cin_number: data.cin,
-          cin_expiry: data.cinExpiry,
-          date_of_birth: data.dob,
-          cin_front_url: data.cinFrontUrl,
-          cin_back_url: data.cinBackUrl,
-          status: 'pending'
-        });
-
-      if (driverError) throw driverError;
-
-      onNext();
-    } catch (err: unknown) {
-      console.error(err);
-      setError("Erreur lors de l'enregistrement. Veuillez vérifier vos informations.");
-    } finally {
-      setLoading(false);
+    // Validate all required fields before proceeding
+    if (!data.firstName || !data.lastName || !data.city || !data.cin || !data.dob || !data.cinExpiry) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
     }
+
+    if (!data.cinFrontUrl || !data.cinBackUrl) {
+      setError("Veuillez télécharger les deux côtés de votre CIN.");
+      return;
+    }
+
+    // All good — proceed to next step (no DB writes here, Step4's API handles it all)
+    onNext();
   };
 
   return (
