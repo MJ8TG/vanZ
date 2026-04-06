@@ -38,12 +38,20 @@ export default function AddressAutocomplete({
     suggestions: { status, data },
     setValue: setInputValue,
     clearSuggestions,
+    init,
   } = usePlacesAutocomplete({
     requestOptions: {
       componentRestrictions: { country: "tn" }, // Restrict to Tunisia
     },
     debounce: 300,
+    initOnMount: false,
   });
+
+  useEffect(() => {
+    if (isLoaded) {
+      init();
+    }
+  }, [isLoaded, init]);
 
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
