@@ -463,9 +463,6 @@
     "titleDriver": "فضاء السائق",
     "subtitleClient": "تتبع طلبات النقل الخاصة بك",
     "subtitleDriver": "أدر أرباحك ومهامك",
-    "actions": {
-      "newAd": "إعلان جديد"
-    },
     "tabs": {
       "open": "مفتوحة",
       "myOffers": "عروضي",
