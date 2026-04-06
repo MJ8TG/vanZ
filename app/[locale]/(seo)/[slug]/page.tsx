@@ -1,13 +1,17 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 import { seoPagesConfig, getSeoPageConfig } from "@/data/seoPages";
 import FaqSection from "@/components/seo/FaqSection";
 import JsonLd from "@/components/seo/JsonLd";
 
-export async function generateStaticParams() {
-  return seoPagesConfig.map((config) => ({
-    slug: config.slug,
-  }));
+export function generateStaticParams() {
+  return routing.locales.flatMap((locale) => 
+    seoPagesConfig.map((config) => ({
+      locale,
+      slug: config.slug,
+    }))
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string, slug: string }> }) {
@@ -31,12 +35,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function SeoPage({ params }: { params: Promise<{ locale: string, slug: string }> }) {
-  const resolvedParams = await params;
-  const config = getSeoPageConfig(resolvedParams.slug);
+  const { locale, slug } = await params;
+  
+  // Enable static rendering
+  setRequestLocale(locale);
+
+  const config = getSeoPageConfig(slug);
   if (!config) notFound();
   
-  const t = await getTranslations({ locale: resolvedParams.locale, namespace: `seoPages.${config.translationKey}` });
-  const tCta = await getTranslations({ locale: resolvedParams.locale, namespace: "cta" });
+  const t = await getTranslations({ locale: locale, namespace: `seoPages.${config.translationKey}` });
+  const tCta = await getTranslations({ locale: locale, namespace: "cta" });
   
   const faqItems = [
     { question: t("faq1Q"), answer: t("faq1A") },

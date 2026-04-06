@@ -1,5 +1,5 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Cairo, Nunito, Plus_Jakarta_Sans } from "next/font/google";
@@ -27,7 +27,11 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: any }> }) {
   const resolvedParams = await params;
   try {
     const t = await getTranslations({ locale: resolvedParams.locale, namespace: 'metadata' });
@@ -55,6 +59,9 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  
+  // Enable static rendering
+  setRequestLocale(locale);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

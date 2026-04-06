@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import WizardProgress from "@/components/drivers/WizardProgress";
 import Step1Phone from "@/components/drivers/Step1Phone";
@@ -66,7 +66,7 @@ const initialData: DriverFormData = {
   appliedReferralCode: "",
 };
 
-export default function DriverSignupPage() {
+function DriverSignupForm() {
   const t = useTranslations("driverSignup");
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<DriverFormData>(initialData);
@@ -171,5 +171,17 @@ export default function DriverSignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DriverSignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-vanz-ice pt-20">
+        <Loader2 className="w-12 h-12 text-vanz-teal animate-spin" />
+      </div>
+    }>
+      <DriverSignupForm />
+    </Suspense>
   );
 }

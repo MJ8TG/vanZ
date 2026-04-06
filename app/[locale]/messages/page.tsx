@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { datasql } from "@/lib/datasql";
 import ConversationsList from "@/components/chat/ConversationsList";
 import ChatScreen from "@/components/chat/ChatScreen";
 import { MessageSquare, ArrowLeft } from "lucide-react";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const searchParams = useSearchParams();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<"client" | "driver">("client");
@@ -157,5 +157,17 @@ export default function MessagesPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+       <div className="flex items-center justify-center min-h-screen">
+          <div className="w-8 h-8 border-4 border-vanz-teal border-t-transparent rounded-full animate-spin" />
+       </div>
+    }>
+      <MessagesContent />
+    </Suspense>
   );
 }

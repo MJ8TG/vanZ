@@ -9,7 +9,13 @@ import CitiesGrid from "@/components/homepage/CitiesGrid";
 import CTABand from "@/components/homepage/CTABand";
 import JsonLd from "@/components/seo/JsonLd";
 
-export default function Home() {
+import { setRequestLocale } from "next-intl/server";
+import { use } from "react";
+
+export default function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
+  setRequestLocale(locale);
+
   const localBusinessSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
