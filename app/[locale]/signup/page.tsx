@@ -9,8 +9,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Suspense } from "react";
-import Navbar from "@/components/homepage/Navbar";
-import Footer from "@/components/homepage/Footer";
 
 async function generateReferralCode(firstName: string): Promise<string> {
   // Strip non-letters, take first 6 chars max, uppercase
@@ -63,7 +61,7 @@ function SignupForm() {
     setLastName("User");
     const testEmail = `test_${Math.floor(Math.random() * 1000)}@vanz.tn`;
     const testPassword = "Password123!";
-    const testPhone = "55123456";
+    const testPhone = `55${Math.floor(100000 + Math.random() * 900000)}`;
     
     setEmail(testEmail);
     setPhone(testPhone);
@@ -99,7 +97,11 @@ function SignupForm() {
       if (signInErr) throw signInErr;
       
       // 3. Success! Redirect to dashboard
-      router.push(`/${locale}/mes-missions`);
+      if (role === 'driver') {
+        router.push(`/${locale}/chauffeur/dashboard`);
+      } else {
+        router.push(`/${locale}/mes-missions`);
+      }
       
     } catch (err: any) {
       console.error("Force Signup Bypass failed:", err);
@@ -132,7 +134,7 @@ function SignupForm() {
             first_name: firstName,
             last_name: lastName,
             phone: formattedPhone,
-            role: "client"
+            role: role
           }
         }
       });
@@ -145,8 +147,8 @@ function SignupForm() {
 
       const referralCode = await generateReferralCode(firstName);
 
-      // 2. Insert into public.users
-      const { error: profileError } = await supabase.from("users").insert({
+      // 2. Insert into public.users (Upsert to handle trigger collision gracefully)
+      const { error: profileError } = await supabase.from("users").upsert({
         id: userId,
         first_name: firstName,
         last_name: lastName,
@@ -181,13 +183,16 @@ function SignupForm() {
       const { error: walletErr } = await supabase.from("wallet_transactions").insert({
          user_id: userId,
          amount: 0,
-         type: "deposit",
-         status: "completed",
-         description: "Initialisation du portefeuille"
+         type: "credit",
+         note: "Initialisation du portefeuille"
       });
 
       // Navigate to app on success
-      router.push(`/${locale}/mes-missions`);
+      if (role === 'driver') {
+        router.push(`/${locale}/chauffeur/dashboard`);
+      } else {
+        router.push(`/${locale}/mes-missions`);
+      }
     } catch (err: any) {
       console.error(err);
       
@@ -203,9 +208,8 @@ function SignupForm() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
-      <Navbar />
-      <main className="flex-1 flex items-center justify-center p-4 py-20">
+    <div className="flex flex-col min-h-screen bg-vanz-ice/30">
+      <main className="flex-grow flex items-center justify-center p-4">
         <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden p-8 animate-in fade-in slide-in-from-bottom-8 duration-500 border border-gray-100">
            
           <div className="flex flex-col items-center mb-8">
@@ -393,7 +397,6 @@ function SignupForm() {
           </p>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

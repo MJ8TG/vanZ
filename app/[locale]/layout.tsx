@@ -3,6 +3,8 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Cairo, Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import Navbar from "@/components/homepage/Navbar";
+import Footer from "@/components/homepage/Footer";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -63,8 +65,12 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div dir={dir} className="contents" suppressHydrationWarning>
-        {children}
+      <div dir={dir} className={`${cairo.variable} ${nunito.variable} ${jakarta.variable} flex flex-col min-h-screen`} suppressHydrationWarning>
+        <Navbar />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
       </div>
     </NextIntlClientProvider>
   );

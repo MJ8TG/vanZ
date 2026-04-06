@@ -57,13 +57,16 @@ function TunisiaMap() {
         opacity={0.3}
       />
       
-      {/* City Nodes */}
       {cities.map((city, i) => (
-        <group key={i} position={new THREE.Vector3(...city.pos)}>
+        <group key={i} position={new THREE.Vector3(city.pos[0], city.pos[1], city.pos[2])}>
           <Sphere args={[0.08, 16, 16]}>
             <meshStandardMaterial color="#2BBFDF" emissive="#2BBFDF" emissiveIntensity={2} toneMapped={false} />
           </Sphere>
-          {/* Subtle pulse ring around the city could go here */}
+          {/* Pulse ring */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.1, 0.12, 32]} />
+            <meshBasicMaterial color="#2BBFDF" transparent opacity={0.4} />
+          </mesh>
         </group>
       ))}
 

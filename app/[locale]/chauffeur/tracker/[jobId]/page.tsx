@@ -4,7 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { datasql } from '@/lib/datasql';
-import { Loader2, ArrowLeft, Navigation, Play, Pause, CheckCircle2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Navigation, Play, Pause, CheckCircle2, Camera } from 'lucide-react';
+import { uploadFile } from '@/lib/upload';
+
+interface Job {
+  id: string;
+  status: string;
+  pickup_lat: number;
+  pickup_lng: number;
+  dropoff_lat: number;
+  dropoff_lng: number;
+  pickup_address: string;
+  dropoff_address: string;
+  accepted_bid_id: string;
+  destination_address: string;
+}
 
 export default function DriverTrackingConsole() {
   const params = useParams();
@@ -14,9 +28,14 @@ export default function DriverTrackingConsole() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [jobData, setJobData] = useState<any>(null);
+  const [jobData, setJobData] = useState<Job | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   
+  // ... (rest of states)
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   // Simulation State
   const [isSimulating, setIsSimulating] = useState(false);
   const simulationRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,8 +69,8 @@ export default function DriverTrackingConsole() {
         if (bid?.driver_id !== user.id) throw new Error("Cette mission n'est pas la vôtre.");
 
         setJobData(job);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError((err as Error).message);
       } finally {
         setLoading(false);
       }
@@ -67,6 +86,7 @@ export default function DriverTrackingConsole() {
   }, [jobId, locale, router]);
 
   const toggleSimulation = () => {
+    if (!jobData) return;
     if (isSimulating) {
       if (simulationRef.current) clearInterval(simulationRef.current);
       setIsSimulating(false);
@@ -80,6 +100,7 @@ export default function DriverTrackingConsole() {
       let stepCount = 0;
       
       simulationRef.current = setInterval(async () => {
+        if (!jobData) return;
         stepCount++;
         // Slowly move towards dropoff
         currentLat += (jobData.dropoff_lat - currentLat) * 0.1;
@@ -111,16 +132,67 @@ export default function DriverTrackingConsole() {
     }
   };
 
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleCompleteJob = async () => {
     try {
-      if (!confirm("Avez-vous bien livré la marchandise ? Le client devra confirmer.")) return;
+      if (!photoFile) {
+        alert("Preuve de livraison photo obligatoire (Photo du colis devant la porte ou avec le client).");
+        return;
+      }
+
+      if (!confirm("Voulez-vous clôturer cette mission ? Le paiement sera crédité sur votre compte.")) return;
       
-      // Mark job as technically completed pending payment/verification
-      await datasql.from('jobs').update({ status: 'completed' }).eq('id', jobId);
+      setIsUploading(true);
+      
+      // 1. Upload photo to Supabase
+      const timestamp = new Date().getTime();
+      const fileName = `${jobId}_proof_${timestamp}.jpg`;
+      const bucketPath = `job-proofs/${userId}/${fileName}`;
+      const photoUrl = await uploadFile('driver-documents', bucketPath, photoFile);
+      
+      // 2. Get location for geotagging proof
+      let lat = null;
+      let lng = null;
+      try {
+        const pos = await new Promise<GeolocationPosition>((res, rej) => 
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+        );
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+      } catch (e) {
+        console.warn("Geotagging failed, proceeding without coordinates.");
+      }
+
+      // 3. Call Completion API
+      const res = await fetch('/api/jobs/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_id: jobId,
+          driver_id: userId,
+          delivery_photo_url: photoUrl,
+          delivery_photo_lat: lat,
+          delivery_photo_lng: lng
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Erreur lors de la clôture.");
+
+      alert("🎉 Félicitations ! Mission clôturée. Gains: " + result.data.driver_payout + " TND.");
       router.push(`/${locale}/mes-missions`);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      alert("Erreur lors de la clôture.");
+      alert((err as Error).message || "Une erreur est survenue.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -219,13 +291,51 @@ export default function DriverTrackingConsole() {
             )}
 
             <hr className="my-8 border-gray-100" />
+            
+            <div className="mb-6">
+              <h3 className="text-sm font-black text-vanz-navy uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Camera className="w-5 h-5 text-vanz-teal" /> Preuve de Livraison
+              </h3>
+              
+              <div className="relative group cursor-pointer">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handlePhotoUpload}
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  title="Prendre une photo de la livraison"
+                  aria-label="Prendre une photo de la livraison"
+                />
+                
+                {photoPreview ? (
+                  <div className="relative aspect-video rounded-3xl overflow-hidden border-2 border-vanz-teal/30 shadow-lg">
+                    <img src={photoPreview} alt="Proof" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                      Changer la photo
+                    </div>
+                  </div>
+                ) : (
+                  <div className="aspect-video rounded-3xl bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-6 text-center hover:border-vanz-teal/50 hover:bg-vanz-teal/5 transition-all">
+                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-vanz-teal mb-4 group-hover:scale-110 transition-transform">
+                      <Camera className="w-8 h-8" />
+                    </div>
+                    <p className="text-sm font-black text-vanz-navy mb-1">Prendre la photo</p>
+                    <p className="text-xs text-gray-400 font-medium max-w-[180px]">Colis à destination avec preuve visible du domicile.</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
             <button
               onClick={handleCompleteJob}
-              disabled={isSimulating}
-              className="w-full py-4 rounded-xl border-2 border-green-500 text-green-600 font-black flex items-center justify-center gap-2 hover:bg-green-50 transition-all disabled:opacity-50"
+              disabled={isSimulating || isUploading}
+              className="w-full py-4 rounded-xl bg-green-500 text-white font-black flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 hover:bg-green-600 transition-all disabled:opacity-50 disabled:grayscale"
             >
-              <CheckCircle2 className="w-6 h-6" /> Terminer la mission
+              {isUploading ? (
+                <><Loader2 className="w-6 h-6 animate-spin" /> Clôture en cours...</>
+              ) : (
+                <><CheckCircle2 className="w-6 h-6" /> Confirmer la Livraison</>
+              )}
             </button>
           </div>
         </div>

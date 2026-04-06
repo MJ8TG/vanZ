@@ -57,6 +57,11 @@ CREATE TABLE IF NOT EXISTS public.drivers (
   vehicle_plate text UNIQUE NOT NULL,
   vehicle_capacity numeric(10,2), -- in KG or Liters
   
+  -- Live Tracking & Geographic Distribution
+  current_lat numeric(10,8),
+  current_lng numeric(11,8),
+  last_location_update timestamp with time zone,
+  
   -- Document URLs
   cin_front_url text,
   cin_back_url text,
@@ -553,3 +558,26 @@ DROP TRIGGER IF EXISTS trg_driver_status_change ON public.drivers;
 CREATE TRIGGER trg_driver_status_change
 AFTER UPDATE ON public.drivers
 FOR EACH ROW EXECUTE FUNCTION public.notify_driver_status_change();
+
+-- H. Geospatial (PostGIS) Radius Filtering
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+CREATE OR REPLACE FUNCTION get_jobs_within_radius(
+  driver_lat numeric,
+  driver_lng numeric,
+  radius_km numeric
+)
+RETURNS SETOF public.jobs AS $$
+BEGIN
+  RETURN QUERY
+  SELECT *
+  FROM public.jobs
+  WHERE status = 'open'
+    AND pickup_lat IS NOT NULL
+    AND pickup_lng IS NOT NULL
+    AND ST_DistanceSphere(
+          ST_MakePoint(pickup_lng::float, pickup_lat::float),
+          ST_MakePoint(driver_lng::float, driver_lat::float)
+        ) <= (radius_km * 1000);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -4,11 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
 import { Bell } from 'lucide-react';
 
+interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+  user_id: string;
+}
+
 export default function NotificationBell({ userId }: { userId?: string }) {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   useEffect(() => {
     // If no explicit userId, try to fetch current user
@@ -29,7 +39,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
         .limit(20);
 
       if (data) {
-        setNotifications(data);
+        setNotifications(data as Notification[]);
         setUnreadCount(data.filter(n => !n.read_at).length);
       }
 
@@ -41,16 +51,22 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           table: 'notifications',
           filter: `user_id=eq.${activeUserId}`
         }, (payload) => {
-          const newNotif = payload.new;
+          const newNotif = payload.new as Notification;
           setNotifications(prev => [newNotif, ...prev].slice(0, 20)); // Keep last 20
           setUnreadCount(prev => prev + 1);
         })
         .subscribe();
-
-      return () => { supabase.removeChannel(channel); };
+      
+      channelRef.current = channel;
     };
 
     initFetch();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
   }, [userId]);
 
   // Click outside to close

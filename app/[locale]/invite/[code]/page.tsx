@@ -2,8 +2,6 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { datasql as supabase } from '@/lib/datasql';
 import Link from 'next/link';
-import Navbar from "@/components/homepage/Navbar";
-import Footer from "@/components/homepage/Footer";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -34,7 +32,6 @@ export default async function InviteLanding({ params }: { params: Promise<{ loca
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pt-20">
-      <Navbar />
       <main className="flex-1 flex items-center justify-center p-6 mt-16">
          <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-[#051E3C] p-8 text-center relative overflow-hidden">
@@ -81,7 +78,6 @@ export default async function InviteLanding({ params }: { params: Promise<{ loca
             </div>
          </div>
       </main>
-      <Footer />
     </div>
   );
 }

@@ -23,7 +23,8 @@
     "react-dom": "19.2.4",
     "recharts": "^3.8.0",
     "swiper": "^12.1.2",
-    "three": "^0.183.2"
+    "three": "^0.183.2",
+    "use-places-autocomplete": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

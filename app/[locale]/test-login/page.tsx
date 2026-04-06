@@ -24,8 +24,8 @@ export default function TestLoginPage() {
       if (signInErr) throw signInErr;
 
       router.push(`/${locale}/messages`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,7 @@ export default function TestLoginPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-vanz-navy p-4">
       <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl">
-        <h1 className="text-2xl font-black text-vanz-navy mb-6 text-center">Test Login Bypass</h1>
+        <h1 className="text-2xl font-black text-vanz-navy mb-6 text-center">Connexion de Test</h1>
         
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm font-medium border border-red-100">
@@ -48,7 +48,7 @@ export default function TestLoginPage() {
             onClick={() => handleLogin('client')}
             className="w-full py-4 bg-vanz-teal text-white font-bold rounded-2xl hover:brightness-110 transition-all disabled:opacity-50"
           >
-            Login as Test Client
+            Se connecter comme Client
           </button>
 
           <button
@@ -56,12 +56,12 @@ export default function TestLoginPage() {
             onClick={() => handleLogin('driver')}
             className="w-full py-4 bg-vanz-yellow text-vanz-navy font-bold rounded-2xl hover:brightness-110 transition-all disabled:opacity-50"
           >
-            Login as Test Driver
+            Se connecter comme Chauffeur
           </button>
         </div>
 
         <p className="mt-8 text-xs text-gray-400 text-center uppercase tracking-widest font-bold">
-          E2E Testing Utility
+          Utilitaire de Test E2E
         </p>
       </div>
     </div>

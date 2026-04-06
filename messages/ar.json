@@ -8,6 +8,10 @@
     "login": "تسجيل الدخول",
     "postJob": "نشر طلب",
     "becomeDriver": "كن سائقاً",
+    "dashboard": "لوحة القيادة",
+    "signup": "تسجيل",
+    "market": "سوق المهام",
+    "messages": "الرسائل",
     "language": "Français",
     "menu": "القائمة",
     "close": "إغلاق"
@@ -402,5 +406,204 @@
     
     "whatsappShareClient": "مرحباً! أستخدم VanZ لنقل أغراضي. سجل باستخدام رمزي {code} واحصل على 10 د.ت في طلبك الأول! 👉 https://vanz.tn/invite/{code}",
     "whatsappShareDriver": "مرحباً! انضم إلى VanZ باستخدام رمزي {code}. إنه تطبيق رائع للنقل. احصل على 10 د.ت في رحلتك الأولى! 👉 https://vanz.tn/invite/{code}"
+  },
+  "nouveauJob": {
+    "title": "مهمة جديدة",
+    "subtitle": "صف حاجتك، واحصل على عروض في الوقت الحقيقي.",
+    "steps": {
+      "service": "الخدمة",
+      "address": "العناوين",
+      "details": "التفاصيل",
+      "confirm": "التأكيد"
+    },
+    "form": {
+      "serviceTitle": "ما هي الخدمة التي تبحث عنها؟",
+      "pickup": "الانطلاق (ولاية)",
+      "pickupPlaceholder": "مثال: تونس",
+      "dropoff": "الوصول (ولاية)",
+      "dropoffPlaceholder": "مثال: سوسة",
+      "pickupDetails": "تفاصيل الانطلاق",
+      "pickupDetailsPlaceholder": "الشارع، الحي، الطابق...",
+      "dropoffDetails": "تفاصيل الوصول",
+      "dropoffDetailsPlaceholder": "العنوان الدقيق...",
+      "vehicleType": "نوع الشاحنة المطلوبة",
+      "date": "التاريخ المتوقع",
+      "timeSlot": "الوقت",
+      "morning": "صباحاً",
+      "afternoon": "بعد الظهر",
+      "evening": "مساءً",
+      "anytime": "في أي وقت",
+      "description": "الوصف",
+      "descriptionPlaceholder": "ماذا سننقل؟ (مثال: صالون 3 مقاعد، قطعتين...)",
+      "photos": "الصور (اختياري)",
+      "budget": "الميزانية المطلوبة (د.ت)",
+      "budgetPlaceholder": "مثال: 50"
+    },
+    "actions": {
+        "next": "متابعة",
+        "prev": "رجوع",
+        "submit": "نشر المهمة",
+        "publishing": "جاري النشر..."
+    },
+    "success": {
+        "title": "تم نشر المهمة!",
+        "desc": "طلبك مرئي الآن. سيقدم لك السائقون عروضهم.",
+        "cta": "عرض مهامي"
+    },
+    "vehicles": {
+      "moto": "دراجة نارية",
+      "van_s": "شاحنة صغيرة",
+      "van_xl": "شاحنة كبيرة / بيك أب",
+      "camion": "شاحنة متوسطة"
+    }
+  },
+  "mesMissions": {
+    "titleClient": "شحناتي",
+    "titleDriver": "فضاء السائق",
+    "subtitleClient": "تتبع طلبات النقل الخاصة بك",
+    "subtitleDriver": "أدر أرباحك ومهامك",
+    "actions": {
+      "newAd": "إعلان جديد"
+    },
+    "tabs": {
+      "open": "مفتوحة",
+      "myOffers": "عروضي",
+      "active": "قيد التنفيذ",
+      "completed": "الأرشيف"
+    },
+    "status": {
+      "open": "في الانتظار",
+      "matched": "تم القبول",
+      "in_progress": "في الطريق",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "empty": {
+      "title": "لا توجد مهام هنا",
+      "descClient": "لم تقم بنشر أي إعلانات بعد.",
+      "descDriver": "ليس لديك عروض حالية. اذهب إلى السوق للبحث عن عمل!",
+      "ctaDriver": "مشاهدة سوق المهام"
+    },
+    "job": {
+        "pickup": "انطلاق",
+        "dropoff": "وصول",
+        "date": "التاريخ المقرر",
+        "asap": "في أقرب وقت ممكن",
+        "budget": "ميزانية الحريف",
+        "bidsReceived": "العروض المستلمة",
+        "bidSubmitted": "لقد قدمت عرضاً. في انتظار قرار الحريف.",
+        "status": "الوضعية",
+        "wonMission": "لقد فزت بهذه المهمة!",
+        "yourDriver": "السائق الخاص بك",
+        "finalAmount": "المبلغ النهائي",
+        "paid": "تم الدفع",
+        "proofDetails": "قم بتحميل صورة كإثبات للتحقق"
+    },
+    "actions": {
+        "newAd": "إعلان جديد",
+        "market": "سوق المهام",
+        "chat": "دردشة",
+        "track": "تتبع",
+        "finish": "إنهاء",
+        "viewInvoice": "عرض الفاتورة"
+    },
+    "review": {
+        "title": "كيف سارت المهمة؟",
+        "subtitle": "رأيك يهم مجتمع VanZ.",
+        "yourReview": "رأيك",
+        "rated": "لقد قمت بتقييم {stars}/5 نجوم.",
+        "noteDriver": "قيم السائق الخاص بك",
+        "noteClient": "قيم الحريف",
+        "strengths": "نقاط القوة:",
+        "commentPlaceholder": "تعليق إضافي؟ (اختياري)",
+        "submitting": "جاري الإرسال...",
+        "submit": "إرسال تقييمي",
+        "errorNote": "يرجى اختيار تقييم.",
+        "success": "شكراً لتقييمك!",
+        "errorSubmit": "خطأ أثناء إرسال التقييم.",
+        "tags": {
+            "ponctuel": "منضبط",
+            "soigneux": "حريص",
+            "communicatif": "متواصل جيدا",
+            "professionnel": "محترف",
+            "respectueux": "محترم",
+            "wrapped": "تغليف جيد",
+            "easy": "سهل الوصول"
+        }
+    }
+  },
+  "dispute": {
+    "title": "الإبلاغ عن مشكلة",
+    "mission": "المهمة",
+    "reasonLabel": "السبب (إجباري)",
+    "reasonPlaceholder": "اختر سبب المشكلة",
+    "detailsLabel": "تفاصيل الحادث (إجباري)",
+    "detailsPlaceholder": "اشرح بالضبط ما حدث...",
+    "photosLabel": "أدلة / صور (اختياري)",
+    "photoCount": "{count} صورة مختارة",
+    "addPhotos": "إضافة حتى 3 صور",
+    "cancel": "إلغاء",
+    "submit": "فتح نزاع",
+    "submitting": "جاري الإرسال...",
+    "successTitle": "تم إرسال البلاغ",
+    "successDesc": "سيقوم فريقنا بمراجعة المشكلة والاتصال بك في غضون 24 ساعة.",
+    "errorMinChars": "يرجى تقديم وصف مفصل (20 حرفاً على الأقل).",
+    "errorSubmit": "خطأ أثناء الإرسال.",
+    "reasons": {
+        "delay": "تأخير كبير من السائق",
+        "damaged": "بضاعة متضررة",
+        "behavior": "سلوك غير لائق من السائق",
+        "payment": "مشكلة في الدفع أو سعر إضافي",
+        "absent": "الحريف غائب أو لا يمكن الاتصال به",
+        "other": "آخر"
+    }
+  },
+  "proof": {
+    "title": "إثبات التسليم إلزامي",
+    "desc": "لإغلاق هذه الرحلة وضمان دفع مستحقاتك، يجب عليك التقاط صورة مادية لمكان الإيداع.",
+    "geoDenied": "لم يتم العثور على الموقع - سيتم تسجيل الصورة بدون إحداثيات GPS.",
+    "openCamera": "فتح الكاميرا",
+    "finish": "إنهاء الرحلة",
+    "validating": "جاري التحقق...",
+    "successTitle": "تم تأكيد التسليم!",
+    "successDesc": "تم إرسال الإيصال إلى الحريف.",
+    "errorUpload": "خطأ في التحميل",
+    "errorValidation": "خطأ أثناء التحقق.",
+    "errorSave": "خطأ أثناء حفظ إثبات التسليم."
+  },
+  "bids": {
+    "bestOffer": "أفضل عرض",
+    "courses": "رحلات",
+    "accepting": "جاري القبول...",
+    "accept": "قبول",
+    "message": "رسالة",
+    "acceptedTitle": "تم قبول العرض!",
+    "redirecting": "جاري التحويل إلى المحادثة...",
+    "loadingBids": "في انتظار العروض...",
+    "emptySubtitle": "ستظهر عروض السائقين هنا في الوقت الفعلي.",
+    "errorAccept": "خطأ أثناء القبول."
+  },
+  "profil": {
+    "title": "الملف الشخصي",
+    "verifiedDriver": "سائق موثّق",
+    "client": "حريف",
+    "note": "تقييم",
+    "reviews": "الآراء",
+    "member": "عضو",
+    "info": "معلومات",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني",
+    "city": "المدينة",
+    "referral": "رمز الإحالة",
+    "menu": {
+      "mesMissions": "مهامي",
+      "favorites": "السائقين المفضلين",
+      "wallet": "الرصيد: {balance} د.ت",
+      "settings": "الإعدادات",
+      "market": "سوق المهام"
+    },
+    "logout": "تسجيل الخروج",
+    "roleClient": "حريف",
+    "roleDriver": "سائق موثّق"
   }
 }

@@ -10,8 +10,7 @@ interface Props {
   updateData: (data: Partial<DriverFormData>) => void;
   onNext: () => void;
   onBack: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t: any;
+  t: (key: string) => string;
 }
 
 export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Props) {
@@ -43,7 +42,7 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
       if (driverError) throw driverError;
 
       onNext();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError("Erreur lors de l'enregistrement du véhicule.");
     } finally {

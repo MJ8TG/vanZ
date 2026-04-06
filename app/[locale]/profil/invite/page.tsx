@@ -1,19 +1,17 @@
 import { getTranslations } from "next-intl/server";
 import { datasql as supabase } from "@/lib/datasql";
-import Navbar from "@/components/homepage/Navbar";
-import Footer from "@/components/homepage/Footer";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Share2, Users, Gift, CheckCircle } from "lucide-react";
 
-export default async function ReferralDashboardPage({ params }: { params: { locale: string } }) {
-  const t = await getTranslations({ locale: params.locale, namespace: "invite" });
+export default async function ReferralDashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  const resolvedParams = await params;
+  const t = await getTranslations({ locale: resolvedParams.locale, namespace: "invite" });
   
   // 1. Authenticate user
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    redirect(`/${params.locale}/login`);
+    redirect(`/${resolvedParams.locale}/login`);
   }
 
   // 2. Fetch User Profile
@@ -24,7 +22,7 @@ export default async function ReferralDashboardPage({ params }: { params: { loca
     .single();
 
   if (!profile) {
-    redirect(`/${params.locale}/login`);
+    redirect(`/${resolvedParams.locale}/login`);
   }
 
   const role = profile.role || 'client'; // 'client' or 'driver'
@@ -58,8 +56,6 @@ export default async function ReferralDashboardPage({ params }: { params: { loca
 
   return (
     <main className="min-h-screen bg-gray-50/50 pt-24 pb-16">
-      <Navbar />
-
       <div className="max-w-4xl mx-auto px-4 mt-8">
         
         {/* Header Section */}
@@ -139,8 +135,6 @@ export default async function ReferralDashboardPage({ params }: { params: { loca
         </div>
 
       </div>
-
-      <Footer />
     </main>
   );
 }

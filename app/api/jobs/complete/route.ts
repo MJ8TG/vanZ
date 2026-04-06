@@ -143,8 +143,8 @@ export async function POST(req: Request) {
       }
     });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[/api/jobs/complete] Error:', err);
-    return NextResponse.json({ error: err.message || 'Erreur interne.' }, { status: 500 });
+    return NextResponse.json({ error: (err as Error).message || 'Erreur interne.' }, { status: 500 });
   }
 }

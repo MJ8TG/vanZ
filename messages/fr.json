@@ -8,6 +8,10 @@
     "login": "Se connecter",
     "postJob": "Publier un job",
     "becomeDriver": "Devenir chauffeur",
+    "dashboard": "Tableau de bord",
+    "signup": "S'inscrire",
+    "market": "Marché des Missions",
+    "messages": "Messages",
     "language": "العربية",
     "menu": "Menu",
     "close": "Fermer"
@@ -17,8 +21,8 @@
     "subtitle": "Des chauffeurs vérifiés, des prix compétitifs. Publiez votre job et recevez des offres en minutes.",
     "cta1": "Publier un job",
     "cta2": "Devenir chauffeur",
-    "trustBadge1": "+500 jobs réalisés",
-    "trustBadge2": "+80 chauffeurs vérifiés",
+    "trustBadge1": "+50 jobs réalisés",
+    "trustBadge2": "+20 chauffeurs vérifiés",
     "trustBadge3": "4.8★ satisfaction",
     "trustBadge4": "30% d'économies",
     "serviceCard1": "Déménagement",
@@ -28,9 +32,9 @@
   },
   "stats": {
     "jobs": "Jobs réalisés",
-    "jobsValue": "500",
+    "jobsValue": "50",
     "drivers": "Chauffeurs vérifiés",
-    "driversValue": "80",
+    "driversValue": "20",
     "rating": "Satisfaction client",
     "ratingValue": "4.8",
     "savings": "D'économies en moyenne",
@@ -96,7 +100,82 @@
     "tagCareful": "Soigneux",
     "tagCommunicative": "Communicatif",
     "tagProfessional": "Professionnel",
-    "success": "Merci ! Votre avis aide la communauté VanZ."
+    "success": "Merci ! Votre avis aide la communauté VanZ.",
+    "review": {
+        "title": "Comment s'est passée la mission ?",
+        "subtitle": "Votre avis compte pour la communauté VanZ.",
+        "yourReview": "Votre Avis",
+        "rated": "Vous avez noté {stars}/5 étoiles.",
+        "noteDriver": "Notez votre chauffeur",
+        "noteClient": "Notez le client",
+        "strengths": "Points forts :",
+        "commentPlaceholder": "Un commentaire supplémentaire ? (facultatif)",
+        "submitting": "Envoi...",
+        "submit": "Soumettre mon avis",
+        "errorNote": "Veuillez sélectionner une note.",
+        "success": "Merci pour votre avis !",
+        "errorSubmit": "Erreur lors de la soumission de l'avis.",
+        "tags": {
+            "ponctuel": "Ponctuel",
+            "soigneux": "Soigneux",
+            "communicatif": "Communicatif",
+            "professionnel": "Professionnel",
+            "respectueux": "Respectueux",
+            "wrapped": "Colis bien emballé",
+            "easy": "Facile d'accès"
+        }
+    }
+  },
+  "dispute": {
+    "title": "Signaler un Problème",
+    "mission": "Mission",
+    "reasonLabel": "Raison (Obligatoire)",
+    "reasonPlaceholder": "Sélectionner la raison du problème",
+    "detailsLabel": "Détails de l'incident (Obligatoire)",
+    "detailsPlaceholder": "Expliquez exactement ce qui s'est passé...",
+    "photosLabel": "Preuves / Photos (Optionnel)",
+    "photoCount": "{count} photo(s) sélectionnée(s)",
+    "addPhotos": "Ajouter jusqu'à 3 photos",
+    "cancel": "Annuler",
+    "submit": "Ouvrir Litige",
+    "submitting": "Envoi...",
+    "successTitle": "Signalement Envoyé",
+    "successDesc": "Notre équipe va examiner le problème et vous recontacter sous 24h.",
+    "errorMinChars": "Merci de fournir une description détaillée (min 20 caractères).",
+    "errorSubmit": "Erreur lors de la soumission.",
+    "reasons": {
+        "delay": "Retard important du chauffeur",
+        "damaged": "Marchandise endommagée",
+        "behavior": "Chauffeur injurieux ou comportement inadapté",
+        "payment": "Problème de paiement ou surtaxe",
+        "absent": "Client absent ou injoignable",
+        "other": "Autre"
+    }
+  },
+  "proof": {
+    "title": "Preuve de Livraison Obligatoire",
+    "desc": "Pour clôturer cette course et garantir votre paiement, vous devez prendre une photo matérielle du dépôt.",
+    "geoDenied": "Localisation indisponible — la photo sera enregistrée sans coordonnées GPS.",
+    "openCamera": "Ouvrir l'appareil photo",
+    "finish": "Terminer la Course",
+    "validating": "Validation en cours...",
+    "successTitle": "Livraison Validée !",
+    "successDesc": "Le reçu a été envoyé au client.",
+    "errorUpload": "Erreur d'upload",
+    "errorValidation": "Erreur lors de la validation.",
+    "errorSave": "Erreur lors de l'enregistrement de la preuve de livraison."
+  },
+  "bids": {
+    "bestOffer": "Meilleure offre",
+    "courses": "courses",
+    "accepting": "Acceptation...",
+    "accept": "Accepter",
+    "message": "Message",
+    "acceptedTitle": "Offre Acceptée !",
+    "redirecting": "Redirection vers la discussion...",
+    "loadingBids": "En attente d'offres...",
+    "emptySubtitle": "Les offres des chauffeurs apparaîtront ici en temps réel.",
+    "errorAccept": "Erreur lors de l'acceptation."
   },
   "cities": {
     "title": "Disponible dans toute la Tunisie",
@@ -402,5 +481,119 @@
     
     "whatsappShareClient": "Salut ! J'utilise VanZ pour mes déménagements et livraisons. Inscris-toi avec mon code {code} et gagne 10 TND sur ta première commande ! 👉 https://vanz.tn/invite/{code}",
     "whatsappShareDriver": "Salut ! Rejoins VanZ avec mon code {code}. C'est une super appli pour les transports. Gagne 10 TND sur ton premier trajet ! 👉 https://vanz.tn/invite/{code}"
+  },
+  "nouveauJob": {
+    "title": "Nouvelle Mission",
+    "subtitle": "Décrivez votre besoin, recevez des offres en temps réel.",
+    "steps": {
+      "service": "SERVICE",
+      "address": "ADRESSES",
+      "details": "DÉTAILS",
+      "confirm": "CONFIRMATION"
+    },
+    "form": {
+      "serviceTitle": "Quel service recherchez-vous ?",
+      "pickup": "Départ (Gouvernorat)",
+      "pickupPlaceholder": "Ex: Tunis",
+      "dropoff": "Arrivée (Gouvernorat)",
+      "dropoffPlaceholder": "Ex: Sousse",
+      "pickupDetails": "Précisions sur le départ",
+      "pickupDetailsPlaceholder": "Rue, quartier, étage...",
+      "dropoffDetails": "Précisions sur l'arrivée",
+      "dropoffDetailsPlaceholder": "Destination précise...",
+      "vehicleType": "Type de véhicule requis",
+      "date": "Date estimée",
+      "timeSlot": "Moment",
+      "morning": "Matin",
+      "afternoon": "Après-midi",
+      "evening": "Soir",
+      "anytime": "Flexible",
+      "description": "Description",
+      "descriptionPlaceholder": "Qu'allons-nous transporter ? (Ex: Un canapé 3 places, 2 cartons...)",
+      "photos": "Photos (Optionnel)",
+      "budget": "Budget Souhaité (TND)",
+      "budgetPlaceholder": "Ex: 50"
+    },
+    "actions": {
+        "next": "Continuer",
+        "prev": "Retour",
+        "submit": "Publier ma mission",
+        "publishing": "Publication..."
+    },
+    "success": {
+        "title": "Mission Publiée !",
+        "desc": "Votre demande est visible. Les chauffeurs vont vous proposer leurs offres.",
+        "cta": "Voir mes missions"
+    },
+    "vehicles": {
+      "moto": "Moto / Scooter",
+      "van_s": "Petit Van",
+      "van_xl": "Grand Van / Pickup",
+      "camion": "Camionette"
+    }
+  },
+  "mesMissions": {
+    "titleClient": "Mes Expéditions",
+    "titleDriver": "Espace Chauffeur",
+    "subtitleClient": "Suivez vos demandes de transport",
+    "subtitleDriver": "Gérez vos gains et missions",
+    "actions": {
+      "newAd": "Nouvelle annonce"
+    },
+    "tabs": {
+      "open": "Ouvertes",
+      "myOffers": "Mes Offres",
+      "active": "En Cours",
+      "completed": "Historique"
+    },
+    "status": {
+      "open": "En attente",
+      "matched": "Accepté",
+      "in_progress": "En route",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    },
+    "empty": {
+      "title": "Aucune mission ici",
+      "descClient": "Vous n'avez pas encore publié d'annonces.",
+      "descDriver": "Vous n'avez pas encore d'offres en cours. Allez sur le marché pour trouver du travail !",
+      "ctaDriver": "Voir le Marché des Missions"
+    },
+    "job": {
+        "pickup": "DÉPART",
+        "dropoff": "ARRIVÉE",
+        "date": "Date Prévue",
+        "asap": "Dès que possible",
+        "budget": "Budget Client",
+        "bidsReceived": "Offres reçues",
+        "accepted": "Gagné !",
+        "yourDriver": "Votre Chauffeur",
+        "chat": "Chat",
+        "follow": "Suivre",
+        "complete": "Terminer"
+    }
+  },
+  "profil": {
+    "title": "Profil",
+    "verifiedDriver": "Chauffeur vérifié",
+    "client": "Client",
+    "note": "Note",
+    "reviews": "Avis",
+    "member": "Membre",
+    "info": "Informations",
+    "phone": "Téléphone",
+    "email": "Email",
+    "city": "Ville",
+    "referral": "Code Parrain",
+    "menu": {
+      "mesMissions": "Mes Missions",
+      "favorites": "Chauffeurs Favoris",
+      "wallet": "Solde: {balance} TND",
+      "settings": "Paramètres",
+      "market": "Marché des Missions"
+    },
+    "logout": "Se déconnecter",
+    "roleClient": "Client",
+    "roleDriver": "Chauffeur vérifié"
   }
 }

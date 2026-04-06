@@ -84,8 +84,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, status });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[/api/jobs/update-status] Error:', err);
-    return NextResponse.json({ error: err.message || 'Erreur interne.' }, { status: 500 });
+    return NextResponse.json({ error: (err as Error).message || 'Erreur interne.' }, { status: 500 });
   }
 }

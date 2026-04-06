@@ -2,177 +2,209 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { datasql } from '@/lib/datasql';
-import Navbar from '@/components/homepage/Navbar';
-import Footer from '@/components/homepage/Footer';
 import { 
-  Truck, Sofa, Package, MapPinned, Building2, Zap,
-  MapPin, Navigation, Camera, Clock, DollarSign, 
-  ChevronRight, ChevronLeft, Check, Loader2, Plus, X,
-  CalendarDays, FileText, Shield
+  Truck, MapPin, Package, Calendar, Clock, DollarSign, 
+  ChevronRight, ChevronLeft, Check, Camera, X, Loader2,
+  Navigation, Shield, Zap, Sofa, Boxes, Building2, Timer
 } from 'lucide-react';
 
-// ─── Service Types ─────────────────────────────────────────
-const SERVICES = [
-  { key: 'moving', label: 'Déménagement', desc: 'Maison / Appartement complet', icon: Truck, colorClass: 'text-[#2BBFDF]' },
-  { key: 'furniture', label: 'Transport Meuble', desc: 'Canapé, lit, table...', icon: Sofa, colorClass: 'text-[#F5A623]' },
-  { key: 'parcel', label: 'Livraison Colis', desc: 'Cartons, électroménager', icon: Package, colorClass: 'text-[#7B61FF]' },
-  { key: 'intercity', label: 'Intervilles', desc: 'Tunis ↔ Sfax, Sousse...', icon: MapPinned, colorClass: 'text-[#E74C6F]' },
-  { key: 'office', label: 'Bureaux & Pro', desc: 'Entreprise, machines', icon: Building2, colorClass: 'text-[#34C759]' },
-  { key: 'express', label: 'Express', desc: 'Livraison rapide < 2h', icon: Zap, colorClass: 'text-[#FF9500]' },
-];
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 
-const VEHICLE_SIZES = [
-  { key: 'moto', label: 'Moto / Scooter', desc: 'Petits colis < 20kg', capacity: '20 kg' },
-  { key: 'van_s', label: 'Petit Van', desc: 'Cartons, petit meuble', capacity: '300 kg' },
-  { key: 'van_xl', label: 'Grand Van', desc: 'Studio / 2 pièces', capacity: '800 kg' },
-  { key: 'camion', label: 'Camion', desc: 'Appartement complet', capacity: '2000 kg' },
-];
-
-const TIME_SLOTS = [
-  { key: 'morning', label: 'Matin', desc: '08h – 12h', icon: '🌅' },
-  { key: 'afternoon', label: 'Après-midi', desc: '12h – 18h', icon: '☀️' },
-  { key: 'evening', label: 'Soir', desc: '18h – 22h', icon: '🌆' },
-  { key: 'flexible', label: 'Flexible', desc: 'Je suis disponible', icon: '🤷' },
+const TUNISIAN_GOVERNORATES = [
+  "Ariana", "Béja", "Ben Arous", "Bizerte", "Gabès", "Gafsa", "Jendouba", "Kairouan", 
+  "Kasserine", "Kébili", "Le Kef", "Mahdia", "Manouba", "Médenine", "Monastir", 
+  "Nabeul", "Sfax", "Sidi Bouzid", "Siliana", "Sousse", "Tataouine", "Tozeur", "Tunis", "Zaghouan"
 ];
 
 export default function NouveauJobPage() {
   const router = useRouter();
   const locale = useLocale();
-
+  const t = useTranslations('nouveauJob');
+  const tCommon = useTranslations('common');
+  const tServices = useTranslations('services');
+  
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const totalSteps = 4;
+
+  const [serviceType, setServiceType] = useState('moving');
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [pickupLat, setPickupLat] = useState<number | null>(null);
+  const [pickupLng, setPickupLng] = useState<number | null>(null);
+  
+  const [dropoffAddress, setDropoffAddress] = useState('');
+  const [dropoffLat, setDropoffLat] = useState<number | null>(null);
+  const [dropoffLng, setDropoffLng] = useState<number | null>(null);
+  const [loadCapacity, setLoadCapacity] = useState('van_s');
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [timeSlot, setTimeSlot] = useState('morning');
+  const [description, setDescription] = useState('');
+  const [budget, setBudget] = useState('');
+  const [photos, setPhotos] = useState<string[]>([]);
+  
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Form state
-  const [serviceType, setServiceType] = useState('');
-  const [pickupAddress, setPickupAddress] = useState('');
-  const [dropoffAddress, setDropoffAddress] = useState('');
-  const [description, setDescription] = useState('');
-  const [loadCapacity, setLoadCapacity] = useState('');
-  const [clientBudget, setClientBudget] = useState('');
-  const [timeSlot, setTimeSlot] = useState('flexible');
-  const [scheduledDate, setScheduledDate] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [insuranceSelected, setInsuranceSelected] = useState(false);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [todayDate, setTodayDate] = useState('');
+  const SERVICES = [
+    { key: 'moving', icon: Truck, colorClass: 'text-vanz-teal' },
+    { key: 'furniture', icon: Sofa, colorClass: 'text-vanz-yellow-dark' },
+    { key: 'parcel', icon: Boxes, colorClass: 'text-blue-500' },
+    { key: 'express', icon: Zap, colorClass: 'text-purple-500' },
+    { key: 'office', icon: Building2, colorClass: 'text-vanz-navy' },
+    { key: 'intercity', icon: Navigation, colorClass: 'text-green-500' }
+  ];
+
+  const VEHICLE_SIZES = [
+    { key: 'moto', label: t('vehicles.moto') || 'Moto / Scooter', capacity: 'Max 20kg' },
+    { key: 'van_s', label: t('vehicles.van_s') || 'Petit Van', capacity: 'Max 500kg' },
+    { key: 'van_xl', label: t('vehicles.van_xl') || 'Grand Van / Pickup', capacity: 'Max 1.5t' },
+    { key: 'camion', label: t('vehicles.camion') || 'Camionette', capacity: 'Max 3.5t' }
+  ];
+
+  const TIME_SLOTS = [
+    { key: 'morning', label: t('form.morning') || 'Matin', desc: '08:00 - 12:00' },
+    { key: 'afternoon', label: t('form.afternoon') || 'Après-midi', desc: '12:00 - 18:00' },
+    { key: 'evening', label: t('form.evening') || 'Soir', desc: '18:00 - 21:00' },
+    { key: 'anytime', label: t('form.anytime') || 'Flexible', desc: 'Toute la journée' }
+  ];
+
+  const todayDate = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    setTodayDate(new Date().toISOString().split('T')[0]);
-  }, []);
-
-  useEffect(() => {
-    const checkAuth = async () => {
+    const checkUser = async () => {
       const { data: { user } } = await datasql.auth.getUser();
-      if (user) setUserId(user.id);
+      if (!user) {
+        router.push(`/${locale}/test-login`);
+        return;
+      }
+      setLoading(false);
     };
-    checkAuth();
-  }, []);
+    checkUser();
+  }, [locale, router]);
 
-  const totalSteps = 4;
-  const progress = (step / totalSteps) * 100;
-
-  // Photo upload
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !userId) return;
+    if (!e.target.files?.[0]) return;
     setUploadingPhoto(true);
+    setError(null);
+
     try {
-      const ext = file.name.split('.').pop();
-      const path = `${userId}/job_${Date.now()}.${ext}`;
-      const { error: upErr } = await datasql.storage.from('documents').upload(path, file);
-      if (upErr) throw upErr;
-      const { data } = datasql.storage.from('documents').getPublicUrl(path);
-      setPhotos(prev => [...prev, data.publicUrl]);
-    } catch {
-      setError("Erreur lors de l'upload de la photo.");
+      const file = e.target.files[0];
+      const fakeUrl = URL.createObjectURL(file);
+      setPhotos(prev => [...prev, fakeUrl]);
+    } catch (err) {
+      setError(locale === 'ar' ? "خطأ في تحميل الصورة" : "Erreur lors de l'envoi de la photo.");
     } finally {
       setUploadingPhoto(false);
     }
   };
 
-  // Submit job
-  const handleSubmit = async () => {
-    if (!userId) {
-      alert("⚠️ Vous devez être connecté pour publier une mission.");
-        router.push(`/${locale}/login`);
-        return;
+  const validateStep = () => {
+    if (step === 2) {
+      if (!pickupAddress || !dropoffAddress) {
+        setError(locale === 'ar' ? "يرجى اختيار عنوان الانطلاق والوصول" : "Veuillez choisir les adresses de départ et d'arrivée.");
+        return false;
       }
+    }
+    if (step === 3) {
+      if (!scheduledDate) {
+        setError(locale === 'ar' ? "يرجى اختيار تاريخ" : "Veuillez choisir une date.");
+        return false;
+      }
+      if (new Date(scheduledDate) < new Date(todayDate)) {
+        setError(locale === 'ar' ? "التاريخ لا يمكن أن يكون في الماضي" : "La date ne peut pas être dans le passé.");
+        return false;
+      }
+    }
+    setError(null);
+    return true;
+  };
 
-    setLoading(true);
+  const nextStep = () => {
+    if (validateStep()) {
+      setStep(prev => prev + 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const prevStep = () => {
+    setStep(prev => prev - 1);
+    window.scrollTo(0, 0);
+  };
+
+  const handleSubmit = async () => {
+    if (!budget || Number(budget) <= 0) {
+      setError(locale === 'ar' ? "يرجى تحديد المبلغ" : "Veuillez indiquer un budget (ex: 50 TND).");
+      return;
+    }
+
+    setSubmitting(true);
     setError(null);
 
     try {
-      const { error: insertErr } = await datasql.from('jobs').insert({
-        client_id: userId,
-        service_type: serviceType,
-        pickup_address: pickupAddress,
-        dropoff_address: dropoffAddress,
-        description,
-        load_capacity: loadCapacity,
-        client_budget: clientBudget ? parseFloat(clientBudget) : null,
-        time_slot: timeSlot,
-        scheduled_at: scheduledDate ? new Date(scheduledDate).toISOString() : null,
-        payment_method: paymentMethod,
-        insurance_selected: insuranceSelected,
-        photo_urls: photos.length > 0 ? photos : null,
-        status: 'open'
-      });
+      const { data: { user } } = await datasql.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      const { error: insertErr } = await datasql
+        .from('jobs')
+        .insert({
+          client_id: user.id,
+          service_type: serviceType,
+          pickup_address: pickupAddress,
+          pickup_lat: pickupLat,
+          pickup_lng: pickupLng,
+          dropoff_address: dropoffAddress,
+          dropoff_lat: dropoffLat,
+          dropoff_lng: dropoffLng,
+          load_capacity: loadCapacity,
+          scheduled_at: scheduledDate,
+          time_slot: timeSlot,
+          description: description,
+          client_budget: parseFloat(budget),
+          status: 'open',
+          photo_urls: photos
+        });
 
       if (insertErr) throw insertErr;
-
       setSuccess(true);
-      setTimeout(() => {
-        router.push(`/${locale}/mes-missions`);
-      }, 2500);
     } catch (err: any) {
-      setError(err.message || "Erreur lors de la publication.");
+      setError(err.message || (locale === 'ar' ? "حدث خطأ أثناء النشر" : "Une erreur est survenue lors de la publication."));
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const canProceed = () => {
-    switch (step) {
-      case 1: return !!serviceType;
-      case 2: return pickupAddress.length >= 3 && dropoffAddress.length >= 3;
-      case 3: return !!loadCapacity;
-      case 4: return true;
-      default: return false;
-    }
-  };
-
-  const handleNextStep = () => {
-    if (canProceed()) {
-      setStep(s => s + 1);
-      window.scrollTo(0, 0);
-    } else {
-      // Visual feedback
-      if (step === 3 && !loadCapacity) {
-        setError("Veuillez sélectionner la taille du véhicule pour continuer.");
-      } else if (step === 2 && (pickupAddress.length < 3 || dropoffAddress.length < 3)) {
-        setError("Veuillez renseigner les adresses de prise en charge et de destination.");
-      }
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-12 h-12 text-vanz-teal animate-spin" aria-label="Initialisation..." />
+        </main>
+      </div>
+    );
+  }
 
   if (success) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="bg-white rounded-3xl shadow-2xl p-12 text-center max-w-md mx-4 animate-in fade-in zoom-in duration-500">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-10 h-10 text-green-600" />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[3rem] shadow-2xl p-12 text-center max-w-md w-full animate-in zoom-in fade-in duration-500">
+            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 border-4 border-green-100">
+               <Check className="w-12 h-12 text-green-500" />
             </div>
-            <h2 className="text-2xl font-black text-vanz-navy mb-3">Mission Publiée !</h2>
-            <p className="text-gray-500 font-medium mb-2">Les chauffeurs près de chez vous vont recevoir votre demande.</p>
-            <p className="text-sm text-vanz-teal font-bold animate-pulse mt-6">Redirection vers vos missions...</p>
+            <h2 className="text-3xl font-black text-vanz-navy mb-4">{t('success.title')}</h2>
+            <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+              {t('success.desc')}
+            </p>
+            <button
+              onClick={() => router.push(`/${locale}/mes-missions`)}
+              className="w-full py-5 bg-vanz-teal text-white font-black text-lg rounded-2xl shadow-xl shadow-vanz-teal/20 hover:brightness-110 active:scale-95 transition-all"
+            >
+              {t('success.cta')}
+            </button>
           </div>
         </main>
       </div>
@@ -180,33 +212,27 @@ export default function NouveauJobPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <Navbar />
-      
-      <main className="flex-1 pt-24 pb-16 px-4">
-        <div className="max-w-2xl mx-auto">
+    <div className="flex flex-col min-h-screen bg-gray-50/50">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-12 pb-32 md:py-20 md:pb-20">
+        
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-black text-vanz-navy mb-4 tracking-tight">{t('title')}</h1>
+          <p className="text-lg text-gray-500 font-medium">{t('subtitle')}</p>
+        </div>
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-black text-vanz-navy mb-2">
-              Nouvelle Mission
-            </h1>
-            <p className="text-gray-500 font-medium">
-              Décrivez votre besoin, recevez des offres en temps réel.
-            </p>
-          </div>
-
+        <div className="max-w-2xl mx-auto w-full">
           {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between text-xs font-bold text-gray-400 mb-2">
-              <span className={step >= 1 ? 'text-vanz-teal' : ''}>Service</span>
-              <span className={step >= 2 ? 'text-vanz-teal' : ''}>Adresses</span>
-              <span className={step >= 3 ? 'text-vanz-teal' : ''}>Détails</span>
-              <span className={step >= 4 ? 'text-vanz-teal' : ''}>Confirmer</span>
+          <div className="mb-12">
+            <div className="flex justify-between text-[10px] md:text-xs font-black text-gray-400 mb-3 px-1">
+              <span className={step >= 1 ? 'text-vanz-teal' : ''}>{t('steps.service')}</span>
+              <span className={step >= 2 ? 'text-vanz-teal' : ''}>{t('steps.address')}</span>
+              <span className={step >= 3 ? 'text-vanz-teal' : ''}>{t('steps.details')}</span>
+              <span className={step >= 4 ? 'text-vanz-teal' : ''}>{t('steps.confirm')}</span>
             </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-100 rounded-full overflow-hidden p-0.5 border border-gray-100">
               <div 
-                className={`h-full bg-gradient-to-r from-vanz-teal to-[#20A8C5] rounded-full transition-all duration-500 ${
+                className={`h-full bg-vanz-teal rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(43,191,223,0.3)] ${
                   step === 1 ? 'w-1/4' : step === 2 ? 'w-2/4' : step === 3 ? 'w-3/4' : 'w-full'
                 }`}
               />
@@ -214,367 +240,281 @@ export default function NouveauJobPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 border border-red-100 p-4 rounded-xl text-sm font-medium mb-6 flex items-center gap-2">
-              <X className="w-4 h-4 flex-shrink-0 cursor-pointer" onClick={() => setError(null)} />
-              {error}
+            <div className="bg-red-50 text-red-600 border border-red-100 p-5 rounded-2xl text-sm font-bold mb-8 flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 opacity-70" />
+                {error}
+              </div>
+              <button onClick={() => setError(null)} className="hover:scale-110 transition-transform" title="Fermer l'alerte">
+                <X className="w-5 h-5" />
+              </button>
             </div>
           )}
 
-          {/* ─── STEP 1: Service Type ─── */}
+          {/* Steps */}
           {step === 1 && (
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 animate-in fade-in slide-in-from-right-5 duration-300">
-              <h2 className="text-xl font-black text-vanz-navy mb-6 flex items-center gap-3">
-                <Truck className="w-6 h-6 text-vanz-teal" />
-                Quel service recherchez-vous ?
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {SERVICES.map((svc) => (
-                  <button
-                    key={svc.key}
-                    onClick={() => setServiceType(svc.key)}
-                    className={`relative p-5 rounded-2xl border-2 text-left transition-all hover:shadow-md active:scale-[0.98] ${
-                      serviceType === svc.key 
-                        ? 'border-vanz-teal bg-vanz-ice shadow-lg' 
-                        : 'border-gray-100 bg-white hover:border-gray-200'
-                    }`}
-                  >
-                    {serviceType === svc.key && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-vanz-teal rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-white" />
-                      </div>
-                    )}
-                    <svc.icon className={`w-8 h-8 mb-3 ${svc.colorClass}`} />
-                    <p className="font-bold text-vanz-navy text-sm">{svc.label}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{svc.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-white rounded-[2.5rem] shadow-xl shadow-vanz-navy/5 border border-gray-100 p-8 md:p-10">
+                   <h2 className="text-2xl font-black text-vanz-navy mb-8 flex items-center gap-3">
+                     <span className="w-10 h-10 rounded-xl bg-vanz-ice flex items-center justify-center">
+                        <Truck className="w-6 h-6 text-vanz-teal" />
+                     </span>
+                     {t('form.serviceTitle')}
+                   </h2>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                     {SERVICES.map((svc) => (
+                       <button
+                         key={svc.key}
+                         title={`Service: ${tServices(svc.key)}`}
+                         onClick={() => setServiceType(svc.key)}
+                         className={`relative p-6 rounded-2xl border-2 text-left transition-all hover:scale-[1.02] active:scale-[0.98] flex flex-col gap-2 ${
+                           serviceType === svc.key 
+                             ? 'border-vanz-teal bg-vanz-ice shadow-lg shadow-vanz-teal/5' 
+                             : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                         }`}
+                       >
+                         {serviceType === svc.key && (
+                           <div className="absolute top-4 right-4 w-6 h-6 bg-vanz-teal rounded-full flex items-center justify-center">
+                             <Check className="w-4 h-4 text-white" />
+                           </div>
+                         )}
+                         <svc.icon className={`w-10 h-10 mb-2 ${svc.colorClass}`} />
+                         <div>
+                            <p className="font-black text-vanz-navy text-lg">{tServices(svc.key)}</p>
+                            <p className="text-sm text-gray-500 font-medium">{tServices(`${svc.key}Desc`)}</p>
+                         </div>
+                       </button>
+                     ))}
+                   </div>
+                </div>
+             </div>
           )}
 
-          {/* ─── STEP 2: Addresses ─── */}
           {step === 2 && (
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 animate-in fade-in slide-in-from-right-5 duration-300">
-              <h2 className="text-xl font-black text-vanz-navy mb-6 flex items-center gap-3">
-                <MapPin className="w-6 h-6 text-vanz-teal" />
-                D&apos;où à où ?
-              </h2>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="bg-white rounded-[2.5rem] shadow-xl shadow-vanz-navy/5 border border-gray-100 p-8 md:p-10">
+                  <h2 className="text-2xl font-black text-vanz-navy mb-8 flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-xl bg-vanz-ice flex items-center justify-center">
+                       <MapPin className="w-6 h-6 text-green-500" />
+                    </span>
+                    {t('steps.address')}
+                  </h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label htmlFor="pickupGov" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-2">{t('form.pickup')}</label>
+                      <div className="flex flex-col gap-3">
+                        <AddressAutocomplete 
+                          value={pickupAddress}
+                          onChange={setPickupAddress}
+                          onSelectCoordinates={(lat, lng) => {
+                             setPickupLat(lat);
+                             setPickupLng(lng);
+                          }}
+                          placeholder={t('form.pickupDetailsPlaceholder')}
+                          icon={<MapPin className="absolute ltr:left-5 rtl:right-5 top-1/2 -translate-y-1/2 w-6 h-6 text-green-500" />}
+                        />
+                      </div>
+                    </div>
 
-              <div className="space-y-5">
-                {/* Pickup */}
-                <div>
-                  <label htmlFor="pickup" className="block text-sm font-bold text-gray-600 mb-2">
-                    📍 Adresse de prise en charge
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                    <input
-                      id="pickup"
-                      type="text"
-                      value={pickupAddress}
-                      onChange={(e) => setPickupAddress(e.target.value)}
-                      placeholder="Ex: Lac 2, Tunis"
-                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-100 focus:border-vanz-teal focus:ring-0 outline-none text-vanz-navy font-medium transition-colors"
-                    />
-                  </div>
-                </div>
+                    <div className="flex justify-center -my-3 relative z-10">
+                      <div className="w-10 h-10 bg-vanz-navy rounded-full flex items-center justify-center shadow-lg">
+                        <Navigation className="w-5 h-5 text-white rotate-180" />
+                      </div>
+                    </div>
 
-                {/* Visual connector */}
-                <div className="flex justify-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-0.5 h-3 bg-gray-200" />
-                    <Navigation className="w-4 h-4 text-gray-300 rotate-180" />
-                    <div className="w-0.5 h-3 bg-gray-200" />
+                    <div>
+                      <label htmlFor="dropoffGov" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-2">{t('form.dropoff')}</label>
+                      <div className="flex flex-col gap-3">
+                        <AddressAutocomplete 
+                          value={dropoffAddress}
+                          onChange={setDropoffAddress}
+                          onSelectCoordinates={(lat, lng) => {
+                             setDropoffLat(lat);
+                             setDropoffLng(lng);
+                          }}
+                          placeholder={t('form.dropoffDetailsPlaceholder')}
+                          icon={<MapPin className="absolute ltr:left-5 rtl:right-5 top-1/2 -translate-y-1/2 w-6 h-6 text-vanz-yellow" />}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                {/* Dropoff */}
-                <div>
-                  <label htmlFor="dropoff" className="block text-sm font-bold text-gray-600 mb-2">
-                    📍 Adresse de livraison
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                    <input
-                      id="dropoff"
-                      type="text"
-                      value={dropoffAddress}
-                      onChange={(e) => setDropoffAddress(e.target.value)}
-                      placeholder="Ex: La Marsa, Tunis"
-                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-100 focus:border-vanz-teal focus:ring-0 outline-none text-vanz-navy font-medium transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
+               </div>
             </div>
           )}
 
-          {/* ─── STEP 3: Details ─── */}
           {step === 3 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-5 duration-300">
-              {/* Vehicle Size */}
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-xl font-black text-vanz-navy mb-6 flex items-center gap-3">
-                  <Truck className="w-6 h-6 text-vanz-teal" />
-                  Taille du véhicule
-                </h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {VEHICLE_SIZES.map((v) => (
-                    <button
-                      key={v.key}
-                      onClick={() => setLoadCapacity(v.key)}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
-                        loadCapacity === v.key 
-                          ? 'border-vanz-teal bg-vanz-ice' 
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <p className="font-bold text-vanz-navy text-sm">{v.label}</p>
-                      <p className="text-xs text-gray-400">{v.desc}</p>
-                      <p className="text-[10px] font-bold text-vanz-teal mt-1">Max {v.capacity}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Schedule */}
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-lg font-black text-vanz-navy mb-4 flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-vanz-teal" />
-                  Quand ?
-                </h2>
-                
-                <div className="mb-4">
-                  <label htmlFor="scheduled-date" className="block text-sm font-bold text-gray-600 mb-2">
-                    <CalendarDays className="w-4 h-4 inline mr-1" /> Date souhaitée
-                  </label>
-                  <input
-                    id="scheduled-date"
-                    type="date"
-                    value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
-                    min={todayDate}
-                    className="w-full py-3 px-4 rounded-xl border-2 border-gray-100 focus:border-vanz-teal outline-none font-medium text-vanz-navy"
-                  />
-                </div>
-
-                <div className="grid grid-cols-4 gap-2">
-                  {TIME_SLOTS.map((ts) => (
-                    <button
-                      key={ts.key}
-                      onClick={() => setTimeSlot(ts.key)}
-                      className={`p-3 rounded-xl border-2 text-center transition-all ${
-                        timeSlot === ts.key 
-                          ? 'border-vanz-teal bg-vanz-ice' 
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <span className="text-lg block">{ts.icon}</span>
-                      <p className="text-[10px] font-bold text-vanz-navy mt-1">{ts.label}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Description & Photos */}
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-lg font-black text-vanz-navy mb-4 flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-vanz-teal" />
-                  Description & Photos
-                </h2>
-                
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Décrivez les objets à transporter, l'étage, les accès..."
-                  rows={3}
-                  className="w-full py-3 px-4 rounded-xl border-2 border-gray-100 focus:border-vanz-teal outline-none font-medium text-vanz-navy resize-none mb-4"
-                />
-
-                {/* Photo Grid */}
-                <div className="flex gap-3 flex-wrap">
-                  {photos.map((url, i) => (
-                    <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200">
-                      <img src={url} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
-                      <button 
-                        onClick={() => setPhotos(p => p.filter((_, j) => j !== i))}
-                        className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full flex items-center justify-center text-[10px]"
-                        aria-label="Supprimer la photo"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                  {photos.length < 5 && (
-                    <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-vanz-teal hover:bg-vanz-ice transition-colors">
-                      {uploadingPhoto ? (
-                        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
-                      ) : (
-                        <>
-                          <Camera className="w-5 h-5 text-gray-400" />
-                          <span className="text-[9px] text-gray-400 font-bold mt-1">Ajouter</span>
-                        </>
-                      )}
-                      <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} title="Ajouter une photo" />
-                    </label>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ─── STEP 4: Review & Confirm ─── */}
-          {step === 4 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-5 duration-300">
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-xl font-black text-vanz-navy mb-6">Récapitulatif</h2>
-
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span className="text-sm text-gray-500 font-medium">Service</span>
-                    <span className="font-bold text-vanz-navy">{SERVICES.find(s => s.key === serviceType)?.label}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span className="text-sm text-gray-500 font-medium">Départ</span>
-                    <span className="font-bold text-vanz-navy text-right max-w-[60%]">{pickupAddress}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span className="text-sm text-gray-500 font-medium">Arrivée</span>
-                    <span className="font-bold text-vanz-navy text-right max-w-[60%]">{dropoffAddress}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span className="text-sm text-gray-500 font-medium">Véhicule</span>
-                    <span className="font-bold text-vanz-navy">{VEHICLE_SIZES.find(v => v.key === loadCapacity)?.label}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span className="text-sm text-gray-500 font-medium">Créneau</span>
-                    <span className="font-bold text-vanz-navy">{TIME_SLOTS.find(t => t.key === timeSlot)?.label}</span>
-                  </div>
-                  {description && (
-                    <div className="py-3 border-b border-gray-50">
-                      <span className="text-sm text-gray-500 font-medium block mb-1">Description</span>
-                      <p className="text-sm text-vanz-navy font-medium">{description}</p>
-                    </div>
-                  )}
-                  {photos.length > 0 && (
-                    <div className="py-3">
-                      <span className="text-sm text-gray-500 font-medium block mb-2">Photos ({photos.length})</span>
-                      <div className="flex gap-2">
-                        {photos.map((url, i) => (
-                          <img key={i} src={url} alt="" className="w-14 h-14 rounded-lg object-cover" />
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="bg-white rounded-[2.5rem] shadow-xl shadow-vanz-navy/5 border border-gray-100 p-8 md:p-10">
+                  <h2 className="text-2xl font-black text-vanz-navy mb-8 flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-xl bg-vanz-ice flex items-center justify-center">
+                       <Package className="w-6 h-6 text-[#7B61FF]" />
+                    </span>
+                    {t('steps.details')}
+                  </h2>
+                  
+                  <div className="space-y-8">
+                    <div>
+                      <label className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-4 ml-1">{t('form.vehicleType')}</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {VEHICLE_SIZES.map((v) => (
+                          <button
+                            key={v.key}
+                            title={`Véhicule: ${v.label}`}
+                            onClick={() => setLoadCapacity(v.key)}
+                            className={`p-4 rounded-xl border-2 text-left transition-all ${
+                              loadCapacity === v.key 
+                                ? 'border-vanz-teal bg-vanz-ice' 
+                                : 'border-gray-50 bg-gray-50 hover:border-gray-200'
+                            }`}
+                          >
+                            <p className="font-black text-vanz-navy">{v.label}</p>
+                            <p className="text-xs text-gray-500 font-bold">{v.capacity}</p>
+                          </button>
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Budget & Payment */}
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <h2 className="text-lg font-black text-vanz-navy mb-4 flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-vanz-teal" />
-                  Budget & Paiement
-                </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="scheduledDate" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">{t('form.date')}</label>
+                        <input
+                          id="scheduledDate"
+                          type="date"
+                          title="Date"
+                          value={scheduledDate}
+                          min={todayDate}
+                          onChange={(e) => setScheduledDate(e.target.value)}
+                          className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-vanz-teal outline-none font-bold text-vanz-navy"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="timeSlot" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">{t('form.timeSlot')}</label>
+                        <select
+                          id="timeSlot"
+                          title="Heure"
+                          value={timeSlot}
+                          onChange={(e) => setTimeSlot(e.target.value)}
+                          className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-vanz-teal outline-none font-bold text-vanz-navy appearance-none"
+                        >
+                          {TIME_SLOTS.map(ts => (
+                            <option key={ts.key} value={ts.key}>{ts.label} ({ts.desc})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                <div className="mb-5">
-                  <label htmlFor="budget" className="block text-sm font-bold text-gray-600 mb-2">
-                    Budget indicatif (optionnel)
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="budget"
-                      type="number"
-                      value={clientBudget}
-                      onChange={(e) => setClientBudget(e.target.value)}
-                      placeholder="Ex: 80"
-                      className="w-full py-3 px-4 pr-16 rounded-xl border-2 border-gray-100 focus:border-vanz-teal outline-none font-bold text-vanz-navy text-lg"
-                    />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">TND</span>
+                    <div>
+                      <label htmlFor="jobDescription" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">{t('form.description')}</label>
+                      <textarea
+                        id="jobDescription"
+                        rows={3}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={t('form.descriptionPlaceholder')}
+                        className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-vanz-teal outline-none font-bold text-vanz-navy resize-none"
+                      />
+                    </div>
+
+                    <div>
+                      <p className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-4 ml-1">Photos (Optionnel)</p>
+                      <div className="flex flex-wrap gap-4">
+                        {photos.map((url, i) => (
+                          <div key={i} className="relative w-20 h-20 rounded-2xl overflow-hidden group">
+                            <img src={url} alt={`Aperçu ${i}`} className="w-full h-full object-cover" />
+                            <button 
+                              onClick={() => setPhotos(prev => prev.filter((_, j) => i !== j))}
+                              className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Delete photo"
+                            >
+                              <X className="w-6 h-6 text-white" />
+                            </button>
+                          </div>
+                        ))}
+                        {photos.length < 5 && (
+                          <label className="w-20 h-20 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:border-vanz-teal hover:bg-vanz-ice transition-all group">
+                            <input type="file" accept="image/*" className="hidden" title="Upload" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                            {uploadingPhoto ? <Loader2 className="w-6 h-6 text-vanz-teal animate-spin" /> : <Camera className="w-6 h-6 text-gray-400 group-hover:text-vanz-teal" />}
+                          </label>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex gap-3 mb-5">
-                  {[
-                    { key: 'cash', label: 'Espèces', emoji: '💵' },
-                    { key: 'flouci', label: 'Flouci', emoji: '📱' },
-                    { key: 'card', label: 'Carte', emoji: '💳' },
-                  ].map(pm => (
-                    <button
-                      key={pm.key}
-                      onClick={() => setPaymentMethod(pm.key)}
-                      className={`flex-1 py-3 rounded-xl border-2 text-center transition-all ${
-                        paymentMethod === pm.key 
-                          ? 'border-vanz-teal bg-vanz-ice' 
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <span className="text-lg block">{pm.emoji}</span>
-                      <p className="text-xs font-bold text-vanz-navy mt-1">{pm.label}</p>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Insurance */}
-                <button
-                  onClick={() => setInsuranceSelected(!insuranceSelected)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
-                    insuranceSelected 
-                      ? 'border-green-400 bg-green-50' 
-                      : 'border-gray-100 hover:border-gray-200'
-                  }`}
-                >
-                  <Shield className={`w-6 h-6 ${insuranceSelected ? 'text-green-600' : 'text-gray-300'}`} />
-                  <div className="text-left flex-1">
-                    <p className="font-bold text-sm text-vanz-navy">Assurance transport</p>
-                    <p className="text-xs text-gray-400">Couverture en cas de dommage sur vos biens</p>
-                  </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    insuranceSelected ? 'bg-green-500 border-green-500' : 'border-gray-300'
-                  }`}>
-                    {insuranceSelected && <Check className="w-4 h-4 text-white" />}
-                  </div>
-                </button>
-              </div>
+               </div>
             </div>
           )}
 
-          {/* ─── Navigation Buttons ─── */}
-          <div className="flex gap-4 mt-8">
+          {step === 4 && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="bg-white rounded-[2.5rem] shadow-xl shadow-vanz-navy/5 border border-gray-100 p-8 md:p-10">
+                  <h2 className="text-2xl font-black text-vanz-navy mb-8 flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-xl bg-vanz-ice flex items-center justify-center">
+                       <Zap className="w-6 h-6 text-vanz-yellow" />
+                    </span>
+                    {t('steps.confirm')}
+                  </h2>
+
+                  <div className="space-y-6">
+                    <div className="bg-vanz-ice/30 p-6 rounded-3xl border border-vanz-teal/10">
+                       <h3 className="text-sm font-black text-vanz-teal uppercase tracking-widest mb-4">Résumé</h3>
+                       <div className="flex flex-col gap-2">
+                        <p className="font-bold text-sm text-vanz-navy">📍 {pickupAddress || 'Non spécifié'}</p>
+                        <p className="font-bold text-sm text-vanz-navy">🎯 {dropoffAddress || 'Non spécifié'}</p>
+                       </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="budget" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">{t('form.budget')}</label>
+                      <div className="relative">
+                        <div className="absolute ltr:left-5 rtl:right-5 top-1/2 -translate-y-1/2 font-black text-vanz-teal">{tCommon('tnd')}</div>
+                        <input
+                          id="budget"
+                          type="number"
+                          placeholder={t('form.budgetPlaceholder')}
+                          value={budget}
+                          onChange={(e) => setBudget(e.target.value)}
+                          className="w-full ltr:pl-16 rtl:pr-16 ltr:pr-6 rtl:pl-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-vanz-teal focus:bg-white outline-none font-black text-2xl text-vanz-navy transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+               </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="mt-8 md:mt-12 flex gap-4 sticky bottom-4 md:static pb-4 md:pb-0 z-20">
             {step > 1 && (
               <button
-                onClick={() => setStep(s => s - 1)}
-                className="flex items-center gap-2 px-6 py-4 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-all"
+                onClick={prevStep}
+                className="flex-1 py-5 rounded-2xl border-2 border-gray-100 bg-white text-vanz-navy font-black text-lg hover:border-gray-200 shadow-lg md:shadow-none active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <ChevronLeft className="w-5 h-5" /> Retour
+                <ChevronLeft className="w-6 h-6" />
+                {t('actions.prev')}
               </button>
             )}
-
-            {step < totalSteps ? (
-              <button
-                onClick={() => setStep(s => s + 1)}
-                disabled={!canProceed()}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-vanz-teal text-white font-bold shadow-lg shadow-vanz-teal/20 hover:shadow-vanz-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-30 disabled:shadow-none disabled:translate-y-0"
-              >
-                Continuer <ChevronRight className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-vanz-yellow text-vanz-navy font-black text-lg shadow-lg shadow-vanz-yellow/30 hover:shadow-vanz-yellow/50 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50"
-              >
-                {loading ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Publication...</>
-                ) : (
-                  <>🚀 Publier ma Mission</>
-                )}
-              </button>
-            )}
+            
+            <button
+              onClick={step === totalSteps ? handleSubmit : nextStep}
+              disabled={submitting}
+              className={`py-5 rounded-2xl font-black text-lg active:scale-95 transition-all flex items-center justify-center gap-2 shadow-xl ${
+                step === totalSteps 
+                  ? 'flex-1 bg-vanz-yellow text-vanz-navy shadow-vanz-yellow/20' 
+                  : 'flex-[2] bg-vanz-navy text-white shadow-vanz-navy/20'
+              } hover:brightness-110 disabled:opacity-50`}
+            >
+              {submitting ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <>
+                  {step === totalSteps ? t('actions.submit') : t('actions.next')}
+                  {step < totalSteps && <ChevronRight className="w-6 h-6" />}
+                </>
+              )}
+            </button>
           </div>
 
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

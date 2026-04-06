@@ -10,6 +10,8 @@ import MessageBell from "@/components/chat/MessageBell";
 import { datasql } from "@/lib/datasql";
 
 
+const IS_DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
+
 export default function Navbar() {
   const t = useTranslations("nav");
   const tServices = useTranslations("services");
@@ -19,18 +21,36 @@ export default function Navbar() {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isDriver, setIsDriver] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await datasql.auth.getUser();
-      if (user) {
-        setIsSignedIn(true);
-        // Check if driver
-        const { data: profile } = await datasql.from('users').select('role').eq('id', user.id).single();
-        if (profile?.role === 'driver') setIsDriver(true);
+      try {
+        const { data: { user } } = await datasql.auth.getUser();
+        if (user) {
+          setIsSignedIn(true);
+          setUserId(user.id);
+          const { data: profile } = await datasql.from('users').select('role').eq('id', user.id).single();
+          if (profile?.role === 'driver') setIsDriver(true);
+        } else {
+          setIsSignedIn(false);
+          setUserId(null);
+          setIsDriver(false);
+        }
+      } finally {
+        setAuthLoading(false);
       }
     };
     checkAuth();
+
+    const { data: { subscription } } = datasql.auth.onAuthStateChange(() => {
+       checkAuth();
+    });
+
+    return () => {
+       subscription.unsubscribe();
+    };
   }, []);
 
 
@@ -89,20 +109,21 @@ export default function Navbar() {
             </div>
 
             {/* Auth Links / Dashboard */}
-            {isSignedIn ? (
+            {authLoading ? (
               <div className="flex items-center gap-2">
-                {isDriver ? (
-                  <Link href={`/${locale}/chauffeur/missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
-                    <Truck className="w-4 h-4" /> Le Marché
-                  </Link>
-                ) : (
-                  <Link href={`/${locale}/nouveau-job`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
-                    <Package className="w-4 h-4" /> Publier Job
+                <div className="h-8 w-20 bg-white/10 rounded-lg animate-pulse" />
+                <div className="h-8 w-24 bg-white/10 rounded-lg animate-pulse" />
+              </div>
+            ) : isSignedIn ? (
+              <div className="flex items-center gap-2">
+                 <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
+                  {t("dashboard")}
+                </Link>
+                {IS_DEV_MODE && (
+                  <Link href={`/${locale}/admin`} className="px-3 py-2 text-vanz-yellow hover:text-white font-black text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1 border border-vanz-yellow/30">
+                    ADMIN
                   </Link>
                 )}
-                <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
-                  Tableau de bord
-                </Link>
               </div>
             ) : (
               <>
@@ -111,25 +132,31 @@ export default function Navbar() {
                   href={`/${locale}/signup`}
                   className="px-3 py-2 text-white/90 hover:text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-all duration-200"
                 >
-                  S'inscrire
+                  {t("signup")}
                 </Link>
               </>
             )}
 
             {/* Message Bell */}
-            <MessageBell />
+            {isSignedIn && <MessageBell userId={userId!} />}
 
             {/* Notification Bell */}
-            <NotificationBell />
+            {isSignedIn && <NotificationBell userId={userId!} />}
 
             {/* Role-Specific Primary CTA */}
-            {isDriver ? (
+            {authLoading ? (
+              <div className="h-10 w-40 bg-vanz-yellow/30 rounded-full animate-pulse" />
+            ) : isDriver ? (
               <Link href={`/${locale}/chauffeur/missions`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
-                 🚚 Marché des Missions
+                 🚚 {t("market")}
+              </Link>
+            ) : isSignedIn ? (
+              <Link href={`/${locale}/nouveau-job`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
+                📦 {t("postJob")}
               </Link>
             ) : (
-              <Link href={`/${locale}/nouveau-job`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
-                {isSignedIn ? '📦 Publier un job' : '🚀 Devenir Chauffeur'}
+              <Link href={`/${locale}/devenir-chauffeur`} className="px-5 py-2.5 bg-vanz-yellow text-vanz-navy font-black text-sm rounded-full hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-vanz-yellow/30 flex items-center gap-2">
+                🚀 {t("becomeDriver")}
               </Link>
             )}
 
@@ -145,7 +172,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="md:hidden relative z-50 p-2 text-white rounded-lg hover:bg-white/10 transition-colors"
             aria-label={mobileOpen ? t("close") : t("menu")}
           >
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -187,7 +214,7 @@ export default function Navbar() {
             {/* Messages */}
             <Link href={`/${locale}/messages`} className="flex items-center gap-3 px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors" onClick={() => setMobileOpen(false)}>
               <MessageCircle className="w-5 h-5 text-vanz-yellow" />
-              Messages
+              {t("messages")}
             </Link>
 
             {/* Auth Links / Dashboard */}
@@ -200,7 +227,7 @@ export default function Navbar() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <Truck className="w-5 h-5 text-vanz-yellow" />
-                    Trouver une mission
+                    {t("market")}
                   </Link>
                 )}
                 <Link
@@ -209,7 +236,7 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <ClipboardList className="w-5 h-5 text-vanz-yellow" />
-                  Mes Missions
+                  {t("dashboard")}
                 </Link>
               </>
             ) : (
@@ -226,7 +253,7 @@ export default function Navbar() {
                   className="block px-3 py-3 text-white font-medium text-base rounded-lg hover:bg-white/10 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  S'inscrire
+                  {t("signup")}
                 </Link>
               </>
             )}
@@ -234,12 +261,18 @@ export default function Navbar() {
             {/* Role-Specific Primary CTA Mobile */}
             {isDriver ? (
               <Link href={`/${locale}/chauffeur/missions`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
-                🚚 Marché des Missions
+                🚚 {t("market")}
               </Link>
             ) : (
-              <Link href={`/${locale}/nouveau-job`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
-                 {isSignedIn ? '📦 Publier un job' : '🚀 Devenir Chauffeur'}
-              </Link>
+              isSignedIn ? (
+                <Link href={`/${locale}/nouveau-job`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
+                  📦 {t("postJob")}
+                </Link>
+              ) : (
+                <Link href={`/${locale}/devenir-chauffeur`} className="block w-full text-center px-5 py-3 bg-vanz-yellow text-vanz-navy font-black text-base rounded-full hover:brightness-110 transition-all mt-3" onClick={() => setMobileOpen(false)}>
+                  🚀 {t("becomeDriver")}
+                </Link>
+              )
             )}
 
             {/* Language */}

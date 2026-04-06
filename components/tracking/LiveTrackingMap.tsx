@@ -71,20 +71,16 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
   }, []);
 
   useEffect(() => {
+    // Listen to Direct Realtime Broadcasts instead of slow database updates
     const channel = supabase
       .channel(`tracking:${driver.id}`)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'driver_locations',
-        filter: `driver_id=eq.${driver.id}`
-      }, (payload) => {
-        const { lat, lng, heading } = payload.new;
+      .on('broadcast', { event: 'location_update' }, (payload) => {
+        const { lat, lng, heading } = payload.payload;
         setTrail(prev => {
           const updated = [...prev, { lat, lng }];
           return updated.slice(-50);
         });
-        animateVanTo(lat, lng, heading);
+        animateVanTo(lat, lng, heading || 0);
       })
       .subscribe();
 
@@ -126,7 +122,7 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
   const GoogleMapsComponent = () => {
     const { isLoaded } = useJsApiLoader({
       id: 'google-map-script',
-      googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""
+      googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
     });
 
     if (!isLoaded) return <div className="w-full h-full bg-[#e8e0d8] animate-pulse" />;
@@ -161,7 +157,7 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
     </div>
   );
 
-  const MapContainer = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ? GoogleMapsComponent : MockMapComponent;
+  const MapContainer = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? GoogleMapsComponent : MockMapComponent;
 
   // Assuming driver object contains first_name, last_name, avatar_url, drivers(vehicle_plate, vehicle_type, rating) etc.
   const driverInitials = `${driver.first_name?.[0] || ''}${driver.last_name?.[0] || ''}`;

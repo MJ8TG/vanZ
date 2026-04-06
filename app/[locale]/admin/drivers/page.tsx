@@ -46,21 +46,23 @@ export default function AdminDriversApprovalPage() {
     setIsProcessing(true);
 
     try {
-      const { error } = await supabase
-        .from('drivers')
-        .update({ 
+      const res = await fetch('/api/admin/drivers/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          driverId: selectedDriver.id, 
           status, 
-          rejection_reason: reason || null,
-          approved_at: status === 'approved' ? new Date().toISOString() : null
+          reason 
         })
-        .eq('id', selectedDriver.id);
+      });
 
-      if (error) throw error;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
 
       // Update local state
       setDrivers(prev => prev.map(d => d.id === selectedDriver.id ? { ...d, status, rejection_reason: reason || null } : d));
       setSelectedDriver(null);
-      alert(status === 'approved' ? "Chauffeur approuvé !" : "Candidature rejetée.");
+      alert(status === 'approved' ? "Chauffeur approuvé ! SMS envoyé." : "Candidature rejetée. SMS envoyé.");
     } catch (err: any) {
       alert("Erreur: " + err.message);
     } finally {

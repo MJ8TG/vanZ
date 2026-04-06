@@ -44,8 +44,8 @@ export async function POST(req: Request) {
     const formattedPhone = phone.startsWith('+') ? phone : `+216${phone}`;
 
     // Note: In some setups, clicking Signup might have table triggers. 
-    // We manually insert to be sure.
-    const { error: profileError } = await supabaseAdmin.from("users").insert({
+    // We manually upsert to be sure.
+    const { error: profileError } = await supabaseAdmin.from("users").upsert({
       id: userId,
       first_name: firstName,
       last_name: lastName,
@@ -55,10 +55,21 @@ export async function POST(req: Request) {
       // Add referral_code generation logic if needed here
     });
 
+    if (profileError) {
+      console.warn("Manual user upsert failed/skipped due to trigger:", profileError.message);
+    }
+
     // If it's a driver, we can also auto-approve here if needed
     if (role === 'driver') {
+        const dummyPlate = `TEST-${Math.floor(1000 + Math.random() * 9000)}-TN`;
+        const dummyCin = `123${Math.floor(10000 + Math.random() * 90000)}`;
         await supabaseAdmin.from('drivers').insert({
             id: userId,
+            cin_number: dummyCin,
+            cin_expiry: "2030-01-01",
+            date_of_birth: "1990-01-01",
+            vehicle_type: "van",
+            vehicle_plate: dummyPlate,
             status: 'approved'
         });
     }

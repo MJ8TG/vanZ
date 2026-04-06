@@ -1,7 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { blogArticlesConfig } from "@/data/blogArticles";
-import Navbar from "@/components/homepage/Navbar";
-import Footer from "@/components/homepage/Footer";
+import { blogArticlesConfig, blogArticlesContent } from "@/data/blogArticles";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 
@@ -23,9 +21,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: "blog" });
   
   return (
-    <>
-      <Navbar />
-      <main className="flex-1 bg-vanz-ice dark:bg-[#080b17] min-h-screen">
+    <main className="flex-1 bg-vanz-ice dark:bg-[#080b17] min-h-screen">
         
         {/* Header */}
         <section className="bg-vanz-navy text-white pt-40 pb-20 px-4 text-center">
@@ -42,10 +38,8 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
         {/* Grid */}
         <section className="py-24 px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogArticlesConfig.map(async (article) => {
-              // Extract the localized content map directly or import it natively
-              const { blogArticlesContent } = await import('@/data/blogArticles');
-              const localizedContent = blogArticlesContent[article.slug]?.[resolvedParams.locale as string];
+            {blogArticlesConfig.map((article) => {
+              const localizedContent = (blogArticlesContent as any)[article.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
               if (!localizedContent) return null;
 
               return (
@@ -84,8 +78,6 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
           </div>
         </section>
 
-      </main>
-      <Footer />
-    </>
+    </main>
   );
 }

@@ -11,8 +11,7 @@ interface Props {
   updateData: (data: Partial<DriverFormData>) => void;
   onNext: () => void;
   onBack: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t: any;
+  t: (key: string) => string;
 }
 
 export default function Step2Identity({ data, updateData, onNext, onBack, t }: Props) {
@@ -47,9 +46,9 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
 
       const publicUrl = await uploadFile('driver-documents', filePath, file);
       updateData({ [key]: publicUrl });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError("Échec de l'upload de l'image. " + (err.message || ""));
+      setError("Échec de l'upload de l'image. " + ((err as Error).message || ""));
     } finally {
       setUploading(null);
     }
@@ -94,7 +93,7 @@ export default function Step2Identity({ data, updateData, onNext, onBack, t }: P
       if (driverError) throw driverError;
 
       onNext();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError("Erreur lors de l'enregistrement. Veuillez vérifier vos informations.");
     } finally {

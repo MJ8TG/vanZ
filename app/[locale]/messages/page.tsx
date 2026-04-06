@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { datasql } from "@/lib/datasql";
-import Navbar from "@/components/homepage/Navbar";
-import Footer from "@/components/homepage/Footer";
 import ConversationsList from "@/components/chat/ConversationsList";
 import ChatScreen from "@/components/chat/ChatScreen";
 import { MessageSquare, ArrowLeft } from "lucide-react";
@@ -14,7 +12,14 @@ export default function MessagesPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserType, setCurrentUserType] = useState<"client" | "driver">("client");
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
-  const [selectedConvDetails, setSelectedConvDetails] = useState<any>(null);
+  const [selectedConvDetails, setSelectedConvDetails] = useState<{
+    job_id: string;
+    phase: "pre_bid" | "post_acceptance" | "archived";
+    jobs?: {
+      payment_method: string;
+    } | null;
+    [key: string]: any;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -95,11 +100,9 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <Navbar />
-      
-      <main className="flex-1 flex flex-col pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-200px)] min-h-[600px]">
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+      <main className="flex-1 flex overflow-hidden p-4 md:p-8 w-full">
+        <div className="flex flex-col md:flex-row gap-6 w-full h-full">
           
           {/* List Section */}
           <div className={`${selectedConversationId ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-96 bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden`}>
@@ -153,8 +156,6 @@ export default function MessagesPage() {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

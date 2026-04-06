@@ -22,25 +22,30 @@ export default function ConversationsList({ currentUserId, onSelect }: { current
   const fetchConversations = async () => {
     setLoading(true);
     try {
-      // 1. Fetch conversations
+      // 1. Fetch conversations (only join client via FK — driver FK goes to drivers table, not users)
       const { data: convs, error } = await datasql
         .from('conversations')
         .select(`
           *,
-          jobs (service_type),
-          client:users!client_id (first_name, last_name),
-          driver:users!driver_id (first_name, last_name)
+          jobs (service_type)
         `)
         .or(`client_id.eq.${currentUserId},driver_id.eq.${currentUserId}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // 2. Fetch last messages & unread counts for each
+      // 2. Enrich with user names, last messages & unread counts
       const enriched = await Promise.all((convs || []).map(async (c: any) => {
         const isClient = c.client_id === currentUserId;
-        const otherParty = isClient ? c.driver : c.client;
+        const otherPartyId = isClient ? c.driver_id : c.client_id;
         
+        // Fetch the other party's name from the users table directly
+        const { data: otherUser } = await datasql
+          .from('users')
+          .select('first_name, last_name')
+          .eq('id', otherPartyId)
+          .single();
+
         const { data: lastMsg } = await datasql
           .from('messages')
           .select('content, created_at, read_at, sender_id')
@@ -61,7 +66,7 @@ export default function ConversationsList({ currentUserId, onSelect }: { current
           job_id: c.job_id,
           driver_id: c.driver_id,
           client_id: c.client_id,
-          other_party_name: otherParty ? `${otherParty.first_name} ${otherParty.last_name}` : "Utilisateur VanZ",
+          other_party_name: otherUser ? `${otherUser.first_name} ${otherUser.last_name}` : "Utilisateur VanZ",
           last_message: lastMsg?.content || "Aucun message",
           last_message_time: lastMsg?.created_at,
           unread_count: count || 0

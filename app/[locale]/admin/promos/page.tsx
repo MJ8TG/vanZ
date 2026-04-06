@@ -1,17 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
 import { Plus, ToggleLeft, ToggleRight, Ticket, BarChart3, RefreshCcw, X } from 'lucide-react';
 
+export interface Promo {
+  id: string;
+  code: string;
+  discount_type: 'fixed' | 'percentage';
+  discount_value: number;
+  max_uses: number | null;
+  uses_per_user: number;
+  min_job_amount: number;
+  valid_from: string;
+  valid_until: string | null;
+  current_uses: number;
+  is_active: boolean;
+}
+
 export default function AdminPromosPage() {
-  const [promos, setPromos] = useState<any[]>([]);
+  const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
   const [form, setForm] = useState({
      code: '',
-     discount_type: 'fixed',
+     discount_type: 'fixed' as 'fixed' | 'percentage',
      discount_value: '',
      max_uses: '',
      uses_per_user: '1',
@@ -21,16 +35,16 @@ export default function AdminPromosPage() {
      is_active: true
   });
 
-  useEffect(() => {
-    fetchPromos();
-  }, []);
-
-  const fetchPromos = async () => {
+  const fetchPromos = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from('promo_codes').select('*').order('created_at', { ascending: false });
-    setPromos(data || []);
+    setPromos((data as Promo[]) || []);
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPromos();
+  }, [fetchPromos]);
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     await supabase.from('promo_codes').update({ is_active: !currentStatus }).eq('id', id);
@@ -87,7 +101,7 @@ export default function AdminPromosPage() {
 
               <div>
                 <label htmlFor="promo-type" className="block text-xs font-bold text-gray-500 mb-1">Type de Réduction *</label>
-                <select id="promo-type" title="Type de réduction" value={form.discount_type} onChange={(e) => setForm({...form, discount_type: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal">
+                <select id="promo-type" title="Type de réduction" value={form.discount_type} onChange={(e) => setForm({...form, discount_type: e.target.value as 'fixed' | 'percentage'})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-vanz-teal">
                    <option value="fixed">Montant Fixe (TND)</option>
                    <option value="percentage">Pourcentage (%)</option>
                 </select>
@@ -147,7 +161,7 @@ export default function AdminPromosPage() {
               promos.length === 0 ? <tr><td colSpan={5} className="text-center py-8 text-gray-500">Aucun code promo actif.</td></tr> : 
               promos.map(promo => {
                 const isUnlimited = promo.max_uses === null;
-                const percent = isUnlimited ? 0 : Math.min(100, Math.round((promo.current_uses / promo.max_uses) * 100));
+                const percent = isUnlimited || !promo.max_uses ? 0 : Math.min(100, Math.round((promo.current_uses / promo.max_uses) * 100));
 
                 let totalDiscount = 0;
                 if (promo.discount_type === 'fixed') {

@@ -1,4 +1,3 @@
-import Navbar from "@/components/homepage/Navbar";
 import HeroSection from "@/components/homepage/HeroSection";
 import StatsBar from "@/components/homepage/StatsBar";
 import HowItWorks from "@/components/homepage/HowItWorks";
@@ -8,8 +7,6 @@ import LiveJobsFeed from "@/components/homepage/LiveJobsFeed";
 import ReviewsSection from "@/components/homepage/ReviewsSection";
 import CitiesGrid from "@/components/homepage/CitiesGrid";
 import CTABand from "@/components/homepage/CTABand";
-import Footer from "@/components/homepage/Footer";
-
 import JsonLd from "@/components/seo/JsonLd";
 
 export default function Home() {
@@ -30,7 +27,6 @@ export default function Home() {
   return (
     <>
       <JsonLd data={localBusinessSchema} />
-      <Navbar />
       <main>
         <HeroSection />
         <StatsBar />
@@ -42,7 +38,6 @@ export default function Home() {
         <CitiesGrid />
         <CTABand />
       </main>
-      <Footer />
     </>
   );
 }

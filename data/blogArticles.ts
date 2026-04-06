@@ -31,10 +31,26 @@ export const blogArticlesConfig: BlogArticleConfig[] = [
   }
 ];
 
+export interface BlogContentItem {
+  type: "p" | "h2";
+  text: string;
+}
+
+export interface BlogLocaleContent {
+  title: string;
+  excerpt: string;
+  content: BlogContentItem[];
+}
+
+export interface BlogArticleData {
+  fr: BlogLocaleContent;
+  ar: BlogLocaleContent;
+}
+
 // Content for the articles mapped by locale directly here to avoid huge JSON translation files for Long-form text
 // Or we can structure the content blocks here with FR and AR.
 
-export const blogArticlesContent: Record<string, Record<string, any>> = {
+export const blogArticlesContent: Record<BlogArticleSlug, BlogArticleData> = {
   "prix-demenagement-tunisie": {
     fr: {
       title: "Quel est le prix d'un déménagement en Tunisie en 2026 ?",
