@@ -14,7 +14,8 @@
     "messages": "Messages",
     "language": "العربية",
     "menu": "Menu",
-    "close": "Fermer"
+    "close": "Fermer",
+    "logout": "Déconnexion"
   },
   "hero": {
     "title": "Votre transport, simplifié.",

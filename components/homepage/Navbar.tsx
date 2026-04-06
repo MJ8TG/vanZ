@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, Truck, Package, Building2, Zap, ArrowLeftRight, Sofa, MessageCircle, ClipboardList } from "lucide-react";
+import { Menu, X, ChevronDown, Truck, Package, Building2, Zap, ArrowLeftRight, Sofa, MessageCircle, ClipboardList, LogOut } from "lucide-react";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import MessageBell from "@/components/chat/MessageBell";
 import { datasql } from "@/lib/datasql";
@@ -52,6 +52,11 @@ export default function Navbar() {
        subscription.unsubscribe();
     };
   }, []);
+
+  const handleLogout = async () => {
+    await datasql.auth.signOut();
+    window.location.href = `/${locale}/login`;
+  };
 
 
   const services = [
@@ -119,6 +124,9 @@ export default function Navbar() {
                  <Link href={`/${locale}/mes-missions`} className="px-3 py-2 text-white/90 hover:text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1">
                   {t("dashboard")}
                 </Link>
+                <button onClick={handleLogout} className="px-3 py-2 text-white/70 hover:text-red-300 font-bold text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1" title={t("logout")}>
+                  <LogOut className="w-4 h-4" />
+                </button>
                 {IS_DEV_MODE && (
                   <Link href={`/${locale}/admin`} className="px-3 py-2 text-vanz-yellow hover:text-white font-black text-sm rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1 border border-vanz-yellow/30">
                     ADMIN

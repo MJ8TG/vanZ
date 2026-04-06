@@ -68,35 +68,15 @@ export default function Step4Documents({ data, updateData, onNext, onBack, t }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Session expirée. Veuillez recommencer.");
-
-      // Update Drivers table with document URLs
-      const { error: driverError } = await supabase
-        .from('drivers')
-        .update({
-          doc_carte_grise: data.docCarteGrise,
-          doc_assurance: data.docAssurance,
-          doc_permis: data.docPermis,
-          doc_visite_technique: data.docVisite,
-          vehicle_photo_url: data.docVehicle,
-          status: 'pending' // Re-ensure status
-        })
-        .eq('id', user.id);
-
-      if (driverError) throw driverError;
-
-      onNext();
-    } catch (err: any) {
-      console.error(err);
-      setError("Erreur lors de l'enregistrement final. Veuillez réessayer.");
-    } finally {
-      setLoading(false);
+    if (!data.docCarteGrise || !data.docAssurance || !data.docPermis) {
+      setError("Veuillez télécharger tous les documents obligatoires.");
+      return;
     }
+
+    // Trigger final API call via parent handler
+    onNext();
   };
 
   return (

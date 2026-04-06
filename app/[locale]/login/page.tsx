@@ -17,6 +17,41 @@ export default function LoginPage() {
   const router = useRouter();
   const locale = useLocale();
 
+  // 0. Auto-redirect if already logged in
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useState(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+         setCheckingAuth(true);
+         // Find role
+         const { data: profile } = await supabase
+           .from('users')
+           .select('role')
+           .eq('id', user.id)
+           .single();
+         
+         if (profile?.role === 'driver') {
+           router.push(`/${locale}/chauffeur/dashboard`);
+         } else {
+           router.push(`/${locale}/mes-missions`);
+         }
+      } else {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  });
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-vanz-teal animate-spin" />
+      </div>
+    );
+  }
+
   const handleTestFill = async () => {
     const testEmail = "test@vanz.tn";
     const testPassword = "Password123!";

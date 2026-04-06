@@ -19,35 +19,15 @@ export default function Step3Vehicle({ data, updateData, onNext, onBack, t }: Pr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Session expirée. Veuillez recommencer.");
-
-      const { error: driverError } = await supabase
-        .from('drivers')
-        .update({
-          vehicle_type: data.vehicleType,
-          vehicle_brand: data.brand,
-          vehicle_model: data.model,
-          vehicle_year: parseInt(data.year),
-          vehicle_color: data.color,
-          vehicle_plate: data.plate,
-          vehicle_capacity: parseInt(data.capacity)
-        })
-        .eq('id', user.id);
-
-      if (driverError) throw driverError;
-
-      onNext();
-    } catch (err: unknown) {
-      console.error(err);
-      setError("Erreur lors de l'enregistrement du véhicule.");
-    } finally {
-      setLoading(false);
+    if (!data.vehicleType || !data.brand || !data.model || !data.year || !data.plate || !data.capacity) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
     }
+
+    // All good — proceed to next step (DB write handled by final API call in Step4)
+    onNext();
   };
 
   const vehicleTypes = [

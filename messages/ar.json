@@ -14,7 +14,8 @@
     "messages": "الرسائل",
     "language": "Français",
     "menu": "القائمة",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "logout": "تسجيل الخروج"
   },
   "hero": {
     "title": "النقل ببساطة.",
