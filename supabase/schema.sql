@@ -467,7 +467,7 @@ BEGIN
     COALESCE(NEW.phone, NEW.raw_user_meta_data->>'phone'), -- Use metadata if phone field is empty
     COALESCE(NEW.raw_user_meta_data->>'first_name', 'Utilisateur'),
     COALESCE(NEW.raw_user_meta_data->>'last_name', 'VanZ'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'client')
+    'client'  -- Hardcoded. Promotion goes through controlled flows.
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;

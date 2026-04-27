@@ -146,7 +146,7 @@ Et l'utiliser uniquement dans Server Components / API routes, jamais dans Client
 
 ---
 
-## ☐ TASK-0.3 — Bloquer privilege escalation au signup
+## [x] TASK-0.3 — Bloquer privilege escalation au signup
 
 **🔴 Critique · 20min · Privilege escalation via metadata**
 
