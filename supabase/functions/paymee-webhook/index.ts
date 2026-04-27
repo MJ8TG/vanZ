@@ -2,18 +2,36 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+async function md5(str: string): Promise<string> {
+  const data = new TextEncoder().encode(str);
+  const hashBuffer = await crypto.subtle.digest("MD5", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 serve(async (req: Request) => {
   try {
     const webhookPayload = await req.json();
+    const VENDOR_TOKEN = Deno.env.get("PAYMEE_VENDOR_TOKEN") ?? "";
+
+    // 1. Verify signature
+    const expected = await md5(
+      `${webhookPayload.token}${webhookPayload.amount}${webhookPayload.payment_status ? "1" : "0"}${VENDOR_TOKEN}`
+    );
+    if (webhookPayload.check_sum?.toLowerCase() !== expected.toLowerCase()) {
+      console.error('[paymee-webhook] Invalid check_sum');
+      return new Response('Invalid signature', { status: 401 });
+    }
 
     // Verify payment status is strictly 'paid'
     if (webhookPayload.payment_status !== true) {
        return new Response('Payment not completed', { status: 200 });
     }
 
-    const jobIdRaw = webhookPayload.note?.replace('VanZ Job #', '');
+    const url = new URL(req.url);
+    const jobIdRaw = url.searchParams.get('job_id') || webhookPayload.note?.replace('VanZ Job #', '');
     if (!jobIdRaw) {
-       return new Response('Invalid Note formatting missing Job ID', { status: 200 });
+       return new Response('Missing Job ID', { status: 200 });
     }
 
     const supabaseAdmin = createClient(

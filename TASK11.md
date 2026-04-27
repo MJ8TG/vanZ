@@ -237,7 +237,7 @@ GRANT SELECT ON public.users_public TO anon, authenticated;
 
 ---
 
-## ☐ TASK-0.5 — Vérification signature webhook Paymee
+## [x] TASK-0.5 — Vérification signature webhook Paymee
 
 **🔴 Critique · 1h · Anyone can mark jobs as paid**
 
