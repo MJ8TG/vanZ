@@ -36,7 +36,7 @@
 
 > À FAIRE AVANT TOUT DÉPLOIEMENT. Sans Phase 0, le code en prod = sécurité compromise + paiements cassés.
 
-## ☐ TASK-0.1 — Fixer le pipeline de statuts
+## [x] TASK-0.1 — Fixer le pipeline de statuts
 
 **🔴 Critique · 45min · Bloque toute la chaîne paiement/tracking**
 
