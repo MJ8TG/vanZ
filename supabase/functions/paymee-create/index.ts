@@ -26,10 +26,11 @@ serve(async (req: Request) => {
 
     if (!amount) throw new Error("Aucun montant disponible.");
 
-    const BASE_URL = process.env.BASE_URL ?? "https://vanz.tn";
+    const BASE_URL = Deno.env.get("BASE_URL") || "https://vanz.tn";
     const SUPABASE_FUNCTIONS_URL = Deno.env.get("SUPABASE_URL") + "/functions/v1";
 
-    const paymeeResponse = await fetch('https://sandbox.paymee.tn/api/v2/payments/create', { // USING SANDBOX URL For dev
+    const PAYMEE_API = Deno.env.get("PAYMEE_API_URL") || "https://sandbox.paymee.tn/api/v2/payments/create";
+    const paymeeResponse = await fetch(PAYMEE_API, {
       method: 'POST',
       headers: { 'Authorization': `Token ${PAYMEE_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({

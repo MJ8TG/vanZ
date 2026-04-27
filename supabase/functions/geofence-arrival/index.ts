@@ -12,7 +12,13 @@ function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 }
 
+import { verifyWebhookSecret } from "../_shared/auth.ts";
+
 serve(async (req: Request) => {
+  if (!verifyWebhookSecret(req)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   try {
     const payload = await req.json();
     const { record } = payload;

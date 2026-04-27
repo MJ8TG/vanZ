@@ -46,6 +46,12 @@ vanz_agent_brief*.html
 push_error.txt
 lint_output.txt
 build_output.txt
+*.log
+*.csv
+lint_results.json
+tracker_lint.json
+local_lint_output.txt
+final_*.txt
 
 # vscode
 .vscode/
@@ -53,4 +59,6 @@ build_output.txt
 # media and temporary images
 *.mp4
 Gemini_Generated_Image_*.png
-image (4).png
+image*.png
+.DS_Store
+node_modules/

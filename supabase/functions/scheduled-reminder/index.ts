@@ -23,7 +23,12 @@ async function sendSms(to: string, body: string) {
   }
 }
 
-serve(async () => {
+import { verifyWebhookSecret } from "../_shared/auth.ts";
+
+serve(async (req: Request) => {
+  if (!verifyWebhookSecret(req)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
   try {
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",

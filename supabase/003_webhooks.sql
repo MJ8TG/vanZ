@@ -15,7 +15,7 @@ BEGIN
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/referral-reward',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := jsonb_build_object('type', 'UPDATE', 'table', 'jobs', 'record', row_to_json(NEW), 'old_record', row_to_json(OLD))
     );
@@ -38,7 +38,7 @@ BEGIN
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/job-completed',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := jsonb_build_object('type', 'UPDATE', 'table', 'jobs', 'record', row_to_json(NEW), 'old_record', row_to_json(OLD))
     );
@@ -63,7 +63,7 @@ BEGIN
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/geofence-arrival',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := jsonb_build_object('type', 'UPDATE', 'table', 'driver_locations', 'record', row_to_json(NEW))
     );
@@ -79,7 +79,7 @@ FOR EACH ROW EXECUTE FUNCTION public.notify_driver_location_update();
 
 
 -- 3. Cron Job: Job Expiry (Runs every hour)
--- SELECT cron.unschedule('job-expiry-cron');
+SELECT cron.unschedule('job-expiry-cron');
 SELECT cron.schedule(
   'job-expiry-cron',
   '0 * * * *', -- Every hour
@@ -88,7 +88,7 @@ SELECT cron.schedule(
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/job-expiry-cron',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := '{}'::jsonb
     );
@@ -96,7 +96,7 @@ SELECT cron.schedule(
 );
 
 -- 4. Cron Job: Scheduled Reminders (Runs every 15 minutes)
--- SELECT cron.unschedule('scheduled-reminder-cron');
+SELECT cron.unschedule('scheduled-reminder-cron');
 SELECT cron.schedule(
   'scheduled-reminder-cron',
   '*/15 * * * *', -- Every 15 mins
@@ -105,7 +105,7 @@ SELECT cron.schedule(
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/scheduled-reminder',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := '{}'::jsonb
     );
@@ -113,7 +113,7 @@ SELECT cron.schedule(
 );
 
 -- 5. Cron Job: Referral Count Reset (Runs at midnight on the 1st of every month)
--- SELECT cron.unschedule('referral-count-reset-cron');
+SELECT cron.unschedule('referral-count-reset-cron');
 SELECT cron.schedule(
   'referral-count-reset-cron',
   '0 0 1 * *', -- At 00:00 on day-of-month 1
@@ -122,7 +122,7 @@ SELECT cron.schedule(
       url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/referral-count-reset',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
       ),
       body := '{}'::jsonb
     );

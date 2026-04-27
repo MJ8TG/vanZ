@@ -312,7 +312,7 @@ supabase secrets set PAYMEE_VENDOR_TOKEN=xxx
 
 ---
 
-## ☐ TASK-0.6 — Auth des autres webhooks Edge Functions
+## ✅ TASK-0.6 — Auth des autres webhooks Edge Functions
 
 **🔴 Critique · 1h · Anyone can spoof state changes**
 
@@ -381,7 +381,7 @@ serve(async (req: Request) => {
 
 ---
 
-## ☐ TASK-0.7 — Sortir secrets hardcodés en env vars
+## ✅ TASK-0.7 — Sortir secrets hardcodés en env vars
 
 **🔴 Critique · 20min**
 
@@ -435,7 +435,7 @@ supabase secrets set PAYMEE_API_URL=https://sandbox.paymee.tn/api/v2/payments/cr
 
 ---
 
-## ☐ TASK-0.8 — Cleanup repo (gitignore + remove tracked artifacts)
+## ✅ TASK-0.8 — Cleanup repo (gitignore + remove tracked artifacts)
 
 **🟠 Important · 15min · Repo hygiene**
 

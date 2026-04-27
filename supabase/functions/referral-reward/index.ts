@@ -23,7 +23,13 @@ async function sendSms(to: string, body: string) {
   }
 }
 
+import { verifyWebhookSecret } from "../_shared/auth.ts";
+
 serve(async (req: Request) => {
+  if (!verifyWebhookSecret(req)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   try {
     const payload = await req.json();
     const { record, old_record } = payload;

@@ -2,8 +2,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+import { verifyWebhookSecret } from "../_shared/auth.ts";
+
 // Scheduled Cron to reset counts unconditionally natively on 1st of month
-serve(async () => {
+serve(async (req: Request) => {
+  if (!verifyWebhookSecret(req)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
   try {
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
