@@ -29,7 +29,7 @@ async function sendSms(to: string, body: string) {
 }
 
 export async function POST(req: Request) {
-  const IS_DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
+  const IS_DEV_MODE = process.env.DEV_AUTH_BYPASS === '1';
 
   // 1. Auth Guard (Admin only)
   if (!IS_DEV_MODE) {

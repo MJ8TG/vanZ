@@ -5,9 +5,7 @@ import { datasql as supabase } from '@/lib/datasql';
 import Link from 'next/link';
 import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
-import { LayoutDashboard, Users, UserCog, Briefcase, Ticket, HandCoins, Send, LogOut, Loader2, AlertTriangle, Truck } from "lucide-react";
-
-const IS_DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
+import { LayoutDashboard, Users, UserCog, Briefcase, Ticket, HandCoins, Send, LogOut, Loader2, Truck } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -20,21 +18,12 @@ export default function AdminLayout({
   
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState('');
-  const [isDevBypass, setIsDevBypass] = useState(false);
 
   // If we're on the login page, just render children directly (no auth check)
   const isLoginPage = pathname?.includes('/admin/login');
 
   useEffect(() => {
     if (isLoginPage) {
-      setLoading(false);
-      return;
-    }
-
-    // Dev mode: skip Supabase auth entirely
-    if (IS_DEV_MODE) {
-      setUserEmail('dev@vanz.tn');
-      setIsDevBypass(true);
       setLoading(false);
       return;
     }
@@ -63,22 +52,14 @@ export default function AdminLayout({
         setLoading(false);
       } catch (err) {
         console.error('Admin auth check failed:', err);
-        if (IS_DEV_MODE) {
-          setUserEmail('dev@vanz.tn');
-          setIsDevBypass(true);
-          setLoading(false);
-        } else {
-          router.push(`/${locale}/admin/login`);
-        }
+        router.push(`/${locale}/admin/login`);
       }
     };
     checkAuth();
   }, [router, locale, isLoginPage]);
 
   const handleLogout = async () => {
-    if (!IS_DEV_MODE) {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
     router.push(`/${locale}/admin/login`);
   };
 
@@ -131,12 +112,6 @@ export default function AdminLayout({
       </aside>
 
       <main className="flex-1 flex flex-col min-h-screen">
-        {isDevBypass && (
-          <div className="bg-amber-500 text-amber-950 text-center text-xs font-bold py-1.5 px-4 flex items-center justify-center gap-2">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            MODE DÉVELOPPEMENT — Auth Supabase désactivée. Définir NEXT_PUBLIC_DEV_MODE=false pour activer.
-          </div>
-        )}
         <header className="bg-white border-b border-gray-200 h-16 flex items-center px-8 shadow-sm">
           <h1 className="text-lg font-bold text-gray-800">Console Administration</h1>
           <div className="ml-auto flex items-center gap-4">

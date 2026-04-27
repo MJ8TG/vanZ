@@ -40,16 +40,7 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
       setLoading(true);
       setError("");
 
-      // TEST BYPASS (Prefix 000 or magic numbers)
-      const isTestNumber = data.phone.startsWith("000") || ["22222222", "33333333", "55555555"].includes(data.phone);
-      
-      if (isTestNumber) {
-        setTimeout(() => {
-          setShowOtp(true);
-          setLoading(false);
-        }, 500);
-        return;
-      }
+
 
       try {
         const fullPhone = `+216${data.phone}`;
@@ -73,16 +64,7 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
       setLoading(true);
       setError("");
 
-      // TEST BYPASS (Universal Code for test numbers)
-      const isTestNumber = data.phone.startsWith("000") || ["22222222", "33333333", "55555555"].includes(data.phone);
-      
-      if (isTestNumber && data.otp === "123456") {
-        setTimeout(() => {
-          onNext();
-          setLoading(false);
-        }, 500);
-        return;
-      }
+
 
       try {
         const { error } = await supabase.auth.verifyOtp({

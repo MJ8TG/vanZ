@@ -2,22 +2,11 @@
 
 This document tracks all temporary bypasses, test credentials, and critical configurations used during the Supabase integration phase.
 
-## 🔑 Access & Bypasses (DEVELOPMENT ONLY)
+## 🔑 Access & Environment
 
-> [!WARNING]
-> Please REMOVE these bypasses before deploying to a production environment.
-
-### 1. Driver Signup Wizard (OTP Bypass)
-- **File**: `components/drivers/Step1Phone.tsx`
-- **Link**: [Step1Phone.tsx](file:///c:/Users/user/Desktop/vanZ/components/drivers/Step1Phone.tsx)
-- **Test Phone**: `22222222`
-- **Test OTP**: `123456`
-- **Note**: This bypass only skips the UI step. It does **not** create a real Supabase Auth session, so document uploads (Step 2/4) will fail due to RLS policies. To test full uploads, use a real phone number.
-
-### 2. Admin Dashboard (Auth Bypass)
-- **File**: `.env.local`
-- **Variable**: `NEXT_PUBLIC_DEV_MODE=true`
-- **Note**: When active, the Admin layout (`app/[locale]/admin/layout.tsx`) skips the authentication check and allows access to `/admin` pages without logging in.
+### Dev Mode
+- **Variable**: `DEV_AUTH_BYPASS=1`
+- **Note**: Can be set on the server environment for local dev but is ignored entirely in Client Components for security. Supabase auth is still required for the admin dashboard.
 
 ---
 
