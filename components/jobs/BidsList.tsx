@@ -51,7 +51,7 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
         // Fetch driver details for each bid
         const enriched = await Promise.all(data.map(async (bid) => {
           const { data: driver } = await datasql
-            .from('users')
+            .from('users_public')
             .select('first_name, last_name')
             .eq('id', bid.driver_id)
             .maybeSingle();
@@ -99,7 +99,7 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
 
           // Fetch driver info for the new bid
           const { data: driver } = await datasql
-            .from('users')
+            .from('users_public')
             .select('first_name, last_name')
             .eq('id', newBidRaw.driver_id)
             .maybeSingle();

@@ -27,7 +27,15 @@ $$ LANGUAGE SQL SECURITY DEFINER STABLE;
 
 DROP POLICY IF EXISTS "users_read_own_or_admin" ON public.users;
 CREATE POLICY "users_read_own_or_admin" ON public.users
-  FOR SELECT USING (auth.uid() = id OR public.is_admin() OR account_status = 'active');
+  FOR SELECT USING (auth.uid() = id OR public.is_admin());
+
+-- Vue publique pour les infos non-sensibles
+CREATE OR REPLACE VIEW public.users_public AS
+  SELECT id, first_name, last_name, cached_rating, total_reviews, role, city
+  FROM public.users
+  WHERE account_status = 'active';
+
+GRANT SELECT ON public.users_public TO anon, authenticated;
 
 DROP POLICY IF EXISTS "users_update_own" ON public.users;
 CREATE POLICY "users_update_own" ON public.users

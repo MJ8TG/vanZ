@@ -41,7 +41,7 @@ export default function ConversationsList({ currentUserId, onSelect }: { current
         
         // Fetch the other party's name from the users table directly
         const { data: otherUser } = await datasql
-          .from('users')
+          .from('users_public')
           .select('first_name, last_name')
           .eq('id', otherPartyId)
           .single();

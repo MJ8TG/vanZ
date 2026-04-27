@@ -197,7 +197,7 @@ SELECT id, phone, role FROM public.users WHERE role = 'admin';
 
 ---
 
-## ☐ TASK-0.4 — Fixer RLS qui leak les users
+## [x] TASK-0.4 — Fixer RLS qui leak les users
 
 **🔴 Critique · 30min · PII exposed**
 
