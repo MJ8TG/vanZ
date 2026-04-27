@@ -57,7 +57,20 @@ async function runTests() {
     }).eq('id', driverId);
     
     if (updErr) console.warn("Driver Update Error (might be blocked by RLS, proceeding anyway): " + updErr.message);
-    console.log("✅ Driver activated and set to Online.\n");
+    
+    console.log("[2.5/5] Creating Driver Profile in public.drivers...");
+    const { error: drvErr } = await supabase.from('drivers').insert({
+      id: driverId,
+      cin_number: `CIN${testId}`,
+      cin_expiry: '2030-01-01',
+      date_of_birth: '1990-01-01',
+      vehicle_type: 'van_standard',
+      vehicle_plate: `${testId.substring(0,4)} TN 216`,
+      status: 'approved'
+    });
+    if (drvErr) console.warn("Driver Profile Creation Error (might be blocked by RLS): " + drvErr.message);
+    
+    console.log("✅ Driver activated and profile initialized.\n");
 
     console.log("[3/5] Client Post Job...");
     

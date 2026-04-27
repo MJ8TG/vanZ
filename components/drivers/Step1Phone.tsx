@@ -40,8 +40,10 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
       setLoading(true);
       setError("");
 
-      // TEST BYPASS
-      if (data.phone === "22222222") {
+      // TEST BYPASS (Prefix 000 or magic numbers)
+      const isTestNumber = data.phone.startsWith("000") || ["22222222", "33333333", "55555555"].includes(data.phone);
+      
+      if (isTestNumber) {
         setTimeout(() => {
           setShowOtp(true);
           setLoading(false);
@@ -71,8 +73,10 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
       setLoading(true);
       setError("");
 
-      // TEST BYPASS
-      if (data.phone === "22222222" && data.otp === "123456") {
+      // TEST BYPASS (Universal Code for test numbers)
+      const isTestNumber = data.phone.startsWith("000") || ["22222222", "33333333", "55555555"].includes(data.phone);
+      
+      if (isTestNumber && data.otp === "123456") {
         setTimeout(() => {
           onNext();
           setLoading(false);

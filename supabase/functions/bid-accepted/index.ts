@@ -61,7 +61,11 @@ serve(async (req: Request) => {
     // 2. UPDATE job -> status = 'confirmed', accepted_bid_id = bid.id
     const { data: job } = await supabaseAdmin
       .from('jobs')
-      .update({ status: 'matched', accepted_bid_id: record.id })
+      .update({ 
+        status: 'confirmed', 
+        accepted_bid_id: record.id,
+        accepted_bid_amount: record.amount
+      })
       .eq('id', jobId)
       .select('client_id, users!jobs_client_id_fkey(phone)')
       .single();

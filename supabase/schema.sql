@@ -495,10 +495,10 @@ RETURNS TRIGGER AS $$
 BEGIN
   -- We use a generic JSON payload structure that Supabase Webhooks emit
   PERFORM net.http_post(
-    url := coalesce(current_setting('app.settings.supabase_url', true), 'http://supabase_kong:8000') || '/functions/v1/review-submitted',
+    url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/review-submitted',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || coalesce(current_setting('app.settings.supabase_service_role_key', true), coalesce(current_setting('app.settings.supabase_anon_key', true), 'ANON_KEY'))
+      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
     ),
     body := jsonb_build_object('type', 'INSERT', 'table', 'reviews', 'record', row_to_json(NEW))
   );
@@ -519,10 +519,10 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.status = 'accepted' AND OLD.status != 'accepted' THEN
     PERFORM net.http_post(
-      url := coalesce(current_setting('app.settings.supabase_url', true), 'http://supabase_kong:8000') || '/functions/v1/bid-accepted',
+      url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/bid-accepted',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || coalesce(current_setting('app.settings.supabase_service_role_key', true), coalesce(current_setting('app.settings.supabase_anon_key', true), 'ANON_KEY'))
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
       ),
       body := jsonb_build_object('type', 'UPDATE', 'table', 'bids', 'record', row_to_json(NEW), 'old_record', row_to_json(OLD))
     );
@@ -542,10 +542,10 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.status != OLD.status AND (NEW.status = 'approved' OR NEW.status = 'rejected') THEN
     PERFORM net.http_post(
-      url := coalesce(current_setting('app.settings.supabase_url', true), 'http://supabase_kong:8000') || '/functions/v1/driver-status-change',
+      url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/driver-status-change',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || coalesce(current_setting('app.settings.supabase_service_role_key', true), coalesce(current_setting('app.settings.supabase_anon_key', true), 'ANON_KEY'))
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxMDk2MSwiZXhwIjoyMDg5Nzg2OTYxfQ.Obpv9V8J5iQiDRhClYytL9wg5IHrjjdramWS19nJRLc'
       ),
       body := jsonb_build_object('type', 'UPDATE', 'table', 'drivers', 'record', row_to_json(NEW), 'old_record', row_to_json(OLD))
     );

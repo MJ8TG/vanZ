@@ -62,62 +62,79 @@ async function runTests() {
       is_online: true 
     }).eq('id', driverId);
 
-    console.log("✅ Driver activated and set to Online.\n");
+    console.log("✅ Driver activated and set to Online.");
+
+    console.log("[2.5/5] Creating Driver Profile in public.drivers...");
+    const { error: drvErr } = await supabase.from('drivers').insert({
+      id: driverId,
+      cin_number: `CIN${testId}`,
+      cin_expiry: '2030-01-01',
+      date_of_birth: '1990-01-01',
+      vehicle_type: 'van_standard',
+      vehicle_plate: `${testId.substring(0,4)} TN 216`,
+      status: 'approved'
+    });
+    if (drvErr) throw new Error("Driver Profile Creation Failed: " + drvErr.message);
+    console.log("✅ Driver profile created and approved.\n");
 
     console.log("[3/5] Client Post Job & Driver Bid...");
-    // Create Job
+    // [3/5] Client Post Job & Driver Bid
     const { data: job, error: jobErr } = await supabase.from('jobs').insert({
-       client_id: clientId,
-       pickup_address: 'Lac 1, Tunis',
-       dropoff_address: 'Marsa, Tunis',
-       pickup_lat: 36.83, pickup_lng: 10.23, dropoff_lat: 36.88, dropoff_lng: 10.32,
-       service_type: 'van_standard',
-       status: 'open'
+      client_id: clientId,
+      service_type: 'van_standard',
+      pickup_address: 'Lac 1, Tunis',
+      pickup_lat: 36.83,
+      pickup_lng: 10.23,
+      dropoff_address: 'Marsa, Tunis',
+      dropoff_lat: 36.88,
+      dropoff_lng: 10.32,
+      payment_method: 'cash',
+      status: 'open'
     }).select().single();
-    if (jobErr) throw new Error("Job creation failed: " + jobErr.message);
+    if (jobErr) throw jobErr;
 
     const jobId = job.id;
     console.log(`✅ Job #${jobId} Listed.`);
 
-    // Place Bid
     const { data: bid, error: bidErr } = await supabase.from('bids').insert({
-       job_id: jobId,
-       driver_id: driverId,
-       amount: 150,
-       status: 'pending'
+      job_id: jobId,
+      driver_id: driverId,
+      amount: 150,
+      status: 'pending'
     }).select().single();
-    if (bidErr) throw new Error("Bidding failed: " + bidErr.message);
+    if (bidErr) throw bidErr;
 
     const bidId = bid.id;
-    console.log(`✅ Driver Bid 150 TND on Job #${jobId}.\n`);
+    console.log(`✅ Driver Bid 150 TND on Job #${jobId}.`);
 
-    console.log("[4/5] Client Accepts Bid (Triggers bid-accepted Edge Function via Supabase webhook)...");
-    
-    // Update Bid Status -> Edge Function fires
-    await supabase.from('bids').update({ status: 'accepted' }).eq('id', bidId);
+    // [4/5] Client Accepts Bid (Triggers bid-accepted Edge Function via Supabase webhook)
+    const { error: accErr } = await supabase.from('bids').update({ status: 'accepted' }).eq('id', bidId);
+    if (accErr) throw accErr;
 
-    // Give Webhook time to process asynchronous writes
-    await new Promise(r => setTimeout(r, 2000));
+    // Wait for bid-accepted Edge Function to process
+    await new Promise(r => setTimeout(r, 4000));
 
-    // Verify Job Status changed
-    const { data: jobVerify } = await supabase.from('jobs').select('status, accepted_bid_amount, accepted_bid_id').eq('id', jobId).single();
-    if (jobVerify.status !== 'matched' && jobVerify.status !== 'in_progress') {
-       console.warn(`⚠️ Warning: Edge Function bid-accepted might not have fired quickly enough or failed. Job Status: ${jobVerify.status}`);
-       // Fallback mock logic for testing remainder
-       await supabase.from('jobs').update({ status: 'matched', accepted_bid_id: bidId, accepted_bid_amount: 150, driver_id: driverId }).eq('id', jobId);
-    } else {
-       console.log("✅ Edge Function 'bid-accepted' validated Job Matching logic.");
+    // Verify Job Status & Matching
+    const { data: jobCheck, error: chkErr } = await supabase.from('jobs').select('status, accepted_bid_id').eq('id', jobId).single();
+    if (chkErr) throw chkErr;
+    if (jobCheck.status !== 'matched' || jobCheck.accepted_bid_id !== bidId) {
+      throw new Error(`Edge Function 'bid-accepted' Failed: Status=${jobCheck.status}, accepted_bid_id=${jobCheck.accepted_bid_id}`);
     }
-    console.log("\n[5/5] Completing Job & Commission Validation...");
+    console.log(`✅ Edge Function 'bid-accepted' validated Job Matching logic.`);
+
+    // [5/5] Completing Job & Commission Validation
+    console.log('\n[5/5] Completing Job & Commission Validation...');
     
     // Complete Job
-    await supabase.from('jobs').update({ status: 'completed' }).eq('id', jobId);
+    const { error: compErr } = await supabase.from('jobs').update({ status: 'completed' }).eq('id', jobId);
+    if (compErr) throw compErr;
 
-    // Wait for job-completed webhook
-    await new Promise(r => setTimeout(r, 2000));
+    // Wait for triggers/webhooks
+    await new Promise(r => setTimeout(r, 5000));
 
     // Verify Commission Math
-    const { data: jobMath } = await supabase.from('jobs').select('commission_amount, driver_payout').eq('id', jobId).single();
+    const { data: jobMath, error: mathErr } = await supabase.from('jobs').select('commission_amount, driver_payout').eq('id', jobId).single();
+    if (mathErr) throw mathErr;
     const { data: driverMath } = await supabase.from('users').select('pending_commission_debt').eq('id', driverId).single();
     
     const expectedCommission = 150 * 0.15; // 15% standard
@@ -134,10 +151,12 @@ async function runTests() {
     }
 
     // Cleanup Mocks
-    console.log("\n🧹 Cleaning up Mock Auth Users & Test Traces...");
+    /*
+    console.log('\n🧹 Cleaning up Mock Auth Users & Test Traces...');
     await supabase.auth.admin.deleteUser(clientId);
     await supabase.auth.admin.deleteUser(driverId);
-    console.log("✅ Cleanup Complete.");
+    console.log('✅ Cleanup Complete.');
+    */
     console.log("============== E2E SUITE SUCCESS ==============\n");
 
   } catch(e) {

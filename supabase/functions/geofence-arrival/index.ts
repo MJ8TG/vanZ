@@ -64,8 +64,8 @@ serve(async (req: Request) => {
     if (job.status === 'confirmed' && job.pickup_lat && job.pickup_lng) {
       const distPickup = haversineDistance(vanLat, vanLng, job.pickup_lat, job.pickup_lng);
       if (distPickup < 50) {
-         await supabaseAdmin.from('jobs').update({ status: 'in_progress' }).eq('id', jobId);
-         await injectSystemMessage(conversationId, 'Le chauffeur est arrivé !');
+         await supabaseAdmin.from('jobs').update({ status: 'arrived_pickup' }).eq('id', jobId);
+         await injectSystemMessage(conversationId, 'Le chauffeur est arrivé au point de départ !');
          // Real Push Notification stub (usually APNS/FCM via a third party service or Edge function wrapper)
          console.log(`[PUSH] To Client ${job.client_id}: Le chauffeur est arrivé !`);
       }
