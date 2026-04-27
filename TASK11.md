@@ -93,7 +93,7 @@ CREATE INDEX IF NOT EXISTS idx_jobs_status ON public.jobs(status);
 
 ---
 
-## ☐ TASK-0.2 — Supprimer dev bypasses du bundle production
+## [x] TASK-0.2 — Supprimer dev bypasses du bundle production
 
 **🔴 Critique · 30min · Auth admin contournable depuis le client**
 
