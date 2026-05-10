@@ -4,9 +4,15 @@ const crypto = require('crypto');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("Missing NEXT_PUBLIC_SUPABASE variables in .env.local");
+  process.exit(1);
+}
+
+if (!E2E_PASSWORD) {
+  console.error("Missing E2E_TEST_PASSWORD in .env.local");
   process.exit(1);
 }
 
@@ -29,14 +35,14 @@ async function runTests() {
     
     const { data: authClient, error: cErr } = await supabase.auth.signUp({
       email: clientEmail,
-      password: "password123",
+      password: E2E_PASSWORD,
       options: { data: { role: 'client', first_name: 'Test', last_name: 'Client', phone: `+21699000${testId.substring(0,3)}` } }
     });
     if (cErr) throw new Error("Client Mock Failed: " + cErr.message);
 
     const { data: authDriver, error: dErr } = await supabase.auth.signUp({
       email: driverEmail,
-      password: "password123",
+      password: E2E_PASSWORD,
       options: { data: { role: 'driver', first_name: 'Test', last_name: 'Driver', phone: `+21699111${testId.substring(0,3)}` } }
     });
     if (dErr) throw new Error("Driver Mock Failed: " + dErr.message);
@@ -49,7 +55,7 @@ async function runTests() {
     console.log("[2/5] Forcing Driver Verification...");
     
     // Auth back as driver and update public info
-    await supabase.auth.signInWithPassword({ email: driverEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
     const { error: updErr } = await supabase.from('users').update({ 
       account_status: 'active',
       city: 'Tunis',
@@ -74,7 +80,7 @@ async function runTests() {
 
     console.log("[3/5] Client Post Job...");
     
-    await supabase.auth.signInWithPassword({ email: clientEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     const { data: job, error: jobErr } = await supabase.from('jobs').insert({
        client_id: clientId,
        pickup_address: 'Lac 1, Tunis',
@@ -89,7 +95,7 @@ async function runTests() {
     console.log(`✅ Job #${jobId} Listed.\n`);
 
     console.log("[4/5] Driver Bids 150 TND...");
-    await supabase.auth.signInWithPassword({ email: driverEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
     const { data: bid, error: bidErr } = await supabase.from('bids').insert({
        job_id: jobId,
        driver_id: driverId,
@@ -102,7 +108,7 @@ async function runTests() {
     console.log(`✅ Driver Bid 150 TND on Job #${jobId}.`);
 
     console.log("Client Accepts Bid (Triggers bid-accepted Edge Function via webhook)...");
-    await supabase.auth.signInWithPassword({ email: clientEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     await supabase.from('bids').update({ status: 'accepted' }).eq('id', bidId);
 
     await new Promise(r => setTimeout(r, 2000)); // Allow webhook execution

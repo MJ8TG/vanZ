@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { getAuthenticatedUser, getServiceClient } from '@/lib/api-auth';
 
 export async function POST(req: Request) {
+  // 🔒 Auth Gate: verify caller is logged in
+  const { user, error: authError } = await getAuthenticatedUser(req);
+  if (authError) return authError;
+
   try {
     const supabase = getServiceClient();
     const { job_id, driver_id, delivery_photo_url, delivery_photo_lat, delivery_photo_lng } = await req.json();
 
     if (!job_id || !driver_id) {
       return NextResponse.json({ error: 'Paramètres manquants: job_id, driver_id requis.' }, { status: 400 });
+    }
+
+    // 🔒 Authorization: caller must be the driver_id they claim
+    if (user!.id !== driver_id) {
+      return NextResponse.json({ error: 'Vous ne pouvez clôturer que vos propres missions.' }, { status: 403 });
     }
 
     if (!delivery_photo_url) {
@@ -49,7 +51,21 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. Update job → completed with delivery proof
+    // 2. Atomic commission calculation (idempotent — prevents double-credit)
+    const { data: completionResult, error: rpcErr } = await supabase.rpc('complete_job_atomic', {
+      p_job_id: job_id,
+      p_amount: job.accepted_bid_amount || 0,
+      p_rate: 0.15
+    });
+
+    if (rpcErr) throw rpcErr;
+
+    // If empty result, commission was already calculated — still complete the job
+    const isFirstCompletion = completionResult && completionResult.length > 0;
+    const driverPayout = isFirstCompletion ? completionResult[0].payout : job.driver_payout;
+    const commissionAmount = isFirstCompletion ? completionResult[0].commission : job.commission_amount;
+
+    // 3. Update job → completed with delivery proof
     const { error: updateErr } = await supabase
       .from('jobs')
       .update({
@@ -82,33 +98,25 @@ export async function POST(req: Request) {
       });
     }
 
-    // 5. Credit driver wallet (driver_payout)
-    if (job.driver_payout) {
+    // 5. Credit driver wallet (atomic — only on first completion)
+    if (isFirstCompletion && driverPayout) {
       await supabase.from('wallet_transactions').insert({
         user_id: driver_id,
-        amount: job.driver_payout,
+        amount: driverPayout,
         type: 'credit',
         job_id,
-        note: `Paiement mission — ${job.driver_payout} TND (après commission)`
+        note: `Paiement mission — ${driverPayout} TND (après commission)`
       });
 
-      // Update driver credit balance
-      const { data: driverUser } = await supabase
-        .from('users')
-        .select('credit_balance')
-        .eq('id', driver_id)
-        .single();
-
-      if (driverUser) {
-        await supabase
-          .from('users')
-          .update({ credit_balance: (driverUser.credit_balance || 0) + job.driver_payout })
-          .eq('id', driver_id);
-      }
+      // Atomic increment — no read-then-write race
+      await supabase.rpc('increment_credit_balance', {
+        p_user_id: driver_id,
+        p_amount: driverPayout
+      });
     }
 
-    // 6. Award loyalty points to client (1 point per 10 TND spent)
-    if (job.accepted_bid_amount) {
+    // 6. Award loyalty points to client (atomic — only on first completion)
+    if (isFirstCompletion && job.accepted_bid_amount) {
       const loyaltyPoints = Math.floor(job.accepted_bid_amount / 10);
       if (loyaltyPoints > 0) {
         await supabase.from('loyalty_transactions').insert({
@@ -118,18 +126,11 @@ export async function POST(req: Request) {
           job_id
         });
 
-        const { data: clientUser } = await supabase
-          .from('users')
-          .select('loyalty_points')
-          .eq('id', job.client_id)
-          .single();
-
-        if (clientUser) {
-          await supabase
-            .from('users')
-            .update({ loyalty_points: (clientUser.loyalty_points || 0) + loyaltyPoints })
-            .eq('id', job.client_id);
-        }
+        // Atomic increment — no read-then-write race
+        await supabase.rpc('increment_loyalty_points', {
+          p_user_id: job.client_id,
+          p_points: loyaltyPoints
+        });
       }
     }
 
@@ -138,8 +139,8 @@ export async function POST(req: Request) {
       data: {
         job_id,
         status: 'completed',
-        driver_payout: job.driver_payout,
-        commission: job.commission_amount
+        driver_payout: driverPayout,
+        commission: commissionAmount
       }
     });
 

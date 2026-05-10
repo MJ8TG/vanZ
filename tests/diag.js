@@ -1,6 +1,16 @@
-const http = require('http');
+const https = require('https');
 
-http.get('http://localhost:3000/api/test-e2e', (res) => {
+// Diagnostics endpoint - always use HTTPS.
+// For local development, set DIAG_BASE_URL to your local HTTPS URL
+// (e.g. via mkcert) or use the default production-safe URL.
+const baseUrl = process.env.DIAG_BASE_URL || 'https://localhost:3000';
+
+// Reject unauthorized certs only in explicit dev mode
+const rejectUnauthorized = process.env.NODE_ENV !== 'development';
+
+const options = new URL(`${baseUrl}/api/test-e2e`);
+
+https.get(options, { rejectUnauthorized }, (res) => {
   let data = '';
   res.on('data', chunk => data += chunk);
   res.on('end', () => {

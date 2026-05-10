@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -41,7 +40,7 @@ serve(async (req: Request) => {
         phone: client?.phone || '+21620000000',
         return_url: `${BASE_URL}/jobs/${job.id}/payment-success`,
         cancel_url: `${BASE_URL}/jobs/${job.id}/payment-cancel`,
-        webhook_url: `${SUPABASE_FUNCTIONS_URL}/paymee-webhook`
+        webhook_url: `${SUPABASE_FUNCTIONS_URL}/paymee-webhook?job_id=${job.id}`
       })
     });
 

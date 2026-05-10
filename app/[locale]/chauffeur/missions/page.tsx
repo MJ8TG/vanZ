@@ -71,17 +71,17 @@ export default function DriverFeedPage() {
         return;
       }
 
-      // 🚨 TESTING PHASE: Driver approval check disabled for beta testing
-      // const { data: driverAcc } = await datasql
-      //   .from('drivers')
-      //   .select('status')
-      //   .eq('id', user.id)
-      //   .single();
-      //
-      // if (!driverAcc || driverAcc.status !== 'approved') {
-      //   router.push(`/${locale}/signup`);
-      //   return;
-      // }
+      // Enforce Driver Approval Verification
+      const { data: driverAcc } = await datasql
+        .from('drivers')
+        .select('status')
+        .eq('id', user.id)
+        .single();
+
+      if (!driverAcc || driverAcc.status !== 'approved') {
+        router.push(`/${locale}/chauffeur/pending`);
+        return;
+      }
 
       setIsDriver(true);
       if (profile?.city) setDriverCity(profile.city);
@@ -185,9 +185,9 @@ export default function DriverFeedPage() {
     setError(null);
 
     try {
-      const res = await fetch('/api/bids/create', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const res = await authFetch('/api/bids/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_id: jobId,
           driver_id: userId,

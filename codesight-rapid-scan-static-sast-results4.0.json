@@ -1,0 +1,2311 @@
+{
+  "scanType": "rapid-scan-static-sast",
+  "timestamp": "2026-05-05T13:58:28.2520261+01:00",
+  "outputFormat": "json-v1.4.0",
+  "results": {
+    "sigma_runtime": {
+      "version": "2026.4.0",
+      "command": [
+        "analyze",
+        "--make-paths-absolute",
+        "-o",
+        "C:\\Users\\user\\AppData\\Roaming\\BlackDuck\\desktop\\controller\\idirs\\sigma\\ab8c435c\\runs\\vedigvaqpiwm\\results\\result.json",
+        "C:\\Users\\user\\Desktop\\vanZ"
+      ]
+    },
+    "revision": "1.4.0",
+    "issues": {
+      "created": "2026-05-05 12:58:27.0780046 +00:00:00",
+      "issues": [
+        {
+          "fingerprint": "366a66c8df93d2ede72bd0a6576b6ace",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "366a66c8df93d2ede72bd0a6576b6ace",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Encryption key (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\prerender-manifest.json",
+          "language": "JSON",
+          "location": {
+            "start": {
+              "line": 1,
+              "column": 742,
+              "byte": 741
+            },
+            "end": {
+              "line": 1,
+              "column": 806,
+              "byte": 805
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "51d737a46a870d57cb3b00d5a2e32b1e",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "51d737a46a870d57cb3b00d5a2e32b1e",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0i9blst._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 40,
+              "column": 58,
+              "byte": 2128
+            },
+            "end": {
+              "line": 40,
+              "column": 268,
+              "byte": 2338
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "d7240732633c8aee72b42fd685e0a767",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "d7240732633c8aee72b42fd685e0a767",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_05zs093._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "b21be0c3553592ea4381867482953d07",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "b21be0c3553592ea4381867482953d07",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_05zs093._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 56,
+              "column": 27,
+              "byte": 4488
+            },
+            "end": {
+              "line": 56,
+              "column": 40,
+              "byte": 4501
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "e656fb7080cfab765914f27fab91a45b",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "e656fb7080cfab765914f27fab91a45b",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0dkvo-l._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "f82e3fc6079d2fc4a10310695ed24c1f",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "f82e3fc6079d2fc4a10310695ed24c1f",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0g8ciec._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "d74668dbce5c8ff00a1bd25bbe624130",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "d74668dbce5c8ff00a1bd25bbe624130",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0jxed9i._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "77e6dd98cb6294961452d4d57e8a3ca3",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "77e6dd98cb6294961452d4d57e8a3ca3",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0jxed9i._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1254,
+              "column": 30,
+              "byte": 124616
+            },
+            "end": {
+              "line": 1254,
+              "column": 44,
+              "byte": 124630
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "7c425bb1a5cb283b2335d0186c2aa767",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "7c425bb1a5cb283b2335d0186c2aa767",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0k9u~pb._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "6b6e974689033a930bb3a4643fbf58e6",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "6b6e974689033a930bb3a4643fbf58e6",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0k9u~pb._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1283,
+              "column": 30,
+              "byte": 127849
+            },
+            "end": {
+              "line": 1283,
+              "column": 44,
+              "byte": 127863
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "4d0188084df3db173a24e95354797e5d",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "4d0188084df3db173a24e95354797e5d",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0m26~w9._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "889aa5d4ca4af74aa7502aa45610af53",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "889aa5d4ca4af74aa7502aa45610af53",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0pcf4md._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "e71de501b03b480d8c7a8820f0e00d03",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "e71de501b03b480d8c7a8820f0e00d03",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0q7ex-9._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "5c98a048a987d66abb79c46fb11740e8",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "5c98a048a987d66abb79c46fb11740e8",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_0ts58ml._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "006d0f39c03c04473726995c04102bac",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "006d0f39c03c04473726995c04102bac",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\_10h83.z._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 16,
+              "column": 58,
+              "byte": 809
+            },
+            "end": {
+              "line": 16,
+              "column": 268,
+              "byte": 1019
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "fa1890faaae75de734305b777ac3f6a8",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "fa1890faaae75de734305b777ac3f6a8",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\app_[locale]_login_page_tsx_02r7w7g._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 72,
+              "column": 30,
+              "byte": 7496
+            },
+            "end": {
+              "line": 72,
+              "column": 44,
+              "byte": 7510
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "852072b145bf7f8642b4ff55ea43fd5c",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "852072b145bf7f8642b4ff55ea43fd5c",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\app_[locale]_signup_page_tsx_0dk7t.s._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 64,
+              "column": 30,
+              "byte": 7761
+            },
+            "end": {
+              "line": 64,
+              "column": 44,
+              "byte": 7775
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "b4d6a3dc289c14bf50c4be3801688d42",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "b4d6a3dc289c14bf50c4be3801688d42",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\app_[locale]_test-login_page_tsx_0011y-~._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 32,
+              "column": 27,
+              "byte": 3013
+            },
+            "end": {
+              "line": 32,
+              "column": 40,
+              "byte": 3026
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "2dd517f025e1839cd35e60e3bc20aea0",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "2dd517f025e1839cd35e60e3bc20aea0",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Encryption key (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\server-reference-manifest.json",
+          "language": "JSON",
+          "location": {
+            "start": {
+              "line": 4,
+              "column": 21,
+              "byte": 50
+            },
+            "end": {
+              "line": 4,
+              "column": 65,
+              "byte": 94
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "0d1788d187d3618cd7bd17d38a617ef3",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "0d1788d187d3618cd7bd17d38a617ef3",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_01q10fm._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "50251dfdc8cb07e27de5a1d8c686d9ff",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "50251dfdc8cb07e27de5a1d8c686d9ff",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_01q10fm._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1375,
+              "column": 30,
+              "byte": 128049
+            },
+            "end": {
+              "line": 1375,
+              "column": 44,
+              "byte": 128063
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "15e234430a1cf2a894ef986161d05bfc",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "15e234430a1cf2a894ef986161d05bfc",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0219uc6._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "93797d73404b6c922c4650e3ec16c1fc",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "93797d73404b6c922c4650e3ec16c1fc",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_02psdt.._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 67,
+              "column": 30,
+              "byte": 7790
+            },
+            "end": {
+              "line": 67,
+              "column": 44,
+              "byte": 7804
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "1ea9af287ca9a5d00927d5b19f5def70",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "1ea9af287ca9a5d00927d5b19f5def70",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0bzhk5l._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "f4dd2b0c1a44aabbdc77abd0308d5568",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "f4dd2b0c1a44aabbdc77abd0308d5568",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0f2b5wk._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "c00d7b9f5d3a3bbf280401955e077e96",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "c00d7b9f5d3a3bbf280401955e077e96",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0ksogr6._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 79,
+              "column": 30,
+              "byte": 7778
+            },
+            "end": {
+              "line": 79,
+              "column": 44,
+              "byte": 7792
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "22a60619949e7e2a007292f48282e98e",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "22a60619949e7e2a007292f48282e98e",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0n.7dtu._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "1edff38ca15f0e2ecd1ea162ecee3b38",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "1edff38ca15f0e2ecd1ea162ecee3b38",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0ohsbja._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "89ecc351d047ed9114f2d2f14a61280f",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "89ecc351d047ed9114f2d2f14a61280f",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0ohsbja._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 62,
+              "column": 27,
+              "byte": 4965
+            },
+            "end": {
+              "line": 62,
+              "column": 40,
+              "byte": 4978
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "cdd60ea5e8a43030f5c0750fbfed59ce",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "cdd60ea5e8a43030f5c0750fbfed59ce",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0oy7-mc._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "eff19a7b2aee4b43956d279a16d16734",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "eff19a7b2aee4b43956d279a16d16734",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0r681__._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "cd94a864b2ac3ad895a5e2addd69aa97",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "cd94a864b2ac3ad895a5e2addd69aa97",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0r681__._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1346,
+              "column": 30,
+              "byte": 124998
+            },
+            "end": {
+              "line": 1346,
+              "column": 44,
+              "byte": 125012
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "1e1ce0ca8f68d145284ecb8eb778e4b8",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "1e1ce0ca8f68d145284ecb8eb778e4b8",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0ri6kb~._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "5b9f45eeee3daee1b3f5c01c8e6103d0",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "5b9f45eeee3daee1b3f5c01c8e6103d0",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `JWT token`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Medium",
+            "impact": "High",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0sxm2xe._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 58,
+              "byte": 1227
+            },
+            "end": {
+              "line": 17,
+              "column": 268,
+              "byte": 1437
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "7f5e03fab6251de80752acf6d425a892",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "7f5e03fab6251de80752acf6d425a892",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\_0uqyuui._.js",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 34,
+              "column": 27,
+              "byte": 2988
+            },
+            "end": {
+              "line": 34,
+              "column": 40,
+              "byte": 3001
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "d467c402bc3e331f920fcdc8e4550dec",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "d467c402bc3e331f920fcdc8e4550dec",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Encryption key (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\prerender-manifest.json",
+          "language": "JSON",
+          "location": {
+            "start": {
+              "line": 3289,
+              "column": 34,
+              "byte": 89526
+            },
+            "end": {
+              "line": 3289,
+              "column": 98,
+              "byte": 89590
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "dfc922495eb10ca04feace82784b6307",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "dfc922495eb10ca04feace82784b6307",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Encryption key (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\server\\server-reference-manifest.json",
+          "language": "JSON",
+          "location": {
+            "start": {
+              "line": 4,
+              "column": 21,
+              "byte": 50
+            },
+            "end": {
+              "line": 4,
+              "column": 65,
+              "byte": 94
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "949fc6f0d42b6237db1e2ef8a2e43cab",
+          "check_id": "hardcoded_secret_pattern",
+          "checker_id": "hardcoded_secret",
+          "uuid": "949fc6f0d42b6237db1e2ef8a2e43cab",
+          "summary": "Hard-coded secret",
+          "desc": "A secret, such as a password, cryptographic key, or token is stored in plaintext directly in the source code, in an application's properties, or configuration file. Users with access to the secret may then use the secret to access resources that they otherwise would not have access to. Secret type: `Password (generic)`.",
+          "remediation": "Avoid setting sensitive configuration values as string literals. Instead, these values should be set using variables with the sensitive data loaded from an encrypted file or a secret store.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "798"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.verdent\\skills\\webapp-testing\\examples\\test_api_example.py",
+          "language": "Python",
+          "location": {
+            "start": {
+              "line": 90,
+              "column": 56,
+              "byte": 2877
+            },
+            "end": {
+              "line": 90,
+              "column": 93,
+              "byte": 2914
+            }
+          },
+          "issue_type": "hardcoded_secret_pattern",
+          "tags": [
+            "secret"
+          ]
+        },
+        {
+          "fingerprint": "e4ff700357287819d7fb913c5bb03320",
+          "check_id": "missing_tls_node_http",
+          "checker_id": "missing_tls",
+          "uuid": "e4ff700357287819d7fb913c5bb03320",
+          "summary": "Missing TLS",
+          "desc": "Performing an HTTP request with the insecure `http` protocol is dangerous as the server is attempting to connect to a website that does not encrypt traffic with TLS. If sensitive or security-critical data were sent in cleartext over a communication channel without TLS, that data can be sniffed by unauthorized actors.",
+          "remediation": "Performing the request by using the `https` library instead of the insecure `http` library to avoid sending the payload in cleartext in a communication channel without TLS.",
+          "severity": {
+            "level": "Low",
+            "impact": "Medium",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "319"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\tests\\diag.js",
+          "function": "!diag.js!%SCRIPT",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 8,
+              "column": 1,
+              "byte": 269
+            },
+            "end": {
+              "line": 20,
+              "column": 3,
+              "byte": 665
+            }
+          },
+          "issue_type": "missing_tls_node_http",
+          "tags": [
+            "web",
+            "node",
+            "missing_tls",
+            "info_leak",
+            "crypto"
+          ]
+        },
+        {
+          "fingerprint": "4b40a7e0c502ae4083eb75e3a470b809",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "4b40a7e0c502ae4083eb75e3a470b809",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\build\\chunks\\node_modules_13sb.px._.js",
+          "function": "!node_modules_13sb.px._.js!module.exports.%ITEM:cloneSort",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3077,
+              "column": 35,
+              "byte": 112092
+            },
+            "end": {
+              "line": 3077,
+              "column": 55,
+              "byte": 112112
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "180a7fec90efcb43f6bc8eb0e95aa584",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "180a7fec90efcb43f6bc8eb0e95aa584",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\build\\chunks\\[turbopack]_runtime.js",
+          "function": "![turbopack]_runtime.js!handleNodejsUpdate:evalModuleEntry",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1650,
+              "column": 30,
+              "byte": 65632
+            },
+            "end": {
+              "line": 1650,
+              "column": 78,
+              "byte": 65680
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "4b40a7e0c502ae4083eb75e3a470b809",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "4b40a7e0c502ae4083eb75e3a470b809",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\build\\chunks\\node_modules_13sb.px._.js",
+          "function": "!node_modules_13sb.px._.js!module.exports.%ITEM:cloneSort",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3077,
+              "column": 35,
+              "byte": 112092
+            },
+            "end": {
+              "line": 3077,
+              "column": 55,
+              "byte": 112112
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "c56361546982b00ccaae5f41d880535e",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "c56361546982b00ccaae5f41d880535e",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\[turbopack]_runtime.js",
+          "function": "![turbopack]_runtime.js!handleNodejsUpdate:evalModuleEntry",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1663,
+              "column": 30,
+              "byte": 66195
+            },
+            "end": {
+              "line": 1663,
+              "column": 78,
+              "byte": 66243
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "f13e4ebaf53b1ce4ee851420a5a12247",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "f13e4ebaf53b1ce4ee851420a5a12247",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\[turbopack]_runtime.js",
+          "function": "![turbopack]_runtime.js!handleNodejsUpdate:evalModuleEntry",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1663,
+              "column": 30,
+              "byte": 66205
+            },
+            "end": {
+              "line": 1663,
+              "column": 78,
+              "byte": 66253
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "bbad28443ef040e96e7ba6a29e4f8ebb",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "bbad28443ef040e96e7ba6a29e4f8ebb",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:createFakeFunction",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 4246,
+              "column": 32,
+              "byte": 194170
+            },
+            "end": {
+              "line": 4246,
+              "column": 43,
+              "byte": 194181
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "6bdaf821b72de9085d9e4876baa661fd",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "6bdaf821b72de9085d9e4876baa661fd",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:createFakeServerFunction",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 2737,
+              "column": 30,
+              "byte": 112113
+            },
+            "end": {
+              "line": 2737,
+              "column": 33,
+              "byte": 112116
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "a4044633870837d6c7daf5986b081a1d",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "a4044633870837d6c7daf5986b081a1d",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3845,
+              "column": 81,
+              "byte": 170005
+            },
+            "end": {
+              "line": 3845,
+              "column": 134,
+              "byte": 170058
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "a4044633870837d6c7daf5986b081a1d",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "a4044633870837d6c7daf5986b081a1d",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3847,
+              "column": 108,
+              "byte": 170224
+            },
+            "end": {
+              "line": 3847,
+              "column": 155,
+              "byte": 170271
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "a4044633870837d6c7daf5986b081a1d",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "a4044633870837d6c7daf5986b081a1d",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3848,
+              "column": 141,
+              "byte": 170420
+            },
+            "end": {
+              "line": 3848,
+              "column": 183,
+              "byte": 170462
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "99240297f4db177040ce4e1878cd3773",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "99240297f4db177040ce4e1878cd3773",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\server\\chunks\\ssr\\node_modules_next_dist_compiled_07ho8ku._.js",
+          "function": "!node_modules_next_dist_compiled_07ho8ku._.js!module.exports.%ITEM:%IIFE:parseModelString",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 3907,
+              "column": 90,
+              "byte": 173879
+            },
+            "end": {
+              "line": 3907,
+              "column": 98,
+              "byte": 173887
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "8ddbfbb268bea51b1efc8f4e56af20f9",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "8ddbfbb268bea51b1efc8f4e56af20f9",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:createFakeFunction",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1937,
+              "column": 32,
+              "byte": 110857
+            },
+            "end": {
+              "line": 1937,
+              "column": 43,
+              "byte": 110868
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "b72ed359044db2ceb5d8e009fed9e0d9",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "b72ed359044db2ceb5d8e009fed9e0d9",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:createFakeServerFunction",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 464,
+              "column": 30,
+              "byte": 30546
+            },
+            "end": {
+              "line": 464,
+              "column": 33,
+              "byte": 30549
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "7be47c064895ba562ee3783fece4819e",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "7be47c064895ba562ee3783fece4819e",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1542,
+              "column": 81,
+              "byte": 87403
+            },
+            "end": {
+              "line": 1542,
+              "column": 134,
+              "byte": 87456
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "7be47c064895ba562ee3783fece4819e",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "7be47c064895ba562ee3783fece4819e",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1544,
+              "column": 108,
+              "byte": 87622
+            },
+            "end": {
+              "line": 1544,
+              "column": 155,
+              "byte": 87669
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "7be47c064895ba562ee3783fece4819e",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "7be47c064895ba562ee3783fece4819e",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:getInferredFunctionApproximate",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1545,
+              "column": 141,
+              "byte": 87818
+            },
+            "end": {
+              "line": 1545,
+              "column": 183,
+              "byte": 87860
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "956593942ac01b0698fd92fd0b43953d",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "956593942ac01b0698fd92fd0b43953d",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+          "function": "!node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js!%IPFE.%ITEM:%IIFE:parseModelString",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 1604,
+              "column": 90,
+              "byte": 91277
+            },
+            "end": {
+              "line": 1604,
+              "column": 98,
+              "byte": 91285
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "e0c4740b89a58ff68523fde0922176d4",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "e0c4740b89a58ff68523fde0922176d4",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\turbopack-_0p44nws._.js",
+          "function": "!turbopack-_0p44nws._.js!%IIFE:_eval",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 2208,
+              "column": 17,
+              "byte": 90700
+            },
+            "end": {
+              "line": 2208,
+              "column": 21,
+              "byte": 90704
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "5052cf0861426687e484c8a5edc7c15c",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "5052cf0861426687e484c8a5edc7c15c",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\turbopack-pages__app_0_wu8vy._.js",
+          "function": "!turbopack-pages__app_0_wu8vy._.js!%IIFE:_eval",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 2208,
+              "column": 17,
+              "byte": 90696
+            },
+            "end": {
+              "line": 2208,
+              "column": 21,
+              "byte": 90700
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "d16192e8dcb87ee176da4b37fc68fb3b",
+          "check_id": "unsafe_eval_core_javascript",
+          "checker_id": "unsafe_eval",
+          "uuid": "d16192e8dcb87ee176da4b37fc68fb3b",
+          "summary": "Unsafe evaluation function",
+          "desc": "The application uses an unsafe evaluation method. If attacker-controlled code reaches this method, it may lead to remote code execution, code injection, or a cross-site scripting vulnerability.",
+          "remediation": "Whenever possible, rewrite the application without using code evaluation functions. If the application absolutely needs to use dynamic code evaluation, send hard-coded strings, or user input after the input validation to these functions. If conditional execution is needed, map user input to hardcoded values and send them to the evaluation functions.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "676"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\.next\\dev\\static\\chunks\\turbopack-pages__error_016chbq._.js",
+          "function": "!turbopack-pages__error_016chbq._.js!%IIFE:_eval",
+          "language": "JavaScript",
+          "location": {
+            "start": {
+              "line": 2208,
+              "column": 17,
+              "byte": 90649
+            },
+            "end": {
+              "line": 2208,
+              "column": 21,
+              "byte": 90653
+            }
+          },
+          "issue_type": "unsafe_eval_core_javascript",
+          "tags": [
+            "node",
+            "xss",
+            "rce"
+          ]
+        },
+        {
+          "fingerprint": "b2197698f9ba017c400138486951da06",
+          "check_id": "unsafe_innerhtml_manipulation_react",
+          "checker_id": "unsafe_innerhtml_manipulation",
+          "uuid": "b2197698f9ba017c400138486951da06",
+          "summary": "Unsafe output of data into innerHtml",
+          "desc": "Setting raw HTML content without proper sanitization to the `innerHTML` property of a DOM element by using the `dangerouslySetInnerHTML` attribute may lead to cross-site scripting vulnerabilities.",
+          "remediation": "Audit the usage of `dangerouslySetInnerHTML` to make sure it is necessary and its content is properly sanitized.",
+          "severity": {
+            "level": "Info",
+            "impact": "Low",
+            "likelihood": "Low"
+          },
+          "taxonomies": {
+            "cwe": [
+              "79"
+            ]
+          },
+          "filepath": "C:\\Users\\user\\Desktop\\vanZ\\components\\seo\\JsonLd.tsx",
+          "language": "TSX",
+          "location": {
+            "start": {
+              "line": 21,
+              "column": 42,
+              "byte": 772
+            },
+            "end": {
+              "line": 21,
+              "column": 50,
+              "byte": 780
+            }
+          },
+          "issue_type": "unsafe_innerhtml_manipulation_react",
+          "tags": [
+            "web",
+            "react",
+            "client",
+            "xss"
+          ]
+        }
+      ]
+    }
+  }
+}

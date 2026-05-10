@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -41,16 +40,16 @@ serve(async (req: Request) => {
 
     // Verify the amount strictly matches the accepted bid to block spoofers
     const { data: job } = await supabaseAdmin.from('jobs')
-      .select('id, accepted_bid_id, bids(amount)')
+      .select('id, accepted_bid_amount')
       .eq('id', jobIdRaw)
       .single();
 
-    if (!job || !job.bids) {
-       return new Response('Job or active Bids missing', { status: 200 });
+    if (!job || job.accepted_bid_amount == null) {
+       return new Response('Job or accepted bid amount missing', { status: 200 });
     }
 
     // Float normalization
-    if (Math.abs(Number(webhookPayload.amount) - Number(job.bids.amount)) > 0.01) {
+    if (Math.abs(Number(webhookPayload.amount) - Number(job.accepted_bid_amount)) > 0.01) {
        console.error('AMOUNT MISMATCH — possible fraud attempt');
        return new Response('Amount mismatch error', { status: 200 });
     }

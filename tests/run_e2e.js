@@ -1,13 +1,19 @@
-require('dotenv').config({ path: '../.env.local' });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
 // Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("Missing Supabase Service Role credentials to bypass RLS cleanly.");
+  process.exit(1);
+}
+
+if (!E2E_PASSWORD) {
+  console.error("Missing E2E_TEST_PASSWORD in .env.local");
   process.exit(1);
 }
 
@@ -35,7 +41,7 @@ async function runTests() {
     const { data: authClient, error: cErr } = await supabase.auth.admin.createUser({
       email: clientEmail,
       email_confirm: true,
-      password: "password123",
+      password: E2E_PASSWORD,
       user_metadata: { role: 'client', first_name: 'Test', last_name: 'Client', phone: `+21699000${testId.substring(0,3)}` }
     });
     if (cErr) throw new Error("Client Mock Failed: " + cErr.message);
@@ -43,7 +49,7 @@ async function runTests() {
     const { data: authDriver, error: dErr } = await supabase.auth.admin.createUser({
       email: driverEmail,
       email_confirm: true,
-      password: "password123",
+      password: E2E_PASSWORD,
       user_metadata: { role: 'driver', first_name: 'Test', last_name: 'Driver', phone: `+21699111${testId.substring(0,3)}` }
     });
     if (dErr) throw new Error("Driver Mock Failed: " + dErr.message);

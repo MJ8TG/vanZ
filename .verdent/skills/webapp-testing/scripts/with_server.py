@@ -14,6 +14,7 @@ Usage:
       -- python test.py
 """
 
+import shlex
 import subprocess
 import socket
 import time
@@ -65,10 +66,9 @@ def main():
         for i, server in enumerate(servers):
             print(f"Starting server {i+1}/{len(servers)}: {server['cmd']}")
 
-            # Use shell=True to support commands with cd and &&
             process = subprocess.Popen(
-                server['cmd'],
-                shell=True,
+                shlex.split(server['cmd']),
+                shell=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )

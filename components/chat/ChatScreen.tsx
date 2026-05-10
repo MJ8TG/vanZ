@@ -135,9 +135,9 @@ export default function ChatScreen({ conversationId, jobId, currentUserId, curre
     setErrorMsg("");
 
     try {
-      const res = await fetch('/api/messages', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const res = await authFetch('/api/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversation_id: conversationId,
           sender_id: currentUserId,

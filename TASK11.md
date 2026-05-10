@@ -890,7 +890,7 @@ const fetchBids = async () => {
 
 ---
 
-## ☐ TASK-1.6 — Feedback UI sur géoloc refusée
+## [x] TASK-1.6 — Feedback UI sur géoloc refusée
 
 **🟡 Polish · 30min · UX**
 
@@ -937,7 +937,7 @@ if (error) {
 
 # 🟡 PHASE 2 — Performance & data quality
 
-## ☐ TASK-2.1 — PostGIS proper avec GIST index
+## [x] TASK-2.1 — PostGIS proper avec GIST index
 
 **🟡 Polish · 1h · Scale**
 
@@ -1004,7 +1004,7 @@ CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON public.reviews(reviewee_id, c
 
 ---
 
-## ☐ TASK-2.3 — Driver location history
+## [x] TASK-2.3 — Driver location history
 
 **🟡 Polish · 1h · Audit/dispute support**
 

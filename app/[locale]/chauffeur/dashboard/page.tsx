@@ -41,17 +41,17 @@ export default function DriverDashboardPage() {
            return;
         }
 
-        // 🚨 TESTING PHASE: Driver approval check disabled for beta testing
-        // const { data: driverAcc } = await datasql
-        //   .from('drivers')
-        //   .select('status')
-        //   .eq('id', user.id)
-        //   .single();
-        //
-        // if (!driverAcc || driverAcc.status !== 'approved') {
-        //   router.push(`/${locale}/signup`);
-        //   return;
-        // }
+        // Enforce Driver Approval Verification
+        const { data: driverAcc } = await datasql
+          .from('drivers')
+          .select('status')
+          .eq('id', user.id)
+          .single();
+
+        if (!driverAcc || driverAcc.status !== 'approved') {
+          router.push(`/${locale}/chauffeur/pending`);
+          return;
+        }
         
         setProfile(userProfile);
 

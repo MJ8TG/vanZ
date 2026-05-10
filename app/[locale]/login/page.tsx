@@ -33,7 +33,12 @@ export default function LoginPage() {
            .single();
          
          if (profile?.role === 'driver') {
-           router.push(`/${locale}/chauffeur/dashboard`);
+           const { data: driverAcc } = await supabase.from('drivers').select('status').eq('id', user.id).single();
+           if (driverAcc?.status === 'approved') {
+             router.push(`/${locale}/chauffeur/dashboard`);
+           } else {
+             router.push(`/${locale}/chauffeur/pending`);
+           }
          } else {
            router.push(`/${locale}/mes-missions`);
          }
@@ -54,7 +59,8 @@ export default function LoginPage() {
 
   const handleTestFill = async () => {
     const testEmail = "test@vanz.tn";
-    const testPassword = "Password123!";
+    const testPassword = process.env.NEXT_PUBLIC_TEST_PASSWORD || "";
+    if (!testPassword) { setError("NEXT_PUBLIC_TEST_PASSWORD not set"); return; }
     
     setEmail(testEmail);
     setPassword(testPassword);
@@ -87,7 +93,15 @@ export default function LoginPage() {
 
       // 3. Success!
       if (role === 'driver') {
-        router.push(`/${locale}/chauffeur/dashboard`);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: driverAcc } = await supabase.from('drivers').select('status').eq('id', user.id).single();
+          if (driverAcc?.status === 'approved') {
+            router.push(`/${locale}/chauffeur/dashboard`);
+          } else {
+            router.push(`/${locale}/chauffeur/pending`);
+          }
+        }
       } else {
         router.push(`/${locale}/mes-missions`);
       }
@@ -126,7 +140,12 @@ export default function LoginPage() {
         const finalRole = profile?.role || 'client';
 
         if (finalRole === 'driver') {
-          router.push(`/${locale}/chauffeur/dashboard`);
+          const { data: driverAcc } = await supabase.from('drivers').select('status').eq('id', data.user.id).single();
+          if (driverAcc?.status === 'approved') {
+            router.push(`/${locale}/chauffeur/dashboard`);
+          } else {
+            router.push(`/${locale}/chauffeur/pending`);
+          }
         } else {
           router.push(`/${locale}/mes-missions`);
         }
@@ -151,29 +170,29 @@ export default function LoginPage() {
              <p className="text-sm font-medium text-gray-400 mt-2">Connectez-vous pour continuer</p>
           </div>
 
-          {/* Role Selection Toggle */}
-          <div className="flex p-1 bg-gray-50 rounded-2xl border-2 border-gray-100 mb-8 w-full">
-            <button
-              type="button"
-              onClick={() => setRole('client')}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                role === 'client' ? 'bg-vanz-navy text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
-              }`}
-            >
-              <ArrowRight className={`w-4 h-4 transition-transform ${role === 'client' ? 'rotate-0' : '-rotate-45 opacity-0'}`} />
-              📦 Client
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('driver')}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                role === 'driver' ? 'bg-vanz-teal text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
-              }`}
-            >
-              <ArrowRight className={`w-4 h-4 transition-transform ${role === 'driver' ? 'rotate-0' : '-rotate-45 opacity-0'}`} />
-              🚚 Chauffeur
-            </button>
-          </div>
+          {/* Role Selection Toggle (DEV ONLY - real routing is automatic) */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="flex p-1 bg-gray-50 rounded-2xl border-2 border-gray-100 mb-8 w-full">
+              <button
+                type="button"
+                onClick={() => setRole('client')}
+                className={`flex-1 py-2 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                  role === 'client' ? 'bg-vanz-navy text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
+                }`}
+              >
+                Dev: Client
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('driver')}
+                className={`flex-1 py-2 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                  role === 'driver' ? 'bg-vanz-teal text-white shadow-md' : 'text-gray-500 hover:text-vanz-teal'
+                }`}
+              >
+                Dev: Chauffeur
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="mb-6 p-4 bg-red-50/50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium text-center animate-in shake">

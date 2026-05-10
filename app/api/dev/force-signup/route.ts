@@ -2,10 +2,16 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  // 1. SECURITY GATE DISABLED FOR TESTING PHASE
-  // if (process.env.NODE_ENV !== "development") {
-  //   return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  // }
+  // 1. SECURITY GATE — Only allow in development environment
+  if (process.env.NODE_ENV !== "development") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  // 2. Secondary check: require a dev-only secret (defense in depth)
+  const devSecret = req.headers.get("x-dev-secret");
+  if (process.env.DEV_API_SECRET && devSecret !== process.env.DEV_API_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
 
   try {
     const { email, password, firstName, lastName, phone, role } = await req.json();

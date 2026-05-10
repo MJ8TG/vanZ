@@ -1,21 +1,24 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-// Next.js Backend Route to act as a secure proxy to Supabase
-// Helps enforce the Anti-abuse PHONE_REGEX rule locally!
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+import { getAuthenticatedUser, getServiceClient } from "@/lib/api-auth";
 
 const PHONE_REGEX = /(\+216|00216|0[2-9]\d{7})/;
 const URL_REGEX = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi;
 
 export async function POST(req: Request) {
+  // 🔒 Auth Gate
+  const { user, error: authError } = await getAuthenticatedUser(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { conversation_id, sender_id, sender_type, type, content, media_url, media_duration, location_lat, location_lng, location_label } = body;
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    // 🔒 Authorization: caller must be the sender
+    if (user!.id !== sender_id) {
+      return NextResponse.json({ error: "Non autorisé." }, { status: 403 });
+    }
+
+    const supabaseAdmin = getServiceClient();
 
     // 1. Fetch conversation to check phase
     const { data: conv, error: convError } = await supabaseAdmin
@@ -31,7 +34,6 @@ export async function POST(req: Request) {
     // 2. Anti-abuse filter logic (No phone/URLs in pre-bid)
     const isSensitive = PHONE_REGEX.test(content) || URL_REGEX.test(content);
     if (conv.phase === 'pre_bid' && isSensitive && type === 'text') {
-      // Increment violation count directly in DB
       await supabaseAdmin
         .from('conversations')
         .update({ violation_count: (conv.violation_count || 0) + 1 })
@@ -55,18 +57,7 @@ export async function POST(req: Request) {
     // 4. Safe to insert!
     const { data: insertedMsg, error: insertError } = await supabaseAdmin
       .from('messages')
-      .insert({
-        conversation_id,
-        sender_id,
-        sender_type,
-        type,
-        content,
-        media_url,
-        media_duration,
-        location_lat,
-        location_lng,
-        location_label
-      })
+      .insert({ conversation_id, sender_id, sender_type, type, content, media_url, media_duration, location_lat, location_lng, location_label })
       .select()
       .single();
 

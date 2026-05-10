@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { getAuthenticatedUser, getServiceClient } from '@/lib/api-auth';
 
 export async function POST(req: Request) {
+  // 🔒 Auth Gate: verify caller is logged in
+  const { user, error: authError } = await getAuthenticatedUser(req);
+  if (authError) return authError;
+
   try {
     const supabase = getServiceClient();
     const { job_id, bid_id, client_id } = await req.json();
 
     if (!job_id || !bid_id || !client_id) {
       return NextResponse.json({ error: 'Paramètres manquants: job_id, bid_id, client_id requis.' }, { status: 400 });
+    }
+
+    // 🔒 Authorization: caller must be the client_id they claim
+    if (user!.id !== client_id) {
+      return NextResponse.json({ error: 'Vous ne pouvez accepter que vos propres missions.' }, { status: 403 });
     }
 
     // 1. Fetch the bid and verify it belongs to this job

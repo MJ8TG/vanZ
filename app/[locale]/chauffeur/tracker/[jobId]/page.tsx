@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl';
 import { datasql } from '@/lib/datasql';
 import { Loader2, ArrowLeft, Navigation, Play, Pause, CheckCircle2, Camera } from 'lucide-react';
 import { uploadFile } from '@/lib/upload';
+import { useDriverTracking } from '@/hooks/useDriverTracking';
 
 interface Job {
   id: string;
@@ -39,6 +40,12 @@ export default function DriverTrackingConsole() {
   // Simulation State
   const [isSimulating, setIsSimulating] = useState(false);
   const simulationRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { error: trackingError } = useDriverTracking({
+    driverId: userId,
+    isActive: !!jobId && !isSimulating && !!userId,
+    jobId: jobId
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -171,9 +178,9 @@ export default function DriverTrackingConsole() {
       }
 
       // 3. Call Completion API
-      const res = await fetch('/api/jobs/complete', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const res = await authFetch('/api/jobs/complete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_id: jobId,
           driver_id: userId,
@@ -238,6 +245,15 @@ export default function DriverTrackingConsole() {
           </div>
 
           <div className="p-6 -mt-4 relative bg-white rounded-t-3xl">
+
+            {trackingError && !isSimulating && (
+              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
+                <p className="text-red-700 text-sm font-medium">
+                  <strong>Géolocalisation requise</strong> pour que le client puisse suivre votre trajet. Veuillez activer la position dans les paramètres de votre navigateur.
+                </p>
+              </div>
+            )}
+
             <div className="flex flex-col gap-3 mb-8 bg-gray-50 p-4 rounded-2xl relative border border-gray-100">
               <div className="absolute left-[29px] top-8 bottom-8 w-0.5 bg-gray-200" />
               <div className="flex gap-4 relative z-10">

@@ -3,11 +3,20 @@ import { datasql as supabase } from '@/lib/datasql';
 import crypto from 'crypto';
 
 export async function GET(req: Request) {
+  // Gate: only allow in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'E2E route disabled in production' }, { status: 403 });
+  }
+
+  const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD;
+  if (!E2E_PASSWORD) {
+    return NextResponse.json({ error: 'E2E_TEST_PASSWORD env var not set' }, { status: 500 });
+  }
+
   try {
     const testId = crypto.randomBytes(4).toString('hex');
     const clientEmail = `e2e_client_permanent@vanz.tn`;
     const driverEmail = `e2e_driver_permanent@vanz.tn`;
-    const password = "password123";
     
     const logs: string[] = [];
     const pushLog = (msg: string) => { logs.push(msg); console.log(msg); };
@@ -17,12 +26,12 @@ export async function GET(req: Request) {
     // Auth Sign-in or Sign-up
     let clientId, driverId;
 
-    const { data: cAuth, error: cErr } = await supabase.auth.signInWithPassword({ email: clientEmail, password });
+    const { data: cAuth, error: cErr } = await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     if (cErr) {
       pushLog("Registering new client...");
       const { data: cSign, error: csErr } = await supabase.auth.signUp({
         email: clientEmail,
-        password,
+        password: E2E_PASSWORD,
         options: { data: { role: 'client', first_name: 'Test', last_name: 'Client', phone: '+21699000001' } }
       });
       if (csErr) throw new Error("Client Mock Failed: " + csErr.message);
@@ -31,12 +40,12 @@ export async function GET(req: Request) {
       clientId = cAuth.user?.id;
     }
 
-    const { data: dAuth, error: dErr } = await supabase.auth.signInWithPassword({ email: driverEmail, password });
+    const { data: dAuth, error: dErr } = await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
     if (dErr) {
       pushLog("Registering new driver...");
       const { data: dSign, error: dsErr } = await supabase.auth.signUp({
         email: driverEmail,
-        password,
+        password: E2E_PASSWORD,
         options: { data: { role: 'driver', first_name: 'Test', last_name: 'Driver', phone: '+21699000002' } }
       });
       if (dsErr) throw new Error("Driver Mock Failed: " + dsErr.message);
@@ -48,9 +57,7 @@ export async function GET(req: Request) {
     pushLog(`✅ Identities Generated. Client: ${clientId} | Driver: ${driverId}`);
 
     pushLog("\n[2/5] Forcing Driver Verification...");
-    // Since anon keys can't override account_status directly if protected by RLS, we simulate by overriding RLS on this table (if RLS allows updating own row).
-    // Assuming user_id can update itself:
-    await supabase.auth.signInWithPassword({ email: driverEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
     await supabase.from('users').update({ 
       account_status: 'active',
       city: 'Tunis',
@@ -60,7 +67,7 @@ export async function GET(req: Request) {
     pushLog("✅ Driver activated and Online.");
 
     pushLog("\n[3/5] Client Post Job...");
-    await supabase.auth.signInWithPassword({ email: clientEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     const { data: job, error: jobErr } = await supabase.from('jobs').insert({
        client_id: clientId,
        pickup_address: 'Lac 1, Tunis',
@@ -74,7 +81,7 @@ export async function GET(req: Request) {
     pushLog(`✅ Job #${jobId} Listed.`);
 
     pushLog("\n[4/5] Driver Bids & Client Accepts...");
-    await supabase.auth.signInWithPassword({ email: driverEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
     const { data: bid, error: bidErr } = await supabase.from('bids').insert({
        job_id: jobId,
        driver_id: driverId,
@@ -83,7 +90,7 @@ export async function GET(req: Request) {
     }).select().single();
     if (bidErr) throw new Error("Bidding failed: " + bidErr.message);
 
-    await supabase.auth.signInWithPassword({ email: clientEmail, password: "password123" });
+    await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     await supabase.from('bids').update({ status: 'accepted' }).eq('id', bid.id);
     pushLog(`✅ Client Accepted Bid 150 TND.`);
 
@@ -107,8 +114,8 @@ export async function GET(req: Request) {
       success: true, 
       logs,
       credentials: {
-        client: { email: clientEmail, password: "password123" },
-        driver: { email: driverEmail, password: "password123" }
+        client: { email: clientEmail },
+        driver: { email: driverEmail }
       }
     });
 

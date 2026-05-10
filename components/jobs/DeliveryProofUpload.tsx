@@ -56,16 +56,14 @@ export function DeliveryProofUpload({ jobId, driverId, bidAmount, onProofUploade
 
       if (uploadError) throw new Error("Erreur d'upload: " + uploadError.message);
 
-      const { data: urlData } = supabase.storage.from('documents').getPublicUrl(fileName);
-
       // 3. Call the completion API
-      const res = await fetch('/api/jobs/complete', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const res = await authFetch('/api/jobs/complete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_id: jobId,
           driver_id: driverId,
-          delivery_photo_url: urlData.publicUrl,
+          delivery_photo_url: fileName, // Save the path, not the public URL
           delivery_photo_lat: lat,
           delivery_photo_lng: lng
         })

@@ -40,7 +40,7 @@ const STATUS_LABELS: Record<string, string> = {
   completed: 'Livraison terminée'
 };
 
-export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: any, client_id: string }) {
+export function LiveTrackingMap({ job, driver }: { job: any, driver: any }) {
   const [vanPos, setVanPos] = useState({ lat: job.pickup_lat, lng: job.pickup_lng });
   const [vanHeading, setVanHeading] = useState(0);
   const [trail, setTrail] = useState<{lat: number, lng: number}[]>([]);
@@ -111,9 +111,19 @@ export function LiveTrackingMap({ job, driver, client_id }: { job: any, driver: 
 
   const handleSOS = () => {
     navigator.geolocation.getCurrentPosition(async (pos) => {
-      await supabase.functions.invoke('sos-alert', {
-        body: { job_id: job.id, user_id: client_id, user_type: 'client',
-                lat: pos.coords.latitude, lng: pos.coords.longitude }
+      // Sanitize geolocation values: clamp to valid ranges and round to 6 decimal places
+      const lat = Math.max(-90, Math.min(90, Number(pos.coords.latitude.toFixed(6))));
+      const lng = Math.max(-180, Math.min(180, Number(pos.coords.longitude.toFixed(6))));
+
+      await fetch('/api/sos', {
+        method: 'POST',
+        credentials: 'include', // Ensure auth cookie is sent with the request
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_id: job.id,
+          lat,
+          lng,
+        }),
       });
       alert('Alerte envoyée — notre équipe vous contacte.');
     });

@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { getAuthenticatedUser, getServiceClient } from '@/lib/api-auth';
 
 export async function POST(req: Request) {
+  // 🔒 Auth Gate: verify caller is logged in
+  const { user, error: authError } = await getAuthenticatedUser(req);
+  if (authError) return authError;
+
   try {
     const supabase = getServiceClient();
     const { job_id, driver_id, status } = await req.json();
 
     if (!job_id || !driver_id || !status) {
       return NextResponse.json({ error: 'Paramètres manquants: job_id, driver_id, status requis.' }, { status: 400 });
+    }
+
+    // 🔒 Authorization: caller must be the driver_id they claim
+    if (user!.id !== driver_id) {
+      return NextResponse.json({ error: 'Vous ne pouvez mettre à jour que vos propres missions.' }, { status: 403 });
     }
 
     if (!['en_route', 'arrived'].includes(status)) {
@@ -49,14 +51,11 @@ export async function POST(req: Request) {
     const { error: updateErr } = await supabase
       .from('jobs')
       .update({
-        status: status === 'arrived' ? 'in_progress' : status, // 'arrived' technically means they are there to start the actual job logic usually, but let's just make 'status' field update accordingly
+        status: status === 'arrived' ? 'in_progress' : status,
         updated_at: new Date().toISOString()
       })
       .eq('id', job_id);
 
-    // *Actually wait, 'en_route' or 'arrived' might not be standard 'jobs' table statuses for VanZ*
-    // The task plan says "Status states: Confirmé → En route → Arrivé → En livraison → Terminé"
-    // Let's just update the status field.
     if (updateErr) throw updateErr;
 
     // 3. Inject system message

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { sendPushNotification } from "../_shared/push.ts";
@@ -6,7 +5,7 @@ import { sendPushNotification } from "../_shared/push.ts";
 const twilioSid = Deno.env.get("TWILIO_SID");
 const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 const twilioFrom = Deno.env.get("TWILIO_PHONE_NUMBER");
-const adminPhone = "+21651905711" || "+21600000000";
+const adminPhone = Deno.env.get("ADMIN_PHONE") ?? "+21600000000";
 
 async function sendSms(to: string, body: string) {
   if (twilioSid && twilioToken && twilioFrom) {

@@ -103,9 +103,9 @@ function DriverSignupForm() {
       const { data: { user } } = await datasql.auth.getUser();
       if (!user) throw new Error("Vous devez être connecté (Étape 1).");
 
-      const response = await fetch('/api/drivers/signup', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const response = await authFetch('/api/drivers/signup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, userId: user.id })
       });
 

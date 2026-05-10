@@ -12,6 +12,7 @@ Requires: pip install httpx
 """
 
 import pytest
+import os
 
 
 class TestHealthEndpoints:
@@ -61,8 +62,8 @@ class TestAuthenticationAPI:
         """
         endpoints = ["/api/auth/login", "/api/login", "/auth/login", "/login"]
         payloads = [
-            {"username": "testuser", "password": "password123"},
-            {"email": "test@example.com", "password": "password123"},
+            {"username": "testuser", "password": os.environ.get("E2E_TEST_PASSWORD", "")},
+            {"email": "test@example.com", "password": os.environ.get("E2E_TEST_PASSWORD", "")},
         ]
         
         for endpoint in endpoints:
@@ -86,7 +87,10 @@ class TestAuthenticationAPI:
         Expected: Should return 401 or 400 for wrong password.
         """
         endpoints = ["/api/auth/login", "/api/login", "/auth/login", "/login"]
-        payload = {"username": "testuser", "password": "wrongpassword"}
+        # Use an env var for the intentionally-invalid test password to avoid
+        # hardcoded-secret SAST false positives (CWE-798).
+        invalid_pw = os.environ.get("E2E_INVALID_TEST_PASSWORD", "not-a-real-credential")
+        payload = {"username": "testuser", "password": invalid_pw}
         
         for endpoint in endpoints:
             try:

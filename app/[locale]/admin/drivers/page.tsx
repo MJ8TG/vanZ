@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
+import { getSignedUrl } from '@/lib/upload';
 import { 
   Search, ShieldCheck, XCircle, Clock, X, ChevronRight, 
   Truck, CreditCard, FileText, Image as ImageIcon, CheckCircle2, AlertCircle
@@ -12,11 +13,47 @@ export default function AdminDriversApprovalPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedDriver, setSelectedDriver] = useState<any | null>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     fetchDrivers();
   }, []);
+
+  useEffect(() => {
+    if (selectedDriver) {
+      // Clear previous urls
+      setSignedUrls({});
+      const loadUrls = async () => {
+        const urls: Record<string, string> = {};
+        const fetchUrl = async (key: string, path: string) => {
+           if (!path) return;
+           try {
+             // If it's already an HTTP URL, use it directly
+             if (path.startsWith('http')) {
+               urls[key] = path;
+             } else {
+               urls[key] = await getSignedUrl('driver-documents', path);
+             }
+           } catch (e) {
+             console.error('Failed to load signed URL for', key, e);
+           }
+        };
+
+        await Promise.all([
+           fetchUrl('cinFront', selectedDriver.cin_front_url),
+           fetchUrl('cinBack', selectedDriver.cin_back_url),
+           fetchUrl('vehiclePhoto', selectedDriver.vehicle_photo_url),
+           fetchUrl('docCarteGrise', selectedDriver.doc_carte_grise),
+           fetchUrl('docAssurance', selectedDriver.doc_assurance),
+           fetchUrl('docPermis', selectedDriver.doc_permis),
+           fetchUrl('docVisiteTechnique', selectedDriver.doc_visite_technique),
+        ]);
+        setSignedUrls(urls);
+      };
+      loadUrls();
+    }
+  }, [selectedDriver]);
 
   const fetchDrivers = async () => {
     setLoading(true);
@@ -228,7 +265,7 @@ export default function AdminDriversApprovalPage() {
                 </div>
               )}
 
-              {/* Driver Identity */}
+               {/* Driver Identity */}
               <section>
                 <div className="flex items-center gap-2 mb-6 text-vanz-navy">
                   <CreditCard className="w-5 h-5 text-vanz-teal" />
@@ -247,24 +284,24 @@ export default function AdminDriversApprovalPage() {
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                       <div className="group relative rounded-2xl aspect-[4/3] bg-gray-100 border border-gray-100 overflow-hidden">
-                        {selectedDriver.cin_front_url ? (
-                           <img src={selectedDriver.cin_front_url} alt="CIN Front" className="w-full h-full object-cover" />
+                        {signedUrls.cinFront ? (
+                           <img src={signedUrls.cinFront} alt="CIN Front" className="w-full h-full object-cover" />
                         ) : (
                            <div className="flex items-center justify-center h-full text-gray-300"><ImageIcon className="w-8 h-8" /></div>
                         )}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                           <a href={selectedDriver.cin_front_url} target="_blank" className="text-white text-xs font-black underline">Voir plein écran</a>
+                           {signedUrls.cinFront && <a href={signedUrls.cinFront} target="_blank" rel="noopener noreferrer" className="text-white text-xs font-black underline">Voir plein écran</a>}
                         </div>
                         <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[8px] font-bold px-2 py-1 rounded">CIN FACE</span>
                       </div>
                       <div className="group relative rounded-2xl aspect-[4/3] bg-gray-100 border border-gray-100 overflow-hidden">
-                        {selectedDriver.cin_back_url ? (
-                           <img src={selectedDriver.cin_back_url} alt="CIN Back" className="w-full h-full object-cover" />
+                        {signedUrls.cinBack ? (
+                           <img src={signedUrls.cinBack} alt="CIN Back" className="w-full h-full object-cover" />
                         ) : (
                            <div className="flex items-center justify-center h-full text-gray-300"><ImageIcon className="w-8 h-8" /></div>
                         )}
                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                           <a href={selectedDriver.cin_back_url} target="_blank" className="text-white text-xs font-black underline">Voir plein écran</a>
+                           {signedUrls.cinBack && <a href={signedUrls.cinBack} target="_blank" rel="noopener noreferrer" className="text-white text-xs font-black underline">Voir plein écran</a>}
                         </div>
                         <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[8px] font-bold px-2 py-1 rounded">CIN DOS</span>
                       </div>
@@ -272,7 +309,7 @@ export default function AdminDriversApprovalPage() {
                 </div>
               </section>
 
-              {/* Vehicle Section */}
+               {/* Vehicle Section */}
               <section>
                 <div className="flex items-center gap-2 mb-6 text-vanz-navy">
                   <Truck className="w-5 h-5 text-vanz-teal" />
@@ -280,8 +317,8 @@ export default function AdminDriversApprovalPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="aspect-video bg-gray-100 rounded-3xl overflow-hidden border border-gray-100 relative group">
-                      {selectedDriver.vehicle_photo_url ? (
-                         <img src={selectedDriver.vehicle_photo_url} alt="Vehicle" className="w-full h-full object-cover" />
+                      {signedUrls.vehiclePhoto ? (
+                         <img src={signedUrls.vehiclePhoto} alt="Vehicle" className="w-full h-full object-cover" />
                       ) : (
                          <div className="flex items-center justify-center h-full text-gray-300"><ImageIcon className="w-12 h-12" /></div>
                       )}
@@ -318,18 +355,18 @@ export default function AdminDriversApprovalPage() {
                 </div>
                 <div className="space-y-4">
                    {[
-                     { label: 'Carte Grise', url: selectedDriver.doc_carte_grise },
-                     { label: 'Assurance', url: selectedDriver.doc_assurance },
-                     { label: 'Permis de Conduire', url: selectedDriver.doc_permis },
-                     { label: 'Visite Technique', url: selectedDriver.doc_visite_technique }
+                     { label: 'Carte Grise', url: signedUrls.docCarteGrise, hasOriginal: !!selectedDriver.doc_carte_grise },
+                     { label: 'Assurance', url: signedUrls.docAssurance, hasOriginal: !!selectedDriver.doc_assurance },
+                     { label: 'Permis de Conduire', url: signedUrls.docPermis, hasOriginal: !!selectedDriver.doc_permis },
+                     { label: 'Visite Technique', url: signedUrls.docVisiteTechnique, hasOriginal: !!selectedDriver.doc_visite_technique }
                    ].map((doc, idx) => (
                       <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                          <div className="flex items-center gap-3">
-                           {doc.url ? <CheckCircle2 className="w-5 h-5 text-vanz-teal" /> : <XCircle className="w-5 h-5 text-gray-300" />}
+                           {doc.hasOriginal ? <CheckCircle2 className="w-5 h-5 text-vanz-teal" /> : <XCircle className="w-5 h-5 text-gray-300" />}
                            <span className="font-bold text-vanz-navy">{doc.label}</span>
                          </div>
-                         {doc.url ? (
-                           <a href={doc.url} target="_blank" className="text-vanz-teal font-black text-xs hover:underline uppercase tracking-tighter">Ouvrir le document</a>
+                         {doc.hasOriginal ? (
+                           <a href={doc.url || '#'} target="_blank" rel="noopener noreferrer" className="text-vanz-teal font-black text-xs hover:underline uppercase tracking-tighter">Ouvrir le document</a>
                          ) : (
                            <span className="text-gray-300 text-xs font-bold uppercase">Non fourni</span>
                          )}

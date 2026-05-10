@@ -14,11 +14,13 @@ export default function TestLoginPage() {
   const handleLogin = async (role: 'client' | 'driver') => {
     setLoading(true);
     setError(null);
+    const testPassword = process.env.NEXT_PUBLIC_TEST_PASSWORD || "";
+    if (!testPassword) { setError("NEXT_PUBLIC_TEST_PASSWORD not set"); setLoading(false); return; }
     try {
       const email = role === 'client' ? 'test_client_final@vanz.tn' : 'test_driver_final@vanz.tn';
       const { error: signInErr } = await supabase.auth.signInWithPassword({
         email,
-        password: 'password123'
+        password: testPassword
       });
 
       if (signInErr) throw signInErr;

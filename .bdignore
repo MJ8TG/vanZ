@@ -1,0 +1,7 @@
+# Exclude build artifacts and generated code from Black Duck scans
+.next/
+node_modules/
+.verdent/
+out/
+build/
+coverage/

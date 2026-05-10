@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
 
 interface TrackingOptions {
@@ -10,6 +10,8 @@ interface TrackingOptions {
 export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions) {
   const channelRef = useRef<any>(null);
   const lastDbUpdateRef = useRef<number>(0);
+  const lastHistoryUpdateRef = useRef<number>(0);
+  const [error, setError] = useState<GeolocationPositionError | null>(null);
 
   useEffect(() => {
     if (!driverId || !isActive) return;
@@ -30,6 +32,7 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
     // Start GPS Watch
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        setError(null);
         const { latitude, longitude, heading, speed } = position.coords;
         
         // 1. Broadcast to Supabase Realtime (High Frequency - every few seconds)
@@ -46,9 +49,10 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
           }
         });
 
+        const now = Date.now();
+
         // 2. Persist to Postgres (Low Frequency - every 3 minutes)
         // Used for the PostGIS Radius job discovery
-        const now = Date.now();
         if (now - lastDbUpdateRef.current > 3 * 60 * 1000) {
            lastDbUpdateRef.current = now;
            supabase.from('drivers')
@@ -62,9 +66,27 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
                 if(error) console.error("Error saving DB coords:", error);
              });
         }
+
+        // 3. Persist to History table if on an active job (Every 30 seconds)
+        if (jobId && now - lastHistoryUpdateRef.current > 30 * 1000) {
+          lastHistoryUpdateRef.current = now;
+          supabase.from('driver_location_history')
+            .insert({
+              driver_id: driverId,
+              job_id: jobId,
+              lat: latitude,
+              lng: longitude,
+              heading: heading || null,
+              speed: speed || null,
+            })
+            .then(({ error }) => {
+               if(error) console.error("Error saving history coords:", error);
+            });
+        }
       },
-      (error) => {
-        console.error("GPS Watch Error:", error);
+      (err) => {
+        console.error("GPS Watch Error:", err);
+        setError(err);
       },
       {
         enableHighAccuracy: true,
@@ -80,5 +102,5 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
     };
   }, [driverId, isActive, jobId]);
 
-  return null;
+  return { error };
 }

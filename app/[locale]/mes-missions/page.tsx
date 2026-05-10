@@ -81,6 +81,18 @@ export default function MesMissionsPage() {
           }));
           jobsData = enrichedData;
         } else {
+          // Enforce Driver Approval Verification for /mes-missions
+          const { data: driverAcc } = await datasql
+            .from('drivers')
+            .select('status')
+            .eq('id', user.id)
+            .single();
+
+          if (!driverAcc || driverAcc.status !== 'approved') {
+            router.push(`/${locale}/chauffeur/pending`);
+            return;
+          }
+
           const { data: userBids } = await datasql.from('bids').select('job_id').eq('driver_id', user.id);
           const biddedJobIds = userBids?.map(b => b.job_id) || [];
           

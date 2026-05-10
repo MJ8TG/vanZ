@@ -172,10 +172,9 @@ export default function ClientTrackingPage() {
            <span className="text-white text-[10px] font-black uppercase tracking-widest leading-none">GPS LIVE Active</span>
         </div>
 
-        <LiveTrackingMap 
-          job={jobData} 
-          driver={driverData} 
-          client_id={userId as string} 
+        <LiveTrackingMap
+          job={jobData}
+          driver={driverData}
         />
       </div>
 

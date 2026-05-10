@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import signal
 import socket
 import subprocess
@@ -94,7 +95,7 @@ def http_health_check(url: str, timeout: float = 5.0) -> bool:
 
 def command_health_check(cmd: str) -> bool:
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, timeout=10)
+        result = subprocess.run(shlex.split(cmd), shell=False, capture_output=True, timeout=10)
         return result.returncode == 0
     except Exception:
         return False
@@ -214,8 +215,8 @@ class ServiceManager:
         
         with open(log_file, "w") as log_f:
             process = subprocess.Popen(
-                command,
-                shell=True,
+                shlex.split(command),
+                shell=False,
                 stdout=log_f,
                 stderr=subprocess.STDOUT,
                 cwd=cwd,

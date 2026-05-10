@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { datasql as supabase } from '@/lib/datasql';
+import { getSignedUrl } from '@/lib/upload';
 import { ShieldAlert, AlertCircle, MessageSquare, Image as ImageIcon, MapPin, CheckCircle } from 'lucide-react';
 
 const ADMIN_ACTIONS = [
@@ -18,6 +19,7 @@ export default function AdminDisputes() {
   const [selectedDispute, setSelectedDispute] = useState<any | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [actionAmount, setActionAmount] = useState<number>(0);
+  const [signedUrls, setSignedUrls] = useState<{ disputePhotos: string[]; deliveryPhoto: string | null }>({ disputePhotos: [], deliveryPhoto: null });
 
   useEffect(() => {
     fetchDisputes();
@@ -45,6 +47,7 @@ export default function AdminDisputes() {
   const openDisputeDetail = async (dispute: any) => {
     setSelectedDispute(dispute);
     setActionAmount(0);
+    setSignedUrls({ disputePhotos: [], deliveryPhoto: null });
     
     // Fetch Chat Transcripts
     const { data: conv } = await supabase.from('conversations').select('id').eq('job_id', dispute.job_id).single();
@@ -54,6 +57,22 @@ export default function AdminDisputes() {
     } else {
       setMessages([]);
     }
+
+    // Resolve signed URLs for evidence
+    const resolveUrl = async (path: string, bucket = 'documents'): Promise<string> => {
+      if (!path) return '';
+      if (path.startsWith('http')) return path;
+      try { return await getSignedUrl(bucket, path); } catch { return ''; }
+    };
+
+    const dphotos = dispute.photo_urls && dispute.photo_urls.length > 0
+      ? await Promise.all(dispute.photo_urls.map((u: string) => resolveUrl(u)))
+      : [];
+    const dproof = dispute.jobs?.delivery_photo_url
+      ? await resolveUrl(dispute.jobs.delivery_photo_url)
+      : null;
+
+    setSignedUrls({ disputePhotos: dphotos.filter(Boolean), deliveryPhoto: dproof || null });
   };
 
   const executeAdminAction = async (actionDef: any, targetId?: string) => {
@@ -179,7 +198,7 @@ export default function AdminDisputes() {
                        <p className="text-sm text-gray-500">Job: <span className="font-mono">{selectedDispute.job_id}</span></p>
                     </div>
                     {selectedDispute.jobs.receipt_url && (
-                       <a href={selectedDispute.jobs.receipt_url} target="_blank" className="text-sm font-bold text-[#2BBFDF] hover:underline bg-white px-3 py-1.5 border border-[#2BBFDF] rounded-lg">
+                       <a href={selectedDispute.jobs.receipt_url} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#2BBFDF] hover:underline bg-white px-3 py-1.5 border border-[#2BBFDF] rounded-lg">
                           Télécharger Reçu (PDF)
                        </a>
                     )}
@@ -193,12 +212,12 @@ export default function AdminDisputes() {
                     </div>
 
                     {/* Preuves Photos */}
-                    {selectedDispute.photo_urls && selectedDispute.photo_urls.length > 0 && (
+                    {signedUrls.disputePhotos.length > 0 && (
                        <div>
                           <h3 className="text-sm font-bold text-gray-500 uppercase mb-3 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Preuves du Litige</h3>
                           <div className="flex gap-4">
-                             {selectedDispute.photo_urls.map((url: string, i: number) => (
-                                <a key={i} href={url} target="_blank" className="w-32 h-32 rounded-xl overflow-hidden border border-gray-200 hover:opacity-80 transition">
+                             {signedUrls.disputePhotos.map((url: string, i: number) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="w-32 h-32 rounded-xl overflow-hidden border border-gray-200 hover:opacity-80 transition">
                                    <img src={url} className="w-full h-full object-cover" alt="preuve litige" />
                                 </a>
                              ))}
@@ -207,11 +226,11 @@ export default function AdminDisputes() {
                     )}
 
                     {/* Delivery Dropoff Context */}
-                    {selectedDispute.jobs.delivery_photo_url && (
+                    {signedUrls.deliveryPhoto && (
                        <div>
                           <h3 className="text-sm font-bold text-[#2BBFDF] uppercase mb-3 flex items-center gap-2"><MapPin className="w-4 h-4"/> Preuve de Livraison (Chauffeur)</h3>
-                          <a href={selectedDispute.jobs.delivery_photo_url} target="_blank" className="w-48 h-48 block rounded-xl overflow-hidden border border-blue-200 hover:opacity-80 transition">
-                             <img src={selectedDispute.jobs.delivery_photo_url} className="w-full h-full object-cover" alt="livraison" />
+                          <a href={signedUrls.deliveryPhoto} target="_blank" rel="noopener noreferrer" className="w-48 h-48 block rounded-xl overflow-hidden border border-blue-200 hover:opacity-80 transition">
+                             <img src={signedUrls.deliveryPhoto} className="w-full h-full object-cover" alt="livraison" />
                           </a>
                        </div>
                     )}

@@ -120,7 +120,10 @@ CREATE POLICY "storage_read_own_or_admin" ON storage.objects
   FOR SELECT USING (
     auth.uid()::text = (storage.foldername(name))[1] 
     OR public.is_admin()
-    OR bucket_id IN ('job-photos', 'chat-media') -- Allow participants to see job/chat media
+    OR (
+      auth.uid() IS NOT NULL
+      AND bucket_id IN ('job-photos', 'chat-media') -- Authenticated users can see job/chat media
+    )
   );
 
 -- ──────────────────────────────────────────

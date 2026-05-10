@@ -149,9 +149,9 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
     setError(null);
 
     try {
-      const res = await fetch('/api/jobs/accept', {
+      const { authFetch } = await import('@/lib/auth-fetch');
+      const res = await authFetch('/api/jobs/accept', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_id: jobId,
           bid_id: bid.id,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -58,18 +57,20 @@ serve(async (req: Request) => {
              .update({ account_status: 'flagged' })
              .eq('id', revieweeId);
              
-           // Rapidly notify administrators via SOS wrapper
-           await supabaseAdmin.functions.invoke('sos-alert', {
-             body: { 
-                 job_id: record.job_id || 'system',
-                 user_id: revieweeId,
-                 user_type: 'system_flag',
-                 lat: 0, lng: 0,
-                 type: 'low_rating', 
-                 driver_id: revieweeId,
-                 message: `Chauffeur ${revieweeId} — 3 avis consécutifs sous 3.5 étoiles` 
-             }
-           });
+            // Rapidly notify administrators via SOS wrapper
+            await supabaseAdmin.functions.invoke('sos-alert', {
+              body: { 
+                  action: 'trigger_sos',
+                  job_id: record.job_id || 'system',
+                  user_id: revieweeId,
+                  user_type: 'system_flag',
+                  lat: 0, lng: 0,
+                  type: 'low_rating', 
+                  driver_id: revieweeId,
+                  message: `Chauffeur ${revieweeId} — 3 avis consécutifs sous 3.5 étoiles` 
+              },
+              headers: { 'x-edge-secret': Deno.env.get('EDGE_WEBHOOK_SECRET') ?? '' }
+            });
        }
     }
 
