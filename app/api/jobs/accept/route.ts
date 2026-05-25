@@ -54,18 +54,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Cette mission est déjà ${job.status}.` }, { status: 409 });
     }
 
-    // 3. Calculate commission (TND — Rule #1)
-    const commissionRate = job.commission_rate || 0.15;
-    const commissionAmount = Math.round(bid.amount * commissionRate * 100) / 100;
-    const driverPayout = Math.round((bid.amount - commissionAmount) * 100) / 100;
+    // 3. Calculate 12% commission
+    const commissionRate = 0.12;
+    const driverPayout = Math.round(bid.amount / 1.12);
+    const commissionAmount = bid.amount - driverPayout;
 
-    // 4. ATOMIC: Update job → matched
+    // Fetch user profile for Paymee payload
+    const { data: userProfile } = await supabase
+      .from('users')
+      .select('first_name, last_name, phone')
+      .eq('id', client_id)
+      .single();
+
+    // 4. ATOMIC: Update job → payment_pending
     const { error: jobUpdateErr } = await supabase
       .from('jobs')
       .update({
-        status: 'matched',
+        status: 'payment_pending',
         accepted_bid_id: bid_id,
         accepted_bid_amount: bid.amount,
+        commission_rate: commissionRate,
         commission_amount: commissionAmount,
         driver_payout: driverPayout,
         updated_at: new Date().toISOString()
@@ -74,59 +82,44 @@ export async function POST(req: Request) {
 
     if (jobUpdateErr) throw jobUpdateErr;
 
-    // 5. ATOMIC: Accept this bid
-    const { error: bidAcceptErr } = await supabase
-      .from('bids')
-      .update({ status: 'accepted' })
-      .eq('id', bid_id);
+    // 5. Create Paymee Payment for the commission amount
+    const PAYMEE_TOKEN = process.env.PAYMEE_TOKEN;
+    const PAYMEE_API = process.env.PAYMEE_API_URL || "https://sandbox.paymee.tn/api/v2/payments/create";
+    const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const SUPABASE_FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 
-    if (bidAcceptErr) throw bidAcceptErr;
+    const paymeeResponse = await fetch(PAYMEE_API, {
+      method: 'POST',
+      headers: { 'Authorization': `Token ${PAYMEE_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: commissionAmount,
+        note: `VanZ Job #${job_id}`,
+        first_name: userProfile?.first_name || 'Client',
+        last_name: userProfile?.last_name || 'VanZ',
+        phone: userProfile?.phone || '+21620000000',
+        return_url: `${BASE_URL}/fr/mes-missions`,
+        cancel_url: `${BASE_URL}/fr/mes-missions`,
+        webhook_url: `${SUPABASE_FUNCTIONS_URL}/paymee-webhook?job_id=${job_id}`
+      })
+    });
 
-    // 6. ATOMIC: Reject all other bids for this job
-    await supabase
-      .from('bids')
-      .update({ status: 'rejected' })
-      .eq('job_id', job_id)
-      .neq('id', bid_id)
-      .eq('status', 'pending');
+    const paymeeData = await paymeeResponse.json();
 
-    // 7. ATOMIC: Transition conversation phase → post_acceptance
-    const { data: conversation } = await supabase
-      .from('conversations')
-      .update({ phase: 'post_acceptance' })
-      .eq('job_id', job_id)
-      .eq('driver_id', bid.driver_id)
-      .select('id')
-      .single();
-
-    // 8. If conversation exists, inject a system message
-    if (conversation) {
-      await supabase.from('messages').insert({
-        conversation_id: conversation.id,
-        sender_type: 'system',
-        type: 'system',
-        content: `✅ Offre acceptée — ${bid.amount} TND ! Vous pouvez maintenant échanger des photos, messages vocaux et coordonnées. Bonne course !`
-      });
+    if (!paymeeData || !paymeeData.data || !paymeeData.data.payment_url) {
+      throw new Error(`Erreur lors de la création du paiement: ${JSON.stringify(paymeeData)}`);
     }
 
-    // 9. Archive conversations with rejected drivers
-    await supabase
-      .from('conversations')
-      .update({ phase: 'archived' })
-      .eq('job_id', job_id)
-      .neq('driver_id', bid.driver_id);
+    // Do NOT accept the bid or change conversation phase here. 
+    // The webhook will do that upon successful payment.
 
     return NextResponse.json({
       success: true,
       data: {
         job_id,
-        accepted_bid_id: bid_id,
-        driver_id: bid.driver_id,
-        amount: bid.amount,
-        commission: commissionAmount,
-        driver_payout: driverPayout,
-        conversation_id: conversation?.id,
-        phase: 'post_acceptance'
+        payment_url: paymeeData.data.payment_url,
+        payment_pending: true,
+        commission: commissionAmount
       }
     });
 

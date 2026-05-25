@@ -202,7 +202,7 @@ export default function DriverDashboardPage() {
                         </div>
                         <div className="text-right">
                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Gains</p>
-                           <p className="text-lg font-black text-vanz-navy">{job.driver_payout || job.client_budget || 0} {tCommon('tnd')}</p>
+                           <p className="text-lg font-black text-vanz-navy">{job.driver_payout || 0} {tCommon('tnd')}</p>
                         </div>
                      </div>
 

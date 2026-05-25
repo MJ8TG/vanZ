@@ -95,12 +95,11 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   photo_urls text[],
   stops jsonb,
   load_capacity text,
-  client_budget numeric(10,2),
   preferred_time text,
   payment_method text DEFAULT 'cash',
   scheduled_at timestamp with time zone,
   time_slot text,
-  status text DEFAULT 'open' CHECK (status IN ('open', 'matched', 'in_progress', 'completed', 'cancelled', 'expired')),
+  status text DEFAULT 'open' CHECK (status IN ('open', 'payment_pending', 'matched', 'in_progress', 'completed', 'cancelled', 'expired')),
   
   accepted_bid_id uuid, -- Link to bids table
   accepted_bid_amount numeric(10,2),
@@ -277,16 +276,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_transactions (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 14. Admin Actions Table
-CREATE TABLE IF NOT EXISTS public.admin_actions (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  admin_id text NOT NULL,
-  action text NOT NULL,
-  target_id uuid,
-  amount numeric(10,2),
-  notes text,
-  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+-- (admin_actions moved to section 21 below, after admin_users FK target exists)
 
 -- 14. Loyalty Transactions Table
 CREATE TABLE IF NOT EXISTS public.loyalty_transactions (
@@ -377,11 +367,16 @@ CREATE TABLE IF NOT EXISTS public.admin_users (
 
 CREATE TABLE IF NOT EXISTS public.admin_actions (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  admin_id uuid REFERENCES public.admin_users(id),
+  admin_id uuid REFERENCES public.admin_users(id) ON DELETE SET NULL,
   action text NOT NULL,
+  target_id uuid,
   data jsonb,
+  amount numeric(10,2),
+  notes text,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_admin_actions_admin ON public.admin_actions(admin_id, created_at DESC);
 
 -- ═══════════════════════════════════════════════════════════════
 -- AUTOMATION: FUNCTIONS & TRIGGERS

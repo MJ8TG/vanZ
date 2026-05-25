@@ -191,7 +191,7 @@ export default function DriverFeedPage() {
         body: JSON.stringify({
           job_id: jobId,
           driver_id: userId,
-          amount: parseFloat(amount),
+          amount: Math.round(parseFloat(amount) * 1.12),
           note,
           estimated_duration_minutes: duration ? parseInt(duration) : null
         })
@@ -353,12 +353,7 @@ export default function DriverFeedPage() {
                         </p>
                       </div>
                     </div>
-                    {job.client_budget && !job.hasBid && (
-                      <div className="bg-vanz-ice px-5 py-3 rounded-2xl border border-vanz-teal/10 w-full md:w-auto text-center">
-                        <p className="text-[10px] font-black text-vanz-teal uppercase mb-1">Budget Estimé</p>
-                        <p className="text-2xl font-black text-vanz-navy">{job.client_budget} TND</p>
-                      </div>
-                    )}
+
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-8 bg-gray-50/50 p-6 rounded-3xl mb-8 relative border border-gray-100">
@@ -400,8 +395,13 @@ export default function DriverFeedPage() {
 
                           <div className="grid md:grid-cols-2 gap-4 mb-6">
                              <div>
-                                <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Prix (TND)</label>
-                                <input type="number" title="Montant de l'offre" placeholder="Montant" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full p-4 bg-white rounded-xl border-2 border-transparent focus:border-vanz-teal outline-none font-black text-xl text-vanz-navy shadow-sm" />
+                                <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Prix net désiré (TND)</label>
+                                <input type="number" title="Montant de l'offre" placeholder="Vos gains" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full p-4 bg-white rounded-xl border-2 border-transparent focus:border-vanz-teal outline-none font-black text-xl text-vanz-navy shadow-sm" />
+                                {amount && Number(amount) > 0 && (
+                                  <p className="text-[10px] text-gray-500 font-bold mt-2 ml-1">
+                                    Le client paiera <span className="text-vanz-navy">{Math.round(parseFloat(amount) * 1.12)} TND</span> <span className="opacity-70">(inclut 12% frais)</span>
+                                  </p>
+                                )}
                              </div>
                              <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Durée (Min)</label>
@@ -418,7 +418,7 @@ export default function DriverFeedPage() {
                           </button>
                        </div>
                     ) : (
-                       <button onClick={() => { setBiddingJobId(job.id); setAmount(job.client_budget || ''); }} className="w-full py-4 rounded-2xl border-2 border-vanz-teal text-vanz-teal font-black hover:bg-vanz-teal hover:text-white transition-all flex items-center justify-center gap-2" title="Ouvrir le formulaire d'offre">
+                       <button onClick={() => { setBiddingJobId(job.id); setAmount(''); }} className="w-full py-4 rounded-2xl border-2 border-vanz-teal text-vanz-teal font-black hover:bg-vanz-teal hover:text-white transition-all flex items-center justify-center gap-2" title="Ouvrir le formulaire d'offre">
                           🏷️ Faire une offre
                        </button>
                     )}

@@ -59,7 +59,7 @@ export default function MesMissionsPage() {
           const { data, error } = await datasql
             .from('jobs')
             .select(`
-              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_budget, client_id, created_at, accepted_bid_id, driver_payout,
+              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
               bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
             `)
             .eq('client_id', user.id)
@@ -99,7 +99,7 @@ export default function MesMissionsPage() {
           let query = datasql
             .from('jobs')
             .select(`
-              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_budget, client_id, created_at, accepted_bid_id, driver_payout,
+              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
               bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
             `);
 
@@ -321,14 +321,7 @@ export default function MesMissionsPage() {
                             : t('job.asap')}
                         </p>
                       </div>
-                      {job.client_budget && (
-                        <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                            💰 {t('job.budget')}
-                          </p>
-                          <p className="text-sm font-bold text-vanz-navy">{job.client_budget} {tCommon('tnd')}</p>
-                        </div>
-                      )}
+
                     </div>
                   </div>
                 </div>
@@ -447,7 +440,7 @@ export default function MesMissionsPage() {
                   {job.status === 'completed' && job.driver_payout && (
                     <div className="flex flex-col gap-6">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-bold text-gray-500">{t('job.finalAmount')}: <span className="text-vanz-navy">{job.driver_payout} {tCommon('tnd')}</span> ({t('job.paid')})</p>
+                        <p className="text-sm font-bold text-gray-500">{t('job.finalAmount')}: <span className="text-vanz-navy">{job.client_id === userId ? job.accepted_bid_amount : job.driver_payout} {tCommon('tnd')}</span> ({t('job.paid')})</p>
                         <button className="flex items-center gap-2 text-sm font-bold text-vanz-teal hover:underline">
                           <FileText className="w-4 h-4" /> {t('actions.viewInvoice')}
                         </button>

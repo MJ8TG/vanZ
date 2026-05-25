@@ -37,53 +37,42 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
   const t = useTranslations('bids');
   const tCommon = useTranslations('common');
 
+  // Helper: map a raw joined bid row to our Bid interface
+  const mapBid = (raw: any): Bid => ({
+    id: raw.id,
+    amount: raw.amount,
+    note: raw.note,
+    estimated_duration_minutes: raw.estimated_duration_minutes,
+    driver_id: raw.driver_id,
+    driver: {
+      first_name: raw.drivers?.users?.first_name || (locale === 'ar' ? 'سائق' : 'Chauffeur'),
+      last_name: raw.drivers?.users?.last_name || '',
+      vehicle_type: raw.drivers?.vehicle_type || 'van',
+      rating: Math.round((raw.drivers?.users?.cached_rating || 0) * 10) / 10,
+      jobs_count: raw.drivers?.users?.total_reviews || 0,
+    }
+  });
+
+  // Single joined query for all bid data
+  const BID_SELECT = `
+    id, amount, note, estimated_duration_minutes, driver_id, status,
+    drivers!inner(
+      vehicle_type,
+      users:id(first_name, last_name, cached_rating, total_reviews)
+    )
+  `;
+
   useEffect(() => {
-    // Fetch existing bids
     const fetchBids = async () => {
       const { data } = await datasql
         .from('bids')
-        .select('id, amount, note, estimated_duration_minutes, driver_id, status')
+        .select(BID_SELECT)
         .eq('job_id', jobId)
         .eq('status', 'pending')
         .order('amount', { ascending: true });
 
       if (data) {
-        // Fetch driver details for each bid
-        const enriched = await Promise.all(data.map(async (bid) => {
-          const { data: driver } = await datasql
-            .from('users_public')
-            .select('first_name, last_name')
-            .eq('id', bid.driver_id)
-            .maybeSingle();
-
-          const { data: driverProfile } = await datasql
-            .from('drivers')
-            .select('vehicle_type')
-            .eq('id', bid.driver_id)
-            .maybeSingle();
-
-          const { data: reviews } = await datasql
-            .from('reviews')
-            .select('stars')
-            .eq('reviewee_id', bid.driver_id);
-
-          const avgRating = reviews && reviews.length > 0
-            ? reviews.reduce((sum, r) => sum + r.stars, 0) / reviews.length
-            : 4.5;
-
-          return {
-            ...bid,
-            driver: {
-              first_name: driver?.first_name || (locale === 'ar' ? 'سائق' : 'Chauffeur'),
-              last_name: driver?.last_name || '',
-              vehicle_type: driverProfile?.vehicle_type || 'van',
-              rating: Math.round(avgRating * 10) / 10,
-              jobs_count: reviews?.length || 0,
-            }
-          } as Bid;
-        }));
-
-        setBids(enriched);
+        setBids(data.map(mapBid));
       }
     };
     fetchBids();
@@ -95,42 +84,25 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'bids', filter: `job_id=eq.${jobId}` },
         async (payload) => {
-          const newBidRaw = payload.new;
+          // Refetch this specific bid with the same join (real data, not hardcoded)
+          const { data: newBidRaw } = await datasql
+            .from('bids')
+            .select(BID_SELECT)
+            .eq('id', payload.new.id)
+            .single();
 
-          // Fetch driver info for the new bid
-          const { data: driver } = await datasql
-            .from('users_public')
-            .select('first_name, last_name')
-            .eq('id', newBidRaw.driver_id)
-            .maybeSingle();
-
-          const { data: driverProfile } = await datasql
-            .from('drivers')
-            .select('vehicle_type')
-            .eq('id', newBidRaw.driver_id)
-            .maybeSingle();
-
-          const newBid: Bid = {
-            ...newBidRaw as any,
-            driver: {
-              first_name: driver?.first_name || (locale === 'ar' ? 'سائق' : 'Chauffeur'),
-              last_name: driver?.last_name || '',
-              vehicle_type: driverProfile?.vehicle_type || 'van',
-              rating: 4.8,
-              jobs_count: 0,
-            }
-          };
-
-          setBids((current) => {
-            const updated = [...current, newBid];
-            return updated.sort((a, b) => a.amount - b.amount);
-          });
+          if (newBidRaw) {
+            setBids((current) => {
+              const updated = [...current, mapBid(newBidRaw)];
+              return updated.sort((a, b) => a.amount - b.amount);
+            });
+          }
         }
       )
       .subscribe();
 
     return () => { datasql.removeChannel(channel); };
-  }, [jobId]);
+  }, [jobId, locale]);
 
   // "Meilleure offre" badge logic
   const isBest = (bid: Bid) => {
@@ -167,9 +139,11 @@ export default function BidsList({ jobId, clientId }: BidsListProps) {
 
       setAcceptedBidId(bid.id);
 
-      // Redirect to messages after 2 seconds
+      // Redirect to payment or messages
       setTimeout(() => {
-        if (data.data?.conversation_id) {
+        if (data.data?.payment_url) {
+          window.location.href = data.data.payment_url;
+        } else if (data.data?.conversation_id) {
           router.push(`/${locale}/messages?conv=${data.data.conversation_id}`);
         } else {
           router.push(`/${locale}/messages`);

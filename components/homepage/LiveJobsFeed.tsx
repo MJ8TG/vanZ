@@ -15,7 +15,6 @@ const MOCK_JOBS = [
     from: "Tunis",
     to: "Sousse",
     service: "furniture",
-    budget: 120,
     minutesAgo: 5,
     icon: Sofa,
     color: "bg-vanz-teal",
@@ -25,7 +24,6 @@ const MOCK_JOBS = [
     from: "Ariana",
     to: "La Marsa",
     service: "moving",
-    budget: 250,
     minutesAgo: 12,
     icon: Truck,
     color: "bg-blue-500",
@@ -35,7 +33,6 @@ const MOCK_JOBS = [
     from: "Sfax",
     to: "Monastir",
     service: "parcel",
-    budget: 45,
     minutesAgo: 18,
     icon: Package,
     color: "bg-vanz-green",
@@ -45,7 +42,6 @@ const MOCK_JOBS = [
     from: "Ben Arous",
     to: "Manouba",
     service: "furniture",
-    budget: 85,
     minutesAgo: 25,
     icon: Sofa,
     color: "bg-vanz-yellow",
@@ -55,7 +51,6 @@ const MOCK_JOBS = [
     from: "Bizerte",
     to: "Tunis",
     service: "moving",
-    budget: 300,
     minutesAgo: 30,
     icon: Truck,
     color: "bg-purple-500",
@@ -128,15 +123,6 @@ export default function LiveJobsFeed() {
                     <MapPin className="w-4 h-4 text-vanz-green flex-shrink-0" />
                     <span className="text-sm font-medium text-vanz-navy truncate">{job.to}</span>
                   </div>
-                </div>
-
-                {/* Budget */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <span className="text-xs text-gray-400 font-medium">{t("budget")}</span>
-                  <span className="text-lg font-black text-vanz-navy">
-                    {job.budget} <span className="text-sm font-medium text-gray-400">{tCommon("tnd")}</span>
-                  </span>
-                </div>
               </div>
             </SwiperSlide>
           ))}

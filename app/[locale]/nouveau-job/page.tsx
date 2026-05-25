@@ -40,7 +40,6 @@ export default function NouveauJobPage() {
   const [scheduledDate, setScheduledDate] = useState('');
   const [timeSlot, setTimeSlot] = useState('morning');
   const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
   
   const [loading, setLoading] = useState(true);
@@ -136,11 +135,6 @@ export default function NouveauJobPage() {
   };
 
   const handleSubmit = async () => {
-    if (!budget || Number(budget) <= 0) {
-      setError(locale === 'ar' ? "يرجى تحديد المبلغ" : "Veuillez indiquer un budget (ex: 50 TND).");
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
 
@@ -163,7 +157,6 @@ export default function NouveauJobPage() {
           scheduled_at: scheduledDate,
           time_slot: timeSlot,
           description: description,
-          client_budget: parseFloat(budget),
           status: 'open',
           photo_urls: photos
         });
@@ -462,20 +455,7 @@ export default function NouveauJobPage() {
                        </div>
                     </div>
 
-                    <div>
-                      <label htmlFor="budget" className="block text-sm font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">{t('form.budget')}</label>
-                      <div className="relative">
-                        <div className="absolute ltr:left-5 rtl:right-5 top-1/2 -translate-y-1/2 font-black text-vanz-teal">{tCommon('tnd')}</div>
-                        <input
-                          id="budget"
-                          type="number"
-                          placeholder={t('form.budgetPlaceholder')}
-                          value={budget}
-                          onChange={(e) => setBudget(e.target.value)}
-                          className="w-full ltr:pl-16 rtl:pr-16 ltr:pr-6 rtl:pl-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-vanz-teal focus:bg-white outline-none font-black text-2xl text-vanz-navy transition-all"
-                        />
-                      </div>
-                    </div>
+
                   </div>
                </div>
             </div>

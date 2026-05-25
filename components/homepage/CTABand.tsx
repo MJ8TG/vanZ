@@ -43,7 +43,7 @@ export default function CTABand() {
           viewport={{ once: true }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <Link href={`/${locale}/download`}>
+          <Link href={`/${locale}/nouveau-job`}>
             <motion.div
               className="inline-block px-8 py-4 bg-vanz-navy text-white font-bold text-lg rounded-full hover:bg-vanz-navy-light hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg shadow-vanz-navy/30"
               whileHover={{ scale: 1.05 }}

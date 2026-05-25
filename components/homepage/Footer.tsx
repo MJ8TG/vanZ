@@ -112,7 +112,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li>
                 <Link
-                  href={`/${locale}`}
+                  href={`/${locale}/a-propos`}
                   className="text-white/50 hover:text-vanz-teal text-sm transition-colors duration-200"
                 >
                   {t("about")}
@@ -120,7 +120,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={`/${locale}`}
+                  href={`/${locale}/contact`}
                   className="text-white/50 hover:text-vanz-teal text-sm transition-colors duration-200"
                 >
                   {t("contact")}
@@ -128,7 +128,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={`/${locale}`}
+                  href={`/${locale}/conditions-utilisation`}
                   className="text-white/50 hover:text-vanz-teal text-sm transition-colors duration-200"
                 >
                   {t("terms")}
@@ -136,7 +136,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={`/${locale}`}
+                  href={`/${locale}/politique-confidentialite`}
                   className="text-white/50 hover:text-vanz-teal text-sm transition-colors duration-200"
                 >
                   {t("privacy")}

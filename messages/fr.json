@@ -103,28 +103,28 @@
     "tagProfessional": "Professionnel",
     "success": "Merci ! Votre avis aide la communauté VanZ.",
     "review": {
-        "title": "Comment s'est passée la mission ?",
-        "subtitle": "Votre avis compte pour la communauté VanZ.",
-        "yourReview": "Votre Avis",
-        "rated": "Vous avez noté {stars}/5 étoiles.",
-        "noteDriver": "Notez votre chauffeur",
-        "noteClient": "Notez le client",
-        "strengths": "Points forts :",
-        "commentPlaceholder": "Un commentaire supplémentaire ? (facultatif)",
-        "submitting": "Envoi...",
-        "submit": "Soumettre mon avis",
-        "errorNote": "Veuillez sélectionner une note.",
-        "success": "Merci pour votre avis !",
-        "errorSubmit": "Erreur lors de la soumission de l'avis.",
-        "tags": {
-            "ponctuel": "Ponctuel",
-            "soigneux": "Soigneux",
-            "communicatif": "Communicatif",
-            "professionnel": "Professionnel",
-            "respectueux": "Respectueux",
-            "wrapped": "Colis bien emballé",
-            "easy": "Facile d'accès"
-        }
+      "title": "Comment s'est passée la mission ?",
+      "subtitle": "Votre avis compte pour la communauté VanZ.",
+      "yourReview": "Votre Avis",
+      "rated": "Vous avez noté {stars}/5 étoiles.",
+      "noteDriver": "Notez votre chauffeur",
+      "noteClient": "Notez le client",
+      "strengths": "Points forts :",
+      "commentPlaceholder": "Un commentaire supplémentaire ? (facultatif)",
+      "submitting": "Envoi...",
+      "submit": "Soumettre mon avis",
+      "errorNote": "Veuillez sélectionner une note.",
+      "success": "Merci pour votre avis !",
+      "errorSubmit": "Erreur lors de la soumission de l'avis.",
+      "tags": {
+        "ponctuel": "Ponctuel",
+        "soigneux": "Soigneux",
+        "communicatif": "Communicatif",
+        "professionnel": "Professionnel",
+        "respectueux": "Respectueux",
+        "wrapped": "Colis bien emballé",
+        "easy": "Facile d'accès"
+      }
     }
   },
   "dispute": {
@@ -145,12 +145,12 @@
     "errorMinChars": "Merci de fournir une description détaillée (min 20 caractères).",
     "errorSubmit": "Erreur lors de la soumission.",
     "reasons": {
-        "delay": "Retard important du chauffeur",
-        "damaged": "Marchandise endommagée",
-        "behavior": "Chauffeur injurieux ou comportement inadapté",
-        "payment": "Problème de paiement ou surtaxe",
-        "absent": "Client absent ou injoignable",
-        "other": "Autre"
+      "delay": "Retard important du chauffeur",
+      "damaged": "Marchandise endommagée",
+      "behavior": "Chauffeur injurieux ou comportement inadapté",
+      "payment": "Problème de paiement ou surtaxe",
+      "absent": "Client absent ou injoignable",
+      "other": "Autre"
     }
   },
   "proof": {
@@ -463,23 +463,19 @@
     "yourPromoCode": "Votre code promo",
     "downloadApp": "Télécharger l'App (Bientôt)",
     "validityNote": "Valable uniquement pour les nouveaux utilisateurs lors de leur première commande.",
-    
     "dashboardTitle": "Invitez & Gagnez",
     "clientSubtitle": "Invitez un ami à déménager avec VanZ — vous gagnez tous les deux 10 TND.",
     "driverSubtitle": "Invitez un ami à utiliser VanZ — gagnez 10 TND sur votre prochain job.",
     "driverBonus": "Bonus Chauffeurs : Invitez un autre chauffeur → gagnez 20 TND après ses 3 premiers jobs.",
     "yourCodeLabel": "Votre code de parrainage",
     "shareWhatsApp": "Partager sur WhatsApp",
-    
     "referralCodeLabel": "Code de parrainage (Optionnel)",
     "referralPlaceholder": "ABC12",
     "signupCTA": "S'inscrire sur le web",
-    
     "statsTitle": "Vos Statistiques",
     "statInvited": "Amis inscrits",
     "statPending": "Bonus en attente",
     "statEarned": "TND Gagnés",
-    
     "whatsappShareClient": "Salut ! J'utilise VanZ pour mes déménagements et livraisons. Inscris-toi avec mon code {code} et gagne 10 TND sur ta première commande ! 👉 https://vanz.tn/invite/{code}",
     "whatsappShareDriver": "Salut ! Rejoins VanZ avec mon code {code}. C'est une super appli pour les transports. Gagne 10 TND sur ton premier trajet ! 👉 https://vanz.tn/invite/{code}"
   },
@@ -516,15 +512,15 @@
       "budgetPlaceholder": "Ex: 50"
     },
     "actions": {
-        "next": "Continuer",
-        "prev": "Retour",
-        "submit": "Publier ma mission",
-        "publishing": "Publication..."
+      "next": "Continuer",
+      "prev": "Retour",
+      "submit": "Publier ma mission",
+      "publishing": "Publication..."
     },
     "success": {
-        "title": "Mission Publiée !",
-        "desc": "Votre demande est visible. Les chauffeurs vont vous proposer leurs offres.",
-        "cta": "Voir mes missions"
+      "title": "Mission Publiée !",
+      "desc": "Votre demande est visible. Les chauffeurs vont vous proposer leurs offres.",
+      "cta": "Voir mes missions"
     },
     "vehicles": {
       "moto": "Moto / Scooter",
@@ -561,17 +557,17 @@
       "ctaDriver": "Voir le Marché des Missions"
     },
     "job": {
-        "pickup": "DÉPART",
-        "dropoff": "ARRIVÉE",
-        "date": "Date Prévue",
-        "asap": "Dès que possible",
-        "budget": "Budget Client",
-        "bidsReceived": "Offres reçues",
-        "accepted": "Gagné !",
-        "yourDriver": "Votre Chauffeur",
-        "chat": "Chat",
-        "follow": "Suivre",
-        "complete": "Terminer"
+      "pickup": "DÉPART",
+      "dropoff": "ARRIVÉE",
+      "date": "Date Prévue",
+      "asap": "Dès que possible",
+      "budget": "Budget Client",
+      "bidsReceived": "Offres reçues",
+      "accepted": "Gagné !",
+      "yourDriver": "Votre Chauffeur",
+      "chat": "Chat",
+      "follow": "Suivre",
+      "complete": "Terminer"
     }
   },
   "profil": {
@@ -596,5 +592,71 @@
     "logout": "Se déconnecter",
     "roleClient": "Client",
     "roleDriver": "Chauffeur vérifié"
+  },
+  "aboutUs": {
+    "title": "À propos de VanZ",
+    "subtitle": "La première plateforme de mise en relation pour le transport et déménagement en Tunisie.",
+    "missionTitle": "Notre Mission",
+    "missionDesc": "Simplifier la logistique pour les particuliers et les professionnels en offrant un accès rapide, transparent et sécurisé à un réseau de chauffeurs qualifiés.",
+    "visionTitle": "Notre Vision",
+    "visionDesc": "Devenir le standard de qualité et de confiance pour tout déplacement de biens en Afrique du Nord."
+  },
+  "contactUs": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider",
+    "name": "Nom complet",
+    "email": "Adresse email",
+    "subject": "Sujet",
+    "message": "Votre message",
+    "send": "Envoyer le message",
+    "success": "Message envoyé avec succès. Nous vous contacterons bientôt.",
+    "error": "Erreur lors de l'envoi. Veuillez réessayer.",
+    "infoTitle": "Informations de contact",
+    "phone": "+216 20 000 000",
+    "emailAddress": "contact@vanz.tn",
+    "address": "Tunis, Tunisie"
+  },
+  "termsPage": {
+    "title": "Conditions d'utilisation",
+    "lastUpdated": "Dernière mise à jour : Mars 2026",
+    "s1Title": "1. Acceptation des conditions",
+    "s1Desc": "En accédant et en utilisant la plateforme VanZ (site web et application mobile), vous acceptez d'être lié par les présentes conditions générales d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser nos services.",
+    "s2Title": "2. Description du service",
+    "s2Desc": "VanZ est une plateforme de mise en relation entre des clients cherchant à transporter des biens et des chauffeurs indépendants proposant des services de transport et de déménagement en Tunisie. VanZ agit uniquement en tant qu'intermédiaire et n'est pas une entreprise de transport.",
+    "s3Title": "3. Inscription et compte utilisateur",
+    "s3Desc": "Pour utiliser nos services, vous devez créer un compte en fournissant des informations exactes et à jour, notamment un numéro de téléphone tunisien valide. Vous êtes responsable du maintien de la confidentialité de vos identifiants.",
+    "s4Title": "4. Obligations des utilisateurs",
+    "s4L1": "Les clients s'engagent à décrire précisément les biens à transporter et à payer le montant convenu.",
+    "s4L2": "Les marchandises illégales, dangereuses, ou inflammables sont strictement interdites.",
+    "s4L3": "Les utilisateurs doivent faire preuve de respect mutuel à tout moment.",
+    "s5Title": "5. Tarification et Paiements",
+    "s5Desc": "Les prix sont fixés en Dinar Tunisien (TND) selon un système d'enchères ou de prix fixe. VanZ prélève une commission sur chaque transaction réussie. Les paiements peuvent s'effectuer en ligne ou en espèces.",
+    "s6Title": "6. Responsabilité",
+    "s6Desc": "VanZ met tout en œuvre pour vérifier les chauffeurs, mais décline toute responsabilité en cas de dommages matériels non couverts par l'assurance optionnelle, de retards ou de litiges directs entre les parties."
+  },
+  "privacyPage": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : Mars 2026",
+    "s1Title": "1. Introduction",
+    "s1Desc": "Chez VanZ, la protection de vos données personnelles est une priorité absolue. Cette politique de confidentialité explique comment nous collectons, utilisons, partageons et protégeons vos informations.",
+    "s2Title": "2. Données collectées",
+    "s2Desc": "Nous collectons les données suivantes :",
+    "s2L1": "Données d'identité : Nom, prénom, numéro de téléphone, email, carte d'identité (CIN).",
+    "s2L2": "Données de géolocalisation : Localisation GPS (uniquement lorsque l'application est utilisée pour les chauffeurs ou lors de la demande d'un service).",
+    "s2L3": "Données de paiement : Informations de facturation (les données de carte bancaire sont sécurisées par notre partenaire de paiement).",
+    "s2L4": "Données relatives au véhicule : (Chauffeurs uniquement) Carte grise, assurance, visite technique.",
+    "s3Title": "3. Utilisation des données",
+    "s3Desc": "Vos données sont utilisées pour :",
+    "s3L1": "Fournir et améliorer nos services de mise en relation.",
+    "s3L2": "Vérifier l'identité des chauffeurs pour assurer la sécurité de tous.",
+    "s3L3": "Traiter les paiements et envoyer des reçus.",
+    "s3L4": "Gérer le support client et résoudre les litiges.",
+    "s3L5": "Envoyer des communications administratives ou promotionnelles.",
+    "s4Title": "4. Partage des données",
+    "s4Desc": "VanZ ne vend jamais vos données personnelles. Nous pouvons partager certaines informations (nom, numéro de téléphone, localisation) uniquement entre le client et le chauffeur assigné pour la bonne exécution du service.",
+    "s5Title": "5. Sécurité et conservation",
+    "s5Desc": "Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles pour protéger vos données. Les données sont conservées aussi longtemps que votre compte est actif ou selon les exigences légales tunisiennes.",
+    "s6Title": "6. Vos droits",
+    "s6Desc": "Conformément à la législation en vigueur, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez exercer ces droits en nous contactant à privacy@vanz.tn."
   }
 }

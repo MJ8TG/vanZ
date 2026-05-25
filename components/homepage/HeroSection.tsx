@@ -50,7 +50,7 @@ export default function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <Link href={`/${locale}/download`}><motion.div className="px-7 py-3.5 bg-vanz-yellow text-vanz-navy font-bold text-base rounded-full hover:brightness-110 transition-colors shadow-lg shadow-black/10 inline-block" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>{t("cta1")}</motion.div></Link>
+              <Link href={`/${locale}/nouveau-job`}><motion.div className="px-7 py-3.5 bg-vanz-yellow text-vanz-navy font-bold text-base rounded-full hover:brightness-110 transition-colors shadow-lg shadow-black/10 inline-block" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>{t("cta1")}</motion.div></Link>
               <Link href={`/${locale}/devenir-chauffeur`}>
                 <motion.div
                   className="px-7 py-3.5 bg-white text-vanz-navy font-bold text-base rounded-full hover:bg-white/90 transition-colors shadow-lg shadow-black/10 inline-block"

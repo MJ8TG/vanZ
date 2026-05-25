@@ -118,7 +118,7 @@ export default function AdminDisputes() {
 
       // Log the admin matrix action natively
       await supabase.from('admin_actions').insert({
-        admin_id: 'SYSTEM_FRONTEND', // Mock session
+        admin_id: null, // TODO: wire to real admin session UUID once admin auth is integrated
         action: actionDef.action,
         target_id: selectedDispute.job_id,
         amount: isFin ? actionAmount : null
