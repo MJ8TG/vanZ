@@ -123,6 +123,7 @@ export default function LiveJobsFeed() {
                     <MapPin className="w-4 h-4 text-vanz-green flex-shrink-0" />
                     <span className="text-sm font-medium text-vanz-navy truncate">{job.to}</span>
                   </div>
+                </div>
               </div>
             </SwiperSlide>
           ))}
