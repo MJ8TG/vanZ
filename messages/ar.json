@@ -470,7 +470,8 @@
       "matched": "تم القبول",
       "in_progress": "في الطريق",
       "completed": "مكتملة",
-      "cancelled": "ملغاة"
+      "cancelled": "ملغاة",
+      "expired": "منتهية الصلاحية"
     },
     "empty": {
       "title": "لا توجد مهام هنا",

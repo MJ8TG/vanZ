@@ -143,7 +143,7 @@ export default function MesMissionsPage() {
   const filteredJobs = jobs.filter(job => {
     if (activeTab === 'open') return job.status === 'open';
     if (activeTab === 'active') return ['matched', 'in_progress'].includes(job.status);
-    if (activeTab === 'completed') return ['completed', 'cancelled'].includes(job.status);
+    if (activeTab === 'completed') return ['completed', 'cancelled', 'expired'].includes(job.status);
     return false;
   });
 
@@ -159,6 +159,8 @@ export default function MesMissionsPage() {
         return <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold text-xs uppercase tracking-wider">{t('status.completed')} ✅</span>;
       case 'cancelled':
         return <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-500 font-bold text-xs uppercase tracking-wider">{t('status.cancelled')}</span>;
+      case 'expired':
+        return <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold text-xs uppercase tracking-wider">{t('status.expired')}</span>;
       default:
         return <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-500 font-bold text-xs uppercase tracking-wider">{status}</span>;
     }

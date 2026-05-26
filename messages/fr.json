@@ -548,7 +548,8 @@
       "matched": "Accepté",
       "in_progress": "En route",
       "completed": "Terminée",
-      "cancelled": "Annulée"
+      "cancelled": "Annulée",
+      "expired": "Expirée"
     },
     "empty": {
       "title": "Aucune mission ici",
