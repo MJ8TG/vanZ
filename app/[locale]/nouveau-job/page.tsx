@@ -142,6 +142,19 @@ export default function NouveauJobPage() {
       const { data: { user } } = await datasql.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
+      // Check active jobs limit (max 2)
+      const { count, error: countErr } = await datasql
+        .from('jobs')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', user.id)
+        .in('status', ['open', 'payment_pending', 'matched', 'in_progress']);
+
+      if (countErr) throw countErr;
+
+      if (count !== null && count >= 2) {
+        throw new Error(t('limitReached'));
+      }
+
       const { error: insertErr } = await datasql
         .from('jobs')
         .insert({

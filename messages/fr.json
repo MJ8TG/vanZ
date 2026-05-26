@@ -482,6 +482,7 @@
   "nouveauJob": {
     "title": "Nouvelle Mission",
     "subtitle": "Décrivez votre besoin, recevez des offres en temps réel.",
+    "limitReached": "Vous ne pouvez pas publier plus de 2 missions actives en même temps.",
     "steps": {
       "service": "SERVICE",
       "address": "ADRESSES",
