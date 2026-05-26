@@ -42,6 +42,7 @@ function ClientSignupForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   
   const searchParams = useSearchParams();
   const [appliedReferralCode, setAppliedReferralCode] = useState(searchParams?.get("ref")?.toUpperCase() || "");
@@ -50,6 +51,7 @@ function ClientSignupForm() {
   const [loading, setLoading] = useState(false);
   
   const t = useTranslations("invite");
+  const tSignup = useTranslations("signup");
   
   const router = useRouter();
   const locale = useLocale();
@@ -65,6 +67,7 @@ function ClientSignupForm() {
     setEmail(testEmail);
     setPhone(testPhone);
     setPassword(testPassword);
+    setAgreed(true);
     
     setLoading(true);
     setError("");
@@ -110,6 +113,12 @@ function ClientSignupForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (!agreed) {
+      setError(tSignup("mustAgreeError"));
+      setLoading(false);
+      return;
+    }
 
     if (phone.length !== 8) {
       setError("Le numéro de téléphone doit comporter exactement 8 chiffres.");
@@ -338,9 +347,48 @@ function ClientSignupForm() {
               />
             </div>
 
+            {/* Terms Consent Checkbox */}
+            <div className="flex items-start gap-3 mt-4">
+              <input
+                id="agreeToTerms"
+                type="checkbox"
+                required
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 w-4 h-4 text-vanz-teal border-2 border-gray-200 rounded focus:ring-vanz-teal outline-none cursor-pointer"
+              />
+              <label htmlFor="agreeToTerms" className="text-xs text-gray-500 leading-normal cursor-pointer select-none font-medium">
+                {locale === "ar" ? (
+                  <>
+                    أوافق على{" "}
+                    <Link href={`/${locale}/conditions-utilisation`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                      شروط الاستخدام
+                    </Link>{" "}
+                    و{" "}
+                    <Link href={`/${locale}/politique-confidentialite`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                      سياسة الخصوصية
+                    </Link>{" "}
+                    لـ VanZ
+                  </>
+                ) : (
+                  <>
+                    J&apos;accepte les{" "}
+                    <Link href={`/${locale}/conditions-utilisation`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                      Conditions d&apos;utilisation
+                    </Link>{" "}
+                    et la{" "}
+                    <Link href={`/${locale}/politique-confidentialite`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                      Politique de confidentialité
+                    </Link>{" "}
+                    de VanZ
+                  </>
+                )}
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !agreed}
               className="w-full bg-vanz-teal hover:bg-[#00ADC6] text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 group mt-8 shadow-lg shadow-vanz-teal/20 hover:shadow-vanz-teal/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 hover:brightness-110"
             >
               {loading ? (

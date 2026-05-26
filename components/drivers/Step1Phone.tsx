@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DriverFormData } from "@/app/[locale]/devenir-chauffeur/page";
 import { ArrowRight, Phone, Loader2, Gift } from "lucide-react";
 import { datasql as supabase } from "@/lib/datasql";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface Props {
   data: DriverFormData;
@@ -19,9 +20,12 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [agreed, setAgreed] = useState(false);
   
   const searchParams = useSearchParams();
   const refCode = searchParams?.get("ref");
+  const locale = useLocale();
+  const tSignup = useTranslations("signup");
 
   useEffect(() => {
     if (refCode && !data.appliedReferralCode) {
@@ -31,6 +35,10 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      setError(tSignup("mustAgreeError"));
+      return;
+    }
     if (data.phone.length < 8) {
       setError("Le numéro de téléphone doit comporter 8 chiffres.");
       return;
@@ -138,11 +146,50 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
               placeholder="ABC12"
             />
           </div>
+
+          {/* Terms Consent Checkbox */}
+          <div className="flex items-start gap-3 mt-4 mb-6">
+            <input
+              id="agreeToTerms"
+              type="checkbox"
+              required
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-1 w-4 h-4 text-vanz-teal border-2 border-gray-200 rounded focus:ring-vanz-teal outline-none cursor-pointer"
+            />
+            <label htmlFor="agreeToTerms" className="text-xs text-gray-500 leading-normal cursor-pointer select-none font-medium">
+              {locale === "ar" ? (
+                <>
+                  أوافق على{" "}
+                  <Link href={`/${locale}/conditions-utilisation`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                    شروط الاستخدام
+                  </Link>{" "}
+                  و{" "}
+                  <Link href={`/${locale}/politique-confidentialite`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                    سياسة الخصوصية
+                  </Link>{" "}
+                  لـ VanZ
+                </>
+              ) : (
+                <>
+                  J&apos;accepte les{" "}
+                  <Link href={`/${locale}/conditions-utilisation`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                    Conditions d&apos;utilisation
+                  </Link>{" "}
+                  et la{" "}
+                  <Link href={`/${locale}/politique-confidentialite`} target="_blank" className="text-vanz-teal hover:underline font-bold">
+                    Politique de confidentialité
+                  </Link>{" "}
+                  de VanZ
+                </>
+              )}
+            </label>
+          </div>
           
           <button
             type="submit"
             className="w-full bg-vanz-yellow text-vanz-navy font-bold py-3.5 rounded-xl hover:brightness-105 active:scale-95 transition-all flex justify-center items-center gap-2 shadow-lg shadow-vanz-yellow/10 disabled:opacity-50"
-            disabled={loading}
+            disabled={loading || !agreed}
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
               <>
