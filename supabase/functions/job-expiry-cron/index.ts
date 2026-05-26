@@ -16,13 +16,17 @@ serve(async (req: Request) => {
 
     // Calculate exactly 48 hours ago
     const hours48Ago = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    // Calculate 24 hours ago (threshold past scheduled_at)
+    const scheduledExpiryThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    // 1. Find all eligible jobs to expire
+    // 1. Find all eligible jobs to expire:
+    // - status is 'open'
+    // - AND: (scheduled_at is null AND created_at < 48 hours ago) OR (scheduled_at is not null AND scheduled_at < 24 hours ago)
     const { data: expiredJobs, error: fetchError } = await supabaseAdmin
       .from('jobs')
       .select('id')
       .eq('status', 'open')
-      .lt('created_at', hours48Ago);
+      .or(`and(scheduled_at.is.null,created_at.lt.${hours48Ago}),and(scheduled_at.not.is.null,scheduled_at.lt.${scheduledExpiryThreshold})`);
 
     if (fetchError || !expiredJobs || expiredJobs.length === 0) {
       return new Response(JSON.stringify({ success: true, count: 0 }), { headers: { "Content-Type": "application/json" } });
