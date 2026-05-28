@@ -18,22 +18,14 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://hyjagsvunuobarsxrllx.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5amFnc3Z1bnVvYmFyc3hybGx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMTA5NjEsImV4cCI6MjA4OTc4Njk2MX0.wbawjey57tKUqgGCCJ7jUKTYbtlzbHbgn1fseyRNU1E"
       }
     },
     "production": {
       "autoIncrement": true
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "appleId": "",
-        "ascAppId": "",
-        "appleTeamId": ""
-      },
-      "android": {
-        "serviceAccountKeyPath": ""
-      }
     }
   }
 }
