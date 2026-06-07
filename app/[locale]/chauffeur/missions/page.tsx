@@ -129,7 +129,7 @@ export default function DriverFeedPage() {
     }
   }, [locationFilter, radiusKm]);
 
-  const fetchJobs = async (uid: string, filterMode = 'all', radius = 30, coords = null as any, city = null as any) => {
+  const fetchJobs = async (uid: string, filterMode = 'all', radius = 30, coords: { lat: number; lng: number } | null = null, city: string | null = null) => {
     setLoading(true);
 
     let query: any;

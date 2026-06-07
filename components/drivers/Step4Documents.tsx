@@ -89,7 +89,7 @@ export default function Step4Documents({ data, updateData, onNext, onBack, t }: 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {docs.map(({ key, label, required }) => {
-          const isUploaded = !!(data as any)[key];
+          const isUploaded = !!data[key as keyof DriverFormData];
           const isUploading = uploading === key;
           
           return (

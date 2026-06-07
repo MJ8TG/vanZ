@@ -20,9 +20,15 @@ export default function AdminDisputes() {
   const [messages, setMessages] = useState<any[]>([]);
   const [actionAmount, setActionAmount] = useState<number>(0);
   const [signedUrls, setSignedUrls] = useState<{ disputePhotos: string[]; deliveryPhoto: string | null }>({ disputePhotos: [], deliveryPhoto: null });
+  const [adminId, setAdminId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchDisputes();
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) setAdminId(user.id);
+      fetchDisputes();
+    };
+    init();
   }, []);
 
   const fetchDisputes = async () => {
@@ -118,7 +124,7 @@ export default function AdminDisputes() {
 
       // Log the admin matrix action natively
       await supabase.from('admin_actions').insert({
-        admin_id: null, // TODO: wire to real admin session UUID once admin auth is integrated
+        admin_id: adminId,
         action: actionDef.action,
         target_id: selectedDispute.job_id,
         amount: isFin ? actionAmount : null

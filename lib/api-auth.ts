@@ -103,7 +103,7 @@ export async function getAuthenticatedUserWithRole(
     };
   }
 
-  if (!allowedRoles.includes(profile.role as any)) {
+  if (!allowedRoles.includes(profile.role as 'client' | 'driver' | 'admin')) {
     return {
       user: null,
       role: profile.role,

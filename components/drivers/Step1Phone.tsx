@@ -52,7 +52,6 @@ export default function Step1Phone({ data, updateData, onNext, t }: Props) {
 
       try {
         const fullPhone = `+216${data.phone}`;
-        console.log("Sending OTP to:", fullPhone);
         const { error } = await supabase.auth.signInWithOtp({
           phone: fullPhone,
         });

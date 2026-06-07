@@ -142,7 +142,7 @@ export function DeliveryProofUpload({ jobId, driverId, bidAmount, onProofUploade
             id="delivery-photo-input"
             type="file" 
             accept="image/*" 
-            {...({ capture: 'environment' } as any)}
+            capture="environment"
             className="hidden" 
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             title="Choisir un fichier photo"
