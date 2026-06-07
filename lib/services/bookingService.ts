@@ -2,6 +2,18 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "./loggerService";
 import { pricingService } from "./pricingService";
 
+export type JobStatus = 'open' | 'payment_pending' | 'matched' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
+
+export const JOB_STATUS_TRANSITIONS: Record<JobStatus, JobStatus[]> = {
+  open: ['payment_pending', 'cancelled', 'expired'],
+  payment_pending: ['matched', 'open', 'cancelled'],
+  matched: ['in_progress', 'cancelled'],
+  in_progress: ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
+  expired: [],
+};
+
 export interface CreateJobInput {
   client_id: string;
   service_type: string;
@@ -18,6 +30,52 @@ export interface CreateJobInput {
 }
 
 class BookingService {
+  /**
+   * Validate if a status transition is permitted.
+   */
+  validateStatusTransition(currentStatus: JobStatus, targetStatus: JobStatus) {
+    const allowedTransitions = JOB_STATUS_TRANSITIONS[currentStatus];
+    if (!allowedTransitions || !allowedTransitions.includes(targetStatus)) {
+      throw new Error(`State transition from "${currentStatus}" to "${targetStatus}" is invalid.`);
+    }
+  }
+
+  /**
+   * Helper to write records to the audit_logs table.
+   */
+  async recordAuditLog(
+    supabase: SupabaseClient,
+    entityType: 'job' | 'bid' | 'user',
+    entityId: string,
+    actorId: string | null,
+    action: string,
+    previousState: string | null,
+    newState: string | null,
+    payload: Record<string, any> = {},
+    ipAddress?: string
+  ) {
+    try {
+      const { error } = await supabase.from('audit_logs').insert({
+        entity_type: entityType,
+        entity_id: entityId,
+        actor_id: actorId,
+        action,
+        previous_state: previousState,
+        new_state: newState,
+        payload,
+        ip_address: ipAddress || null,
+      });
+
+      if (error) {
+        logger.error("Failed to write audit log to database", error, { entityId, action });
+      } else {
+        logger.info("Audit log recorded", { entityId, action, previousState, newState });
+      }
+    } catch (err) {
+      logger.error("Exception in recordAuditLog", err);
+    }
+  }
+
   /**
    * Fetches job by ID.
    */
@@ -78,7 +136,7 @@ class BookingService {
   /**
    * Create a new job.
    */
-  async createJob(supabase: SupabaseClient, input: CreateJobInput) {
+  async createJob(supabase: SupabaseClient, input: CreateJobInput, ipAddress?: string) {
     logger.info("Creating new job", { client_id: input.client_id });
     const { data, error } = await supabase
       .from("jobs")
@@ -95,6 +153,18 @@ class BookingService {
       throw error;
     }
 
+    await this.recordAuditLog(
+      supabase,
+      'job',
+      data.id,
+      input.client_id,
+      'job_created',
+      null,
+      'open',
+      { service_type: input.service_type },
+      ipAddress
+    );
+
     return data;
   }
 
@@ -106,7 +176,8 @@ class BookingService {
     supabase: SupabaseClient,
     jobId: string,
     driverId: string,
-    status: "en_route" | "arrived" | "in_progress"
+    status: "en_route" | "arrived" | "in_progress",
+    ipAddress?: string
   ) {
     logger.info("Updating job status milestone", { jobId, driverId, status });
 
@@ -128,9 +199,11 @@ class BookingService {
       }
     }
 
-    // 2. Perform the update
-    // If status is "arrived", we transition the job status to "in_progress"
+    // 2. State machine validation
     const dbStatus = status === "arrived" ? "in_progress" : status;
+    this.validateStatusTransition(job.status as JobStatus, dbStatus as JobStatus);
+
+    // 3. Perform the update
     const { error: updateErr } = await supabase
       .from("jobs")
       .update({
@@ -144,7 +217,20 @@ class BookingService {
       throw updateErr;
     }
 
-    // 3. Inject system logs message into conversations
+    // 4. Record transition audit log
+    await this.recordAuditLog(
+      supabase,
+      'job',
+      jobId,
+      driverId,
+      'status_transition',
+      job.status,
+      dbStatus,
+      { milestone_reported: status },
+      ipAddress
+    );
+
+    // 5. Inject system logs message into conversations
     const { data: conversation } = await supabase
       .from("conversations")
       .select("id")
@@ -176,7 +262,13 @@ class BookingService {
   /**
    * Accepts a bid. Moves job to `payment_pending`.
    */
-  async acceptBid(supabase: SupabaseClient, jobId: string, bidId: string, clientId: string) {
+  async acceptBid(
+    supabase: SupabaseClient,
+    jobId: string,
+    bidId: string,
+    clientId: string,
+    ipAddress?: string
+  ) {
     logger.info("Accepting bid", { jobId, bidId, clientId });
 
     // 1. Fetch bid
@@ -205,9 +297,8 @@ class BookingService {
       throw new Error("Vous n'êtes pas le propriétaire de cette mission.");
     }
 
-    if (job.status !== "open") {
-      throw new Error(`Cette mission est déjà ${job.status}.`);
-    }
+    // State machine check
+    this.validateStatusTransition(job.status as JobStatus, 'payment_pending');
 
     // 3. Calculate payouts (12% commission rate)
     const { commissionRate, commissionAmount, driverPayout } =
@@ -232,6 +323,19 @@ class BookingService {
       throw jobUpdateErr;
     }
 
+    // 5. Record transition audit log
+    await this.recordAuditLog(
+      supabase,
+      'job',
+      jobId,
+      clientId,
+      'status_transition',
+      job.status,
+      'payment_pending',
+      { bid_id: bidId, amount: bid.amount, driver_id: bid.driver_id },
+      ipAddress
+    );
+
     return {
       bidAmount: bid.amount,
       commissionAmount,
@@ -248,7 +352,8 @@ class BookingService {
     driverId: string,
     deliveryPhotoUrl: string,
     lat?: number,
-    lng?: number
+    lng?: number,
+    ipAddress?: string
   ) {
     logger.info("Completing job", { jobId, driverId, deliveryPhotoUrl });
 
@@ -256,10 +361,6 @@ class BookingService {
     const job = await this.getJob(supabase, jobId);
     if (!job) {
       throw new Error("Mission introuvable.");
-    }
-
-    if (job.status !== "in_progress" && job.status !== "matched") {
-      throw new Error(`Impossible de terminer une mission avec le statut "${job.status}".`);
     }
 
     if (job.accepted_bid_id) {
@@ -273,6 +374,9 @@ class BookingService {
         throw new Error("Vous n'êtes pas le chauffeur assigné à cette mission.");
       }
     }
+
+    // State machine transition validation
+    this.validateStatusTransition(job.status as JobStatus, 'completed');
 
     // 2. Commission calculation (using atomic database RPC helper)
     const { data: completionResult, error: rpcErr } = await supabase.rpc("complete_job_atomic", {
@@ -307,7 +411,20 @@ class BookingService {
       throw updateErr;
     }
 
-    // 4. Archive conversation chat
+    // 4. Record transition audit log
+    await this.recordAuditLog(
+      supabase,
+      'job',
+      jobId,
+      driverId,
+      'status_transition',
+      job.status,
+      'completed',
+      { delivery_photo_url: deliveryPhotoUrl, lat, lng },
+      ipAddress
+    );
+
+    // 5. Archive conversation chat
     const { data: conversation } = await supabase
       .from("conversations")
       .update({ phase: "archived" })
@@ -325,7 +442,7 @@ class BookingService {
       });
     }
 
-    // 5. Credit driver wallet atomically (only on the first completion to prevent double credits)
+    // 6. Credit driver wallet atomically (only on the first completion to prevent double credits)
     if (isFirstCompletion && driverPayout) {
       await supabase.from("wallet_transactions").insert({
         user_id: driverId,
@@ -341,7 +458,7 @@ class BookingService {
       });
     }
 
-    // 6. Award loyalty points atomically
+    // 7. Award loyalty points atomically
     if (isFirstCompletion && job.accepted_bid_amount) {
       const loyaltyPoints = Math.floor(job.accepted_bid_amount / 10);
       if (loyaltyPoints > 0) {
@@ -368,3 +485,4 @@ class BookingService {
 }
 
 export const bookingService = new BookingService();
+

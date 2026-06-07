@@ -33,6 +33,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'La preuve photo est obligatoire pour clôturer la course.' }, { status: 400 });
     }
 
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+                      req.headers.get('x-real-ip') || 
+                      undefined;
+
     // Process completion via Service Layer
     const result = await bookingService.completeJob(
       supabase,
@@ -40,7 +44,8 @@ export async function POST(req: Request) {
       driver_id,
       delivery_photo_url,
       delivery_photo_lat,
-      delivery_photo_lng
+      delivery_photo_lng,
+      ipAddress
     );
 
     return NextResponse.json({

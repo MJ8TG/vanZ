@@ -33,8 +33,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Statut invalide.' }, { status: 400 });
     }
 
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+                      req.headers.get('x-real-ip') || 
+                      undefined;
+
     // Update status via Service Layer
-    const result = await bookingService.updateJobStatus(supabase, job_id, driver_id, status);
+    const result = await bookingService.updateJobStatus(supabase, job_id, driver_id, status, ipAddress);
 
     return NextResponse.json({ success: true, status: result.dbStatus });
   } catch (err: any) {

@@ -37,8 +37,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Profil client introuvable.' }, { status: 404 });
     }
 
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+                      req.headers.get('x-real-ip') || 
+                      undefined;
+
     // Perform database operations via Service Layer
-    const result = await bookingService.acceptBid(supabase, job_id, bid_id, client_id);
+    const result = await bookingService.acceptBid(supabase, job_id, bid_id, client_id, ipAddress);
 
     // 5. Create Paymee Payment for the commission amount
     const PAYMEE_TOKEN = process.env.PAYMEE_TOKEN;
