@@ -60,3 +60,59 @@ export function getServiceClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
+
+/**
+ * Extracts client IP address from headers safely with standard fallbacks.
+ */
+export function getClientIp(req: Request): string {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const ip = forwardedFor.split(',')[0].trim();
+    if (ip) return ip;
+  }
+  return req.headers.get('x-real-ip') || '127.0.0.1';
+}
+
+/**
+ * Verifies JWT session token and then enforces a database-level role check.
+ */
+export async function getAuthenticatedUserWithRole(
+  req: Request,
+  allowedRoles: ('client' | 'driver' | 'admin')[]
+) {
+  const { user, error: authError } = await getAuthenticatedUser(req);
+  if (authError || !user) {
+    return { user: null, role: null, error: authError };
+  }
+
+  const supabase = getServiceClient();
+  const { data: profile, error: dbError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (dbError || !profile) {
+    return {
+      user: null,
+      role: null,
+      error: NextResponse.json(
+        { error: 'Profil utilisateur introuvable.' },
+        { status: 404 }
+      ),
+    };
+  }
+
+  if (!allowedRoles.includes(profile.role as any)) {
+    return {
+      user: null,
+      role: profile.role,
+      error: NextResponse.json(
+        { error: 'Accès interdit. Rôle insuffisant.' },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return { user, role: profile.role as 'client' | 'driver' | 'admin', error: null };
+}

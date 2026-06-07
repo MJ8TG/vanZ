@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getAuthenticatedUser, getServiceClient } from '@/lib/api-auth';
+import { getAuthenticatedUserWithRole, getServiceClient, getClientIp } from '@/lib/api-auth';
 import { bookingService } from '@/lib/services/bookingService';
 import { rateLimit } from '@/lib/services/rateLimiter';
 import { logger } from '@/lib/services/loggerService';
 
 export async function POST(req: Request) {
-  // 🔒 Auth Gate: verify caller is logged in
-  const { user, error: authError } = await getAuthenticatedUser(req);
+  // 🔒 Auth Gate: verify caller is logged in and is a driver
+  const { user, error: authError } = await getAuthenticatedUserWithRole(req, ['driver']);
   if (authError) return authError;
 
   // 🛡️ Rate Limiting: Limit requests per user
@@ -33,9 +33,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Statut invalide.' }, { status: 400 });
     }
 
-    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
-                      req.headers.get('x-real-ip') || 
-                      undefined;
+    const ipAddress = getClientIp(req);
 
     // Update status via Service Layer
     const result = await bookingService.updateJobStatus(supabase, job_id, driver_id, status, ipAddress);

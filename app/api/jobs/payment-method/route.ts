@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getAuthenticatedUser, getServiceClient } from '@/lib/api-auth';
+import { getAuthenticatedUserWithRole, getServiceClient } from '@/lib/api-auth';
 
 export async function POST(req: Request) {
-  // 🔒 Auth Gate: verify caller is logged in
-  const { user, error: authError } = await getAuthenticatedUser(req);
+  // 🔒 Auth Gate: verify caller is logged in and is a client
+  const { user, error: authError } = await getAuthenticatedUserWithRole(req, ['client']);
   if (authError) return authError;
 
   try {
