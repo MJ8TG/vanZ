@@ -1,0 +1,28 @@
+# Ignore dependencies
+node_modules/
+
+# Ignore local builds and cache
+.expo/
+dist/
+web-build/
+
+# Ignore local Android build caches and intermediate outputs
+android/.gradle/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/local.properties
+
+# Ignore local iOS builds
+ios/build/
+ios/Pods/
+
+# Ignore debug logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Ignore system files
+.DS_Store
+Thumbs.db

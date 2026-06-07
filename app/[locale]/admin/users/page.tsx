@@ -21,7 +21,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     setLoading(true);
-    let query = supabase
+    const query = supabase
       .from('users')
       .select('*, jobs!jobs_client_id_fkey(count)')
       .eq('role', tab)

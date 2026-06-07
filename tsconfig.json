@@ -25,11 +25,24 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "data/**/*.ts",
+    "data/**/*.tsx",
+    "hooks/**/*.ts",
+    "hooks/**/*.tsx",
+    "i18n/**/*.ts",
+    "i18n/**/*.tsx",
+    "lib/**/*.ts",
+    "lib/**/*.tsx",
+    "proxy.ts",
+    "next.config.ts",
+    "next-sitemap.config.js",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "*.mts"
   ],
-  "exclude": ["node_modules", "supabase"]
+  "exclude": ["node_modules", "supabase", "mobile", "tests", "test-results"]
 }

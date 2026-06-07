@@ -39,7 +39,7 @@ export default function DriverTrackingConsole() {
 
   // Simulation State
   const [isSimulating, setIsSimulating] = useState(false);
-  const simulationRef = useRef<NodeJS.Timeout | null>(null);
+  const simulationRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { error: trackingError } = useDriverTracking({
     driverId: userId,

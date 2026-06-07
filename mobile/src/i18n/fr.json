@@ -3,7 +3,21 @@
     "title": "VanZ",
     "subtitle": "Le réseau de transporteurs et déménageurs de confiance en Tunisie.",
     "start": "Commencer",
-    "switchLang": "تغيير اللغة (العربية)"
+    "switchLang": "تغيير اللغة (العربية)",
+    "slides": {
+      "1": {
+        "title": "Trouvez un transporteur",
+        "desc": "Postez votre mission en quelques clics et recevez des offres immédiates pour vos objets ou déménagements."
+      },
+      "2": {
+        "title": "Rentabilisez vos trajets",
+        "desc": "Vous avez un camion ? Trouvez des clients sur votre route et augmentez vos revenus en toute flexibilité."
+      },
+      "3": {
+        "title": "Confiance et Sécurité",
+        "desc": "Une communauté vérifiée, des prix transparents et un suivi en temps réel de vos expéditions."
+      }
+    }
   },
   "modeSelector": {
     "title": "Bienvenue sur VanZ",
@@ -24,7 +38,39 @@
     "verify": "Vérifier",
     "changeNumber": "Modifier le numéro",
     "codeError": "Le code doit contenir 6 chiffres.",
-    "invalidCode": "Code invalide ou expiré"
+    "invalidCode": "Code invalide ou expiré",
+    "loginTitle": "Bon retour",
+    "loginSubtitle": "Connectez-vous pour continuer sur VanZ.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "votre@email.com",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "loginButton": "Se connecter",
+    "createAccount": "Créer un compte",
+    "forgotPassword": "Mot de passe oublié ?",
+    "fillFieldsError": "Veuillez remplir tous les champs.",
+    "invalidLoginError": "Email ou mot de passe incorrect",
+    "registerTitle": "Créer un compte",
+    "registerSubtitle": "Rejoignez la communauté VanZ.",
+    "nameLabel": "Nom et Prénom *",
+    "namePlaceholder": "Foulen Ben Foulen",
+    "phoneLabel": "Numéro de téléphone (Optionnel)",
+    "passwordRequiredLabel": "Mot de passe *",
+    "registerButton": "Créer mon compte",
+    "alreadyHaveAccount": "Vous avez déjà un compte ? ",
+    "registerSuccessTitle": "Vérifiez vos emails",
+    "registerSuccessDesc": "Nous vous avons envoyé un lien de confirmation. Veuillez cliquer sur ce lien pour activer votre compte.",
+    "backToLogin": "Retour à la connexion",
+    "fillRequiredFieldsError": "Veuillez remplir tous les champs obligatoires.",
+    "registerError": "Erreur lors de la création du compte",
+    "resetTitle": "Mot de passe oublié",
+    "resetSubtitle": "Entrez votre email pour recevoir un lien de réinitialisation.",
+    "sendLinkButton": "Envoyer le lien",
+    "cancelButton": "Annuler",
+    "resetSuccessTitle": "Email envoyé",
+    "resetSuccessDesc": "Si un compte est associé à cette adresse, vous recevrez un lien pour réinitialiser votre mot de passe.",
+    "enterEmailError": "Veuillez entrer votre adresse email.",
+    "resetError": "Erreur lors de la réinitialisation"
   },
   "client": {
     "hello": "Bonjour !",

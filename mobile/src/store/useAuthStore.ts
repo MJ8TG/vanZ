@@ -7,7 +7,7 @@ interface AuthState {
   session: Session | null;
   mode: 'client' | 'driver' | null;
   setSession: (session: Session | null) => void;
-  setMode: (mode: 'client' | 'driver') => void;
+  setMode: (mode: 'client' | 'driver' | null) => void;
   logout: () => void;
 }
 

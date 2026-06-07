@@ -215,7 +215,8 @@
     "tnd": "TND",
     "loading": "Chargement...",
     "error": "Une erreur est survenue",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "close": "Fermer"
   },
   "seoPages": {
     "meubleTunis": {
@@ -536,7 +537,12 @@
     "subtitleClient": "Suivez vos demandes de transport",
     "subtitleDriver": "Gérez vos gains et missions",
     "actions": {
-      "newAd": "Nouvelle annonce"
+      "newAd": "Nouvelle annonce",
+      "market": "Marché des Missions",
+      "chat": "Chat",
+      "track": "Suivre",
+      "finish": "Terminer",
+      "viewInvoice": "Voir la facture"
     },
     "tabs": {
       "open": "Ouvertes",
@@ -566,10 +572,40 @@
       "budget": "Budget Client",
       "bidsReceived": "Offres reçues",
       "accepted": "Gagné !",
+      "bidSubmitted": "Vous avez déjà soumis une offre. En attente de la décision du client.",
+      "status": "Statut",
+      "wonMission": "Vous avez gagné cette mission !",
       "yourDriver": "Votre Chauffeur",
       "chat": "Chat",
       "follow": "Suivre",
-      "complete": "Terminer"
+      "complete": "Terminer",
+      "finalAmount": "Montant final",
+      "paid": "payé",
+      "proofDetails": "Ajoutez une photo de preuve pour valider la livraison"
+    },
+    "review": {
+      "title": "Comment s'est passée la mission ?",
+      "subtitle": "Votre avis compte pour la communauté VanZ.",
+      "yourReview": "Votre avis",
+      "rated": "Vous avez noté {stars}/5 étoiles.",
+      "noteDriver": "Notez votre chauffeur",
+      "noteClient": "Notez le client",
+      "strengths": "Points forts :",
+      "commentPlaceholder": "Un commentaire supplémentaire ? (facultatif)",
+      "submitting": "Envoi...",
+      "submit": "Soumettre mon avis",
+      "errorNote": "Veuillez sélectionner une note.",
+      "success": "Merci pour votre avis !",
+      "errorSubmit": "Erreur lors de la soumission de l'avis.",
+      "tags": {
+        "ponctuel": "Ponctuel",
+        "soigneux": "Soigneux",
+        "communicatif": "Communicatif",
+        "professionnel": "Professionnel",
+        "respectueux": "Respectueux",
+        "wrapped": "Colis bien emballé",
+        "easy": "Facile d'accès"
+      }
     }
   },
   "profil": {

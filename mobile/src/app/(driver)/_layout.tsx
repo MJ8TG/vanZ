@@ -1,63 +1,75 @@
 import { Tabs } from 'expo-router';
-import { View, Text } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { StyleSheet, Platform } from 'react-native';
+import TabIcon from '@/components/ui/TabIcon';
+import { useI18n } from '@/i18n';
 
 export default function DriverTabLayout() {
+  const { t } = useI18n();
+
   return (
     <Tabs 
       screenOptions={{ 
         headerShown: false,
-        tabBarActiveTintColor: '#F5C800', // vanz-yellow
-        tabBarInactiveTintColor: '#94a3b8',
+        tabBarActiveTintColor: '#F5C800', // vanz-yellow for driver mode
+        tabBarInactiveTintColor: '#64748b',
         tabBarStyle: {
-          backgroundColor: '#0B1021', // Navy background for driver mode tab bar
-          borderTopColor: '#1e293b',
-        }
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : '#0B1021', // Dark navy for driver
+          position: 'absolute',
+          elevation: 0,
+          borderTopWidth: 0,
+          height: 88,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+          paddingTop: 12,
+        },
+        tabBarBackground: () => (
+          <BlurView 
+            tint="dark" 
+            intensity={90} 
+            style={StyleSheet.absoluteFill} 
+            className="border-t border-white/10"
+          />
+        ),
       }}
     >
       <Tabs.Screen 
         name="index" 
         options={{ 
-          title: 'Missions',
-          tabBarIcon: ({ color }) => (
-            <View className="w-6 h-6 rounded bg-gray-800 items-center justify-center">
-              <Text style={{color}} className="font-bold text-xs">M</Text>
-            </View>
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon="🗺️" label={t('driver.missions')} focused={focused} color={color as string} />
           ),
         }} 
       />
       <Tabs.Screen 
         name="trips" 
         options={{ 
-          title: 'Trajets',
-          tabBarIcon: ({ color }) => (
-            <View className="w-6 h-6 rounded bg-gray-800 items-center justify-center">
-              <Text style={{color}} className="font-bold text-xs">T</Text>
-            </View>
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon="🛣️" label={t('driver.trips')} focused={focused} color={color as string} />
           ),
         }} 
       />
       <Tabs.Screen 
         name="wallet" 
         options={{ 
-          title: 'Gains',
-          tabBarIcon: ({ color }) => (
-            <View className="w-6 h-6 rounded bg-gray-800 items-center justify-center">
-              <Text style={{color}} className="font-bold text-xs">€</Text>
-            </View>
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon="💰" label={t('driver.wallet')} focused={focused} color={color as string} />
           ),
         }} 
       />
       <Tabs.Screen 
         name="profile" 
         options={{ 
-          title: 'Profil',
-          tabBarIcon: ({ color }) => (
-            <View className="w-6 h-6 rounded bg-gray-800 items-center justify-center">
-              <Text style={{color}} className="font-bold text-xs">P</Text>
-            </View>
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon="👤" label={t('driver.profile')} focused={focused} color={color as string} />
           ),
         }} 
       />
+      <Tabs.Screen name="verify" options={{ href: null }} />
+      <Tabs.Screen name="bid/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

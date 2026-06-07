@@ -11,6 +11,7 @@ import { DeliveryProofUpload } from '@/components/jobs/DeliveryProofUpload';
 import { 
   Package, MapPin, CalendarDays, Loader2, Navigation, MessageCircle, Star, FileText, CheckCircle2, AlertTriangle, X, Truck
 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function MesMissionsPage() {
   const router = useRouter();
@@ -20,8 +21,6 @@ export default function MesMissionsPage() {
   const tServices = useTranslations('services');
 
   const [userId, setUserId] = useState<string | null>(null);
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<'client' | 'driver' | null>(null);
   const [activeTab, setActiveTab] = useState<'open' | 'active' | 'completed'>('open');
 
@@ -39,8 +38,10 @@ export default function MesMissionsPage() {
   const [showProofModal, setShowProofModal] = useState(false);
   const [activeCompletionJob, setActiveCompletionJob] = useState<any | null>(null);
 
+  const queryClient = useQueryClient();
+
   useEffect(() => {
-    const fetchUserAndJobs = async () => {
+    const checkUser = async () => {
       const { data: { user } } = await datasql.auth.getUser();
       if (!user) {
         router.push(`/${locale}/login`);
@@ -54,33 +55,7 @@ export default function MesMissionsPage() {
         const userRole = profile?.role || 'client';
         setRole(userRole);
 
-        let jobsData = [];
-        if (userRole === 'client') {
-          const { data, error } = await datasql
-            .from('jobs')
-            .select(`
-              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
-              bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
-            `)
-            .eq('client_id', user.id)
-            .order('created_at', { ascending: false });
-
-          if (error) {
-            console.error("Client fetch error:", error);
-            throw error;
-          }
-          
-          const enrichedData = await Promise.all((data || []).map(async (job: any) => {
-            if (!job.bids || job.bids.length === 0) return job;
-            const enrichedBids = await Promise.all(job.bids.map(async (bid: any) => {
-              const { data: driverUser } = await datasql.from('users').select('first_name, last_name, phone, cached_rating').eq('id', bid.driver_id).single();
-              const { data: driverProfile } = await datasql.from('drivers').select('vehicle_type').eq('id', bid.driver_id).single();
-              return { ...bid, driver: { first_name: driverUser?.first_name || 'Chauffeur', last_name: driverUser?.last_name || '', phone: driverUser?.phone || '', vehicle_type: driverTypeLabels[driverProfile?.vehicle_type || 'van'] || 'van', rating: driverUser?.cached_rating || 0 } };
-            }));
-            return { ...job, bids: enrichedBids };
-          }));
-          jobsData = enrichedData;
-        } else {
+        if (userRole === 'driver') {
           // Enforce Driver Approval Verification for /mes-missions
           const { data: driverAcc } = await datasql
             .from('drivers')
@@ -90,55 +65,99 @@ export default function MesMissionsPage() {
 
           if (!driverAcc || driverAcc.status !== 'approved') {
             router.push(`/${locale}/chauffeur/pending`);
-            return;
           }
-
-          const { data: userBids } = await datasql.from('bids').select('job_id').eq('driver_id', user.id);
-          const biddedJobIds = userBids?.map(b => b.job_id) || [];
-          
-          let query = datasql
-            .from('jobs')
-            .select(`
-              id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
-              bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
-            `);
-
-          if (biddedJobIds.length > 0) {
-            query = query.or(`id.in.(${biddedJobIds.join(',')}),accepted_bid_id.is.not.null`);
-          } else {
-            query = query.not('accepted_bid_id', 'is', null);
-          }
-            
-          const { data, error } = await query.order('created_at', { ascending: false });
-          if (error) throw error;
-          
-          jobsData = (data || []).filter(j => 
-              biddedJobIds.includes(j.id) || 
-              j.bids?.some((b: any) => b.id === j.accepted_bid_id && b.driver_id === user.id)
-          );
         }
-        setJobs(jobsData);
-      } catch (err: any) {
-        console.error("Error fetching jobs:", err);
-      } finally {
-        setLoading(false);
+      } catch (err) {
+        console.error("Error checking user details:", err);
       }
     };
 
-    fetchUserAndJobs();
+    checkUser();
+  }, [locale, router]);
+
+  // Fetch jobs using TanStack Query
+  const { data: jobs = [], isLoading } = useQuery({
+    queryKey: ['web-jobs', userId, role],
+    queryFn: async () => {
+      if (!userId || !role) return [];
+
+      if (role === 'client') {
+        const { data, error } = await datasql
+          .from('jobs')
+          .select(`
+            id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
+            bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
+          `)
+          .eq('client_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error("Client fetch error:", error);
+          throw error;
+        }
+
+        return await Promise.all((data || []).map(async (job: any) => {
+          if (!job.bids || job.bids.length === 0) return job;
+          const enrichedBids = await Promise.all(job.bids.map(async (bid: any) => {
+            const { data: driverUser } = await datasql.from('users').select('first_name, last_name, phone, cached_rating').eq('id', bid.driver_id).single();
+            const { data: driverProfile } = await datasql.from('drivers').select('vehicle_type').eq('id', bid.driver_id).single();
+            return {
+              ...bid,
+              driver: {
+                first_name: driverUser?.first_name || 'Chauffeur',
+                last_name: driverUser?.last_name || '',
+                phone: driverUser?.phone || '',
+                vehicle_type: driverTypeLabels[driverProfile?.vehicle_type || 'van'] || 'van',
+                rating: driverUser?.cached_rating || 0
+              }
+            };
+          }));
+          return { ...job, bids: enrichedBids };
+        }));
+      } else {
+        const { data: userBids } = await datasql.from('bids').select('job_id').eq('driver_id', userId);
+        const biddedJobIds = userBids?.map(b => b.job_id) || [];
+        
+        let query = datasql
+          .from('jobs')
+          .select(`
+            id, status, service_type, pickup_address, dropoff_address, scheduled_at, client_id, created_at, accepted_bid_id, driver_payout,
+            bids:bids!bids_job_id_fkey(id, amount, status, driver_id)
+          `);
+
+        if (biddedJobIds.length > 0) {
+          query = query.or(`id.in.(${biddedJobIds.join(',')}),accepted_bid_id.is.not.null`);
+        } else {
+          query = query.not('accepted_bid_id', 'is', null);
+        }
+          
+        const { data, error } = await query.order('created_at', { ascending: false });
+        if (error) throw error;
+        
+        return (data || []).filter(j => 
+            biddedJobIds.includes(j.id) || 
+            j.bids?.some((b: any) => b.id === j.accepted_bid_id && b.driver_id === userId)
+        );
+      }
+    },
+    enabled: !!userId && !!role,
+  });
+
+  // Supabase Realtime query invalidation
+  useEffect(() => {
+    if (!userId) return;
 
     const subscription = datasql
       .channel('public:jobs')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs' }, () => {
-        fetchUserAndJobs();
+        queryClient.invalidateQueries({ queryKey: ['web-jobs', userId] });
       })
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [locale, router]);
-
+  }, [userId, queryClient]);
 
   const filteredJobs = jobs.filter(job => {
     if (activeTab === 'open') return job.status === 'open';
@@ -170,7 +189,7 @@ export default function MesMissionsPage() {
     return tServices(type) || type;
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50">
         <main className="flex-1 flex items-center justify-center">
@@ -179,6 +198,7 @@ export default function MesMissionsPage() {
       </div>
     );
   }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">

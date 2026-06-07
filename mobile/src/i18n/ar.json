@@ -3,7 +3,21 @@
     "title": "VanZ",
     "subtitle": "شبكة الناقلين والمنقلين الموثوقين في تونس.",
     "start": "ابدأ",
-    "switchLang": "Changer la langue (Français)"
+    "switchLang": "Changer la langue (Français)",
+    "slides": {
+      "1": {
+        "title": "ابحث عن ناقل",
+        "desc": "انشر مهمتك ببضع نقرات وتلقَ عروضًا فورية لأغراضك أو عمليات النقل الخاصة بك."
+      },
+      "2": {
+        "title": "حقق أرباحًا من رحلاتك",
+        "desc": "هل لديك شاحنة؟ اعثر على عملاء في طريقك وزد دخلك بكل مرونة."
+      },
+      "3": {
+        "title": "الثقة والأمان",
+        "desc": "مجتمع موثوق، أسعار شفافة ومتابعة شحناتك في الوقت الفعلي."
+      }
+    }
   },
   "modeSelector": {
     "title": "مرحبا بك في VanZ",
@@ -24,7 +38,39 @@
     "verify": "تحقق",
     "changeNumber": "تغيير الرقم",
     "codeError": "يجب أن يتكون الرمز من 6 أرقام.",
-    "invalidCode": "رمز غير صالح أو منتهي الصلاحية"
+    "invalidCode": "رمز غير صالح أو منتهي الصلاحية",
+    "loginTitle": "مرحباً بعودتك",
+    "loginSubtitle": "سجل الدخول للمتابعة على VanZ.",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "mail@example.com",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "••••••••",
+    "loginButton": "تسجيل الدخول",
+    "createAccount": "إنشاء حساب",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "fillFieldsError": "يرجى ملء جميع الحقول.",
+    "invalidLoginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "registerTitle": "إنشاء حساب",
+    "registerSubtitle": "انضم إلى مجتمع VanZ.",
+    "nameLabel": "الاسم واللقب *",
+    "namePlaceholder": "فلان بن فلان",
+    "phoneLabel": "رقم الهاتف (اختياري)",
+    "passwordRequiredLabel": "كلمة المرور *",
+    "registerButton": "إنشاء حسابي",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟ ",
+    "registerSuccessTitle": "تأكد من بريدك الإلكتروني",
+    "registerSuccessDesc": "لقد أرسلنا لك رابط تأكيد. يرجى النقر على هذا الرابط لتفعيل حسابك.",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "fillRequiredFieldsError": "يرجى ملء جميع الحقول الإلزامية.",
+    "registerError": "خطأ أثناء إنشاء الحساب",
+    "resetTitle": "نسيت كلمة المرور",
+    "resetSubtitle": "أدخل بريدك الإلكتروني لتلقي رابط إعادة التعيين.",
+    "sendLinkButton": "إرسال الرابط",
+    "cancelButton": "إلغاء",
+    "resetSuccessTitle": "تم إرسال البريد الإلكتروني",
+    "resetSuccessDesc": "إذا كان هناك حساب مرتبط بهذا العنوان، فستتلقى رابطاً لإعادة تعيين كلمة المرور الخاصة بك.",
+    "enterEmailError": "يرجى إدخال عنوان بريدك الإلكتروني.",
+    "resetError": "خطأ أثناء إعادة التعيين"
   },
   "client": {
     "hello": "مرحبا!",

@@ -82,7 +82,7 @@ export default function ChatScreen({ conversationId, jobId, currentUserId, curre
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const canSendMedia = phase === 'post_acceptance';
 

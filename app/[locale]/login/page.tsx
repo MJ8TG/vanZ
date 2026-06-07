@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { datasql as supabase } from "@/lib/datasql";
@@ -20,10 +20,13 @@ export default function LoginPage() {
   // 0. Auto-redirect if already logged in
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  useState(() => {
+  useEffect(() => {
+    let mounted = true;
+
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+         if (!mounted) return;
          setCheckingAuth(true);
          // Find role
          const { data: profile } = await supabase
@@ -43,11 +46,16 @@ export default function LoginPage() {
            router.push(`/${locale}/mes-missions`);
          }
       } else {
-        setCheckingAuth(false);
+        if (mounted) setCheckingAuth(false);
       }
     };
+
     checkAuth();
-  });
+
+    return () => {
+      mounted = false;
+    };
+  }, [locale, router]);
 
   if (checkingAuth) {
     return (

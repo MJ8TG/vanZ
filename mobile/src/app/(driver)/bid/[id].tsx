@@ -1,19 +1,25 @@
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { datasql } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useI18n } from '@/i18n';
+import GradientHeader from '@/components/ui/GradientHeader';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function BidScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { session } = useAuthStore();
+  const { t, locale } = useI18n();
   
   const [job, setJob] = useState<any>(null);
   const [price, setPrice] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [jobLoading, setJobLoading] = useState(true);
+  const [lowestBid, setLowestBid] = useState<number | null>(null);
 
   useEffect(() => {
     fetchJob();
@@ -21,13 +27,17 @@ export default function BidScreen() {
 
   const fetchJob = async () => {
     try {
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('id', id)
-        .single();
-      if (error) throw error;
-      setJob(data);
+      const [jobRes, bidsRes] = await Promise.all([
+        datasql.from('jobs').select('*').eq('id', id).single(),
+        datasql.from('bids').select('amount').eq('job_id', id).order('amount', { ascending: true })
+      ]);
+      
+      if (jobRes.error) throw jobRes.error;
+      setJob(jobRes.data);
+      
+      if (bidsRes.data && bidsRes.data.length > 0) {
+        setLowestBid(Number(bidsRes.data[0].amount));
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -35,33 +45,62 @@ export default function BidScreen() {
     }
   };
 
+  const adjustBid = (amount: number) => {
+    const current = parseFloat(price || '0');
+    if (!isNaN(current)) {
+      setPrice(Math.max(0, current + amount).toString());
+    } else {
+      setPrice(Math.max(0, amount).toString());
+    }
+  };
+
   const handleSubmit = async () => {
     if (!price) {
-      Alert.alert('Erreur', 'Veuillez entrer un prix.');
+      Alert.alert(t('common.error'), t('auth.fillFieldsError'));
       return;
     }
     if (!session?.user?.id) {
-      Alert.alert('Erreur', 'Veuillez vous reconnecter.');
+      Alert.alert(t('common.error'), t('auth.invalidCode'));
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await supabase.from('bids').insert({
+      // Check driver status first
+      const { data: driverData, error: driverError } = await datasql
+        .from('drivers')
+        .select('status')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (driverError || driverData?.status !== 'approved') {
+        Alert.alert(
+          locale === 'ar' ? 'حساب غير مفعل' : 'Compte non approuvé',
+          locale === 'ar'
+            ? 'يجب أن يتم تفعيل حسابك أولاً لتتمكن من تقديم عرض.'
+            : 'Votre compte doit être approuvé pour pouvoir soumettre une offre.'
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await datasql.from('bids').insert({
         job_id: id,
         driver_id: session.user.id,
         amount: parseFloat(price),
-        notes: notes || null,
+        note: notes || null,
         status: 'pending',
       });
       
       if (error) throw error;
       
-      Alert.alert('Succès', 'Votre offre a été envoyée au client.', [
-        { text: 'OK', onPress: () => router.back() }
-      ]);
+      Alert.alert(
+        locale === 'ar' ? 'نجاح' : 'Succès', 
+        t('driver.offerSent'), 
+        [{ text: t('common.ok'), onPress: () => router.back() }]
+      );
     } catch (e: any) {
-      Alert.alert('Erreur', e.message);
+      Alert.alert(t('common.error'), e.message);
     } finally {
       setLoading(false);
     }
@@ -70,68 +109,130 @@ export default function BidScreen() {
   if (jobLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-vanz-iceblue">
-        <ActivityIndicator size="large" color="#F5C800" />
+        <ActivityIndicator size="large" color="#FFC800" />
       </View>
     );
   }
 
+  const isRtl = locale === 'ar';
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-vanz-iceblue">
-      <View className="pt-16 pb-6 px-6 bg-vanz-navy">
-        <TouchableOpacity onPress={() => router.back()} className="mb-4">
-          <Text className="text-vanz-teal font-bold text-lg">← Retour</Text>
-        </TouchableOpacity>
-        <Text className="text-white text-2xl font-bold">Faire une offre</Text>
-      </View>
+      <GradientHeader title={t('driver.bidTitle')} backButton={() => router.back()} tall />
 
-      <ScrollView className="flex-1 p-6">
-        {/* Job Summary Card */}
+      <ScrollView className="flex-1 px-5 pt-6" contentContainerStyle={{ paddingBottom: 100 }}>
         {job && (
-          <View className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-vanz-yellow mb-6">
-            <Text className="text-vanz-navy font-bold text-lg mb-1">{job.service_type || 'Mission'}</Text>
-            <Text className="text-vanz-navy/70 text-sm mb-1">📍 {job.pickup_address}</Text>
-            <Text className="text-vanz-navy/70 text-sm mb-2">🏁 {job.dropoff_address}</Text>
-            <Text className="text-vanz-teal font-bold">Budget client : {job.budget} TND</Text>
-          </View>
+          <Animated.View entering={FadeInDown.delay(100).springify()}>
+            <View className="bg-white p-5 rounded-card shadow-card border border-gray-100 mb-6">
+              <Text className={`text-vanz-navy font-black text-xl mb-4 ${isRtl ? 'text-right' : ''}`}>
+                {job.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (job.service_type || 'Mission')}
+              </Text>
+              
+              <View className="bg-gray-50/80 p-4 rounded-2xl border border-gray-100 mb-5 relative">
+                <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-gray-200 ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
+                
+                <View className={`flex-row items-start mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <View className="w-7 h-7 rounded-full bg-vanz-teal/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
+                    <View className="w-2.5 h-2.5 rounded-full bg-vanz-teal" />
+                  </View>
+                  <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
+                    <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.pickup_address}</Text>
+                  </View>
+                </View>
+
+                <View className={`flex-row items-start ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <View className="w-7 h-7 rounded-xl bg-vanz-yellow/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
+                    <View className="w-2.5 h-2.5 rounded-sm bg-vanz-yellow" />
+                  </View>
+                  <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
+                    <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.dropoff_address}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View className="bg-vanz-teal/5 p-4 rounded-xl border border-vanz-teal/10 flex-row justify-between items-center">
+                <Text className="text-vanz-navy font-bold">{locale === 'ar' ? 'أقل عرض حالي:' : 'Offre la plus basse :'}</Text>
+                {lowestBid ? (
+                  <Text className="text-vanz-teal font-black text-lg">{lowestBid} {t('common.currency')}</Text>
+                ) : (
+                  <Text className="text-vanz-teal font-bold">{t('client.noOffers')}</Text>
+                )}
+              </View>
+            </View>
+          </Animated.View>
         )}
 
-        <Text className="text-vanz-navy font-bold text-lg mb-2">Votre Prix (TND)</Text>
-        <TextInput
-          className="bg-white p-4 rounded-xl border border-gray-200 text-vanz-navy text-3xl font-extrabold text-center mb-6"
-          placeholder="0.00"
-          keyboardType="numeric"
-          value={price}
-          onChangeText={setPrice}
-        />
-
-        <Text className="text-vanz-navy font-bold text-lg mb-2">Message pour le client (Optionnel)</Text>
-        <TextInput
-          className="bg-white p-4 rounded-xl border border-gray-200 text-vanz-navy h-32 mb-6"
-          placeholder="Ex: Je suis disponible dès maintenant, j'ai un camion adapté..."
-          multiline
-          textAlignVertical="top"
-          value={notes}
-          onChangeText={setNotes}
-        />
-
-        <View className="bg-vanz-yellow/20 p-4 rounded-xl mb-6">
-          <Text className="text-vanz-navy font-semibold text-sm text-center">
-            N'oubliez pas que le prix inclut la commission VanZ (12%).
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
+            {t('driver.yourPrice')}
           </Text>
-        </View>
+          <View className={`flex-row items-center mb-6 gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <TouchableOpacity 
+              onPress={() => adjustBid(-5)}
+              className="w-16 h-16 bg-white rounded-2xl items-center justify-center border border-gray-100 shadow-sm active:bg-gray-50"
+            >
+              <Text className="text-vanz-navy text-2xl font-medium">-</Text>
+            </TouchableOpacity>
+            
+            <View className="flex-1 relative">
+              <TextInput
+                className="bg-white border-2 border-vanz-teal text-vanz-navy font-black text-3xl text-center h-16 rounded-2xl shadow-glow-teal"
+                placeholder="0"
+                placeholderTextColor="#CBD5E1"
+                keyboardType="numeric"
+                value={price}
+                onChangeText={setPrice}
+              />
+              <Text className="absolute right-5 top-5 text-vanz-teal font-extrabold">{t('common.currency')}</Text>
+            </View>
+
+            <TouchableOpacity 
+              onPress={() => adjustBid(5)}
+              className="w-16 h-16 bg-white rounded-2xl items-center justify-center border border-gray-100 shadow-sm active:bg-gray-50"
+            >
+              <Text className="text-vanz-navy text-2xl font-medium">+</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(300).springify()}>
+          <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
+            {t('driver.messageClient')}
+          </Text>
+          <TextInput
+            className={`bg-white p-4.5 rounded-2xl border border-gray-100 text-vanz-navy h-32 mb-6 text-sm font-semibold shadow-sm ${isRtl ? 'text-right' : ''}`}
+            placeholder={t('driver.messagePlaceholder')}
+            placeholderTextColor="#9CA3AF"
+            multiline
+            textAlignVertical="top"
+            value={notes}
+            onChangeText={setNotes}
+          />
+        </Animated.View>
       </ScrollView>
 
-      <View className="p-6 bg-white border-t border-gray-100">
+      {/* Submit Button */}
+      <View className="absolute bottom-0 w-full p-5 bg-card-glass border-t border-white/50 pb-8 shadow-elevated">
         <TouchableOpacity 
           onPress={handleSubmit}
           disabled={loading || !price}
-          className={`w-full p-4 rounded-xl items-center ${loading || !price ? 'bg-vanz-teal/50' : 'bg-vanz-teal'}`}
+          className="w-full h-16 rounded-2xl overflow-hidden shadow-elevated active:opacity-90"
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text className="text-white text-lg font-bold">Envoyer l'offre</Text>
-          )}
+          <LinearGradient
+            colors={loading || !price ? ['#1A244480', '#0B102180'] : ['#1A2444', '#0B1021']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className="w-full h-full items-center justify-center flex-row"
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Text className="text-white text-xl font-extrabold">{t('driver.sendOffer')}</Text>
+                <Text className="text-white text-xl ml-2">🚀</Text>
+              </>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

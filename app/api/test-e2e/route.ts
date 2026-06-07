@@ -58,6 +58,29 @@ export async function GET(req: Request) {
 
     pushLog("\n[2/5] Forcing Driver Verification...");
     await supabase.auth.signInWithPassword({ email: driverEmail, password: E2E_PASSWORD });
+    
+    // Ensure driver record exists in drivers table
+    const { data: dProfile } = await supabase.from('drivers').select('id').eq('id', driverId).maybeSingle();
+    if (!dProfile) {
+      const { error: insErr } = await supabase.from('drivers').insert({ 
+        id: driverId, 
+        cin_number: `123${Math.floor(10000+Math.random()*90000)}`, 
+        cin_expiry: '2030-01-01', 
+        date_of_birth: '1990-01-01', 
+        vehicle_type: 'van_s', 
+        vehicle_plate: `TEST-${Math.floor(1000+Math.random()*9000)}-TN`, 
+        status: 'approved' 
+      });
+      if (insErr) {
+        throw new Error("Drivers table insertion failed: " + insErr.message);
+      }
+    } else {
+      const { error: updErr } = await supabase.from('drivers').update({ status: 'approved' }).eq('id', driverId);
+      if (updErr) {
+        throw new Error("Drivers table update failed: " + updErr.message);
+      }
+    }
+
     await supabase.from('users').update({ 
       account_status: 'active',
       city: 'Tunis',
@@ -88,7 +111,7 @@ export async function GET(req: Request) {
        amount: 150,
        status: 'pending'
     }).select().single();
-    if (bidErr) throw new Error("Bidding failed: " + bidErr.message);
+    if (bidErr) throw new Error("Bidding failed: " + bidErr.message + " | Job ID: " + jobId + " | Driver ID: " + driverId);
 
     await supabase.auth.signInWithPassword({ email: clientEmail, password: E2E_PASSWORD });
     await supabase.from('bids').update({ status: 'accepted' }).eq('id', bid.id);

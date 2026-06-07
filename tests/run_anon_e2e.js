@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env.local' });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 

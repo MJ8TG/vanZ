@@ -23,7 +23,12 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA36efUQtxdr1wItr5WLtoB12ytzadVN10"
+        }
+      }
     },
     "web": {
       "output": "static",
@@ -54,7 +59,8 @@
           "photosPermission": "L'application a besoin d'accéder à vos photos pour les documents de vérification.",
           "cameraPermission": "L'application a besoin d'accéder à votre caméra pour scanner vos documents."
         }
-      ]
+      ],
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -5,9 +5,11 @@
 @layer base {
   :root {
     /* Brand Colors */
-    --color-teal: #2BBFDF;
+    --color-teal: #38B6FF;
+    --color-teal-dark: #2196D6;
     --color-yellow: #F5C800;
     --color-navy: #0B1021;
+    --color-navy-light: #131B36;
     --color-ice-blue: #F0F6FA;
     --color-green: #22C55E;
     
