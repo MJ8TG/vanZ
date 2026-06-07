@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const config = blogArticlesConfig.find((c) => c.slug === resolvedParams.slug);
   if (!config) return {};
   
-  const content = (blogArticlesContent as any)[resolvedParams.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
+  const content = blogArticlesContent[config.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
   if (!content) return {};
   
   return {
@@ -37,7 +37,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ local
   const config = blogArticlesConfig.find((c) => c.slug === resolvedParams.slug);
   if (!config) notFound();
   
-  const content = (blogArticlesContent as any)[resolvedParams.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
+  const content = blogArticlesContent[config.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
   if (!content) notFound();
   
   const t = await getTranslations({ locale: resolvedParams.locale, namespace: "blog" });

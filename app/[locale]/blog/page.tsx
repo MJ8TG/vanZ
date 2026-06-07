@@ -39,7 +39,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
         <section className="py-24 px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogArticlesConfig.map((article) => {
-              const localizedContent = (blogArticlesContent as any)[article.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
+              const localizedContent = blogArticlesContent[article.slug]?.[resolvedParams.locale as 'fr' | 'ar'];
               if (!localizedContent) return null;
 
               return (
