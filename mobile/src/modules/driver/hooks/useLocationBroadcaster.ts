@@ -14,6 +14,7 @@ export function useLocationBroadcaster({ driverId, isActive, jobId }: Broadcaste
   const watchSubscriptionRef = useRef<any>(null);
   const lastDbUpdateRef = useRef<number>(0);
   const lastHistoryUpdateRef = useRef<number>(0);
+  const lastDriverLocationUpdateRef = useRef<number>(0);
 
   useEffect(() => {
     if (!driverId || !isActive) {
@@ -63,7 +64,7 @@ export function useLocationBroadcaster({ driverId, isActive, jobId }: Broadcaste
           (location) => {
             if (!isSubscribed) return;
 
-            const { latitude, longitude, heading, speed } = location.coords;
+            const { latitude, longitude, heading, speed, accuracy } = location.coords;
 
             // Broadcast high frequency location update via WebSockets
             if (channelRef.current) {
@@ -81,6 +82,24 @@ export function useLocationBroadcaster({ driverId, isActive, jobId }: Broadcaste
             }
 
             const now = Date.now();
+
+            // Persist to driver_locations for Geofence triggers (every 10 seconds)
+            if (now - lastDriverLocationUpdateRef.current > 10 * 1000) {
+              lastDriverLocationUpdateRef.current = now;
+              datasql.from('driver_locations').upsert({
+                driver_id: driverId,
+                job_id: jobId || null,
+                lat: latitude,
+                lng: longitude,
+                heading: heading || 0,
+                speed: speed || 0,
+                accuracy: accuracy || null,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'driver_id' })
+              .then(({ error }) => {
+                if (error) console.error("Error saving driver_locations coords mobile:", error);
+              });
+            }
 
             // Persist to Drivers table (low frequency - every 2 minutes)
             if (now - lastDbUpdateRef.current > 2 * 60 * 1000) {

@@ -11,6 +11,7 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
   const channelRef = useRef<any>(null);
   const lastDbUpdateRef = useRef<number>(0);
   const lastHistoryUpdateRef = useRef<number>(0);
+  const lastDriverLocationUpdateRef = useRef<number>(0);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         setError(null);
-        const { latitude, longitude, heading, speed } = position.coords;
+        const { latitude, longitude, heading, speed, accuracy } = position.coords;
         
         // 1. Broadcast to Supabase Realtime (High Frequency - every few seconds)
         // This won't hit the database and is purely for live React clients
@@ -50,6 +51,24 @@ export function useDriverTracking({ driverId, isActive, jobId }: TrackingOptions
         });
 
         const now = Date.now();
+
+        // 1.5. Persist to driver_locations for Geofence triggers (every 10 seconds)
+        if (now - lastDriverLocationUpdateRef.current > 10 * 1000) {
+          lastDriverLocationUpdateRef.current = now;
+          supabase.from('driver_locations').upsert({
+            driver_id: driverId,
+            job_id: jobId || null,
+            lat: latitude,
+            lng: longitude,
+            heading: heading || 0,
+            speed: speed || 0,
+            accuracy: accuracy || null,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'driver_id' })
+          .then(({ error }) => {
+             if (error) console.error("Error saving driver_locations coords:", error);
+          });
+        }
 
         // 2. Persist to Postgres (Low Frequency - every 3 minutes)
         // Used for the PostGIS Radius job discovery
