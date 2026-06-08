@@ -72,7 +72,7 @@ export default function AdminDisputes() {
     };
 
     const dphotos = dispute.photo_urls && dispute.photo_urls.length > 0
-      ? await Promise.all(dispute.photo_urls.map((u: string) => resolveUrl(u)))
+      ? await Promise.all(dispute.photo_urls.map((u: string) => resolveUrl(u, 'job-images')))
       : [];
     const dproof = dispute.jobs?.delivery_photo_url
       ? await resolveUrl(dispute.jobs.delivery_photo_url)
