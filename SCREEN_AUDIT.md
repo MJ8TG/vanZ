@@ -78,7 +78,8 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 
 ### Missing screens (table exists, no UI)
 - ~~Notifications~~ **✅ BUILT** — shared `components/notifications/NotificationsView.tsx` + `(client)/notifications.tsx` & `(driver)/notifications.tsx` (realtime INSERT stream, mark-all/single read, typed icons, time-ago, bilingual), reachable from both profiles. Added migration `016_notifications_rls.sql` (own-row SELECT/UPDATE + realtime publication) — **requires `supabase db push`**.
-- Client: wallet/credits, saved addresses (`saved_addresses`), referral (`referrals`), post-job review (`reviews`), transaction details, help center, app settings.
+- ~~Post-job review~~ **✅ BUILT** — `(client)/review/[jobId].tsx` (5-star, conditional tags matching web ids, comment), inserts into `reviews` (reviewer_type `client`); guards completed-only / not-already-reviewed; CTA added on completed jobs in `job/[id].tsx`. Uses existing `reviews` RLS (public read + own insert) — no migration needed.
+- Client: wallet/credits, saved addresses (`saved_addresses`), referral (`referrals`), transaction details, help center, app settings.
 - Driver: earnings detail, my vehicle / add vehicle, my documents, driver settings.
 
 ### Deploy steps (pending)

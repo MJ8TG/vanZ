@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Linking } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { authApiFetch } from '@/lib/api';
 import { datasql } from '@/lib/supabase';
@@ -379,6 +379,28 @@ export default function ClientJobDetailsScreen() {
               ) : null}
             </View>
           </Animated.View>
+
+          {/* Review CTA — once the mission is completed */}
+          {currentStatus === 'completed' && job?.accepted_bid_id && (
+            <Animated.View entering={FadeInDown.delay(250).springify()}>
+              <TouchableOpacity
+                onPress={() => router.push(`/(client)/review/${id}` as Href)}
+                className="mb-6 h-14 rounded-2xl overflow-hidden shadow-glow-yellow active:opacity-90"
+              >
+                <LinearGradient
+                  colors={['#F5C800', '#D4AD00']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="w-full h-full items-center justify-center flex-row"
+                >
+                  <Text className="text-lg mr-2 ml-2">⭐</Text>
+                  <Text className="text-vanz-navy font-black text-base">
+                    {locale === 'ar' ? 'ترك تقييم' : 'Laisser un avis'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
 
           {/* Bids List Header */}
           <Animated.Text entering={FadeInDown.delay(300)} className={`text-vanz-navy text-lg font-black mb-4 ${isRtl ? 'text-right' : ''}`}>

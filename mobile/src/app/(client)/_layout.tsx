@@ -75,6 +75,7 @@ export default function ClientTabLayout() {
       <Tabs.Screen name="job/[id]" options={{ href: null }} />
       <Tabs.Screen name="chat/[id]" options={{ href: null, tabBarStyle: { display: 'none' } }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="review/[jobId]" options={{ href: null, tabBarStyle: { display: 'none' } }} />
     </Tabs>
   );
 }
