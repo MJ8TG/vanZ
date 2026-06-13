@@ -153,7 +153,10 @@ export default function DriverProfileScreen() {
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(300).springify()}>
-            <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <PressableCard
+              onPress={() => router.push('/(driver)/vehicle' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
               <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
                   <Text className="text-lg">🚚</Text>

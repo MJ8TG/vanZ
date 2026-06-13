@@ -66,6 +66,21 @@ export default function ClientProfileScreen() {
       {/* Profile Options List */}
       <ScrollView className="flex-1 px-5 pt-8" contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         <View className="gap-4">
+          <Animated.View entering={FadeInDown.delay(140).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(client)/wallet' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">💰</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'محفظتي' : 'Portefeuille'}</Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
+
           <Animated.View entering={FadeInDown.delay(150).springify()}>
             <PressableCard
               onPress={() => router.push('/(client)/notifications' as Href)}

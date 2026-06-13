@@ -82,11 +82,13 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 - ~~Saved addresses~~ **✅ BUILT** — `(client)/addresses.tsx` (list, add via sheet with label presets, set-default, delete) on `saved_addresses`. Reachable from client profile.
 - ~~Referral~~ **✅ BUILT** — shared `components/referral/ReferralView.tsx` + `(client)/referral.tsx` & `(driver)/referral.tsx`: shows `users.referral_code`, native Share + WhatsApp link, stats (invited / rewarded / DT earned) from `referrals`. Reachable from both profiles.
 - Added migration `017_addresses_referrals_rls.sql` (own-row RLS for both tables).
-- Client: wallet/credits, transaction details, help center, app settings.
-- Driver: earnings detail, my vehicle / add vehicle, my documents, driver settings.
+- ~~Client wallet/credits~~ **✅ BUILT** — `(client)/wallet.tsx`: `credit_balance`, `loyalty_points`, `wallet_transactions` history (typed by schema `credit/debit/promo/referral/refund`). Reachable from client profile.
+- ~~Driver my vehicle / my documents~~ **✅ BUILT** — `(driver)/vehicle.tsx`: reads `drivers` row, shows vehicle + identity + document checklist + status badge, with update-docs link to `verify`. Fills the previously-dead "Mon Véhicule" button.
+- Added migration `018_wallet_loyalty_rls.sql` (own-row read for `wallet_transactions`/`loyalty_transactions` — also unblocks the existing **driver wallet**, which had the same missing-policy issue).
+- Remaining: client transaction-detail, help center, app settings; driver earnings detail, driver settings.
 
 ### Deploy steps (pending)
-- Run `supabase db push` to apply `016_notifications_rls.sql` and `017_addresses_referrals_rls.sql` (without them, Notifications / Mes adresses / Parrainage read empty).
+- Run `supabase db push` to apply `016`/`017`/`018` RLS migrations (without them, Notifications / Mes adresses / Parrainage / Portefeuille read empty).
 
 ---
 
