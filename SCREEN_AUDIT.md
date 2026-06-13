@@ -79,11 +79,14 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 ### Missing screens (table exists, no UI)
 - ~~Notifications~~ **✅ BUILT** — shared `components/notifications/NotificationsView.tsx` + `(client)/notifications.tsx` & `(driver)/notifications.tsx` (realtime INSERT stream, mark-all/single read, typed icons, time-ago, bilingual), reachable from both profiles. Added migration `016_notifications_rls.sql` (own-row SELECT/UPDATE + realtime publication) — **requires `supabase db push`**.
 - ~~Post-job review~~ **✅ BUILT** — `(client)/review/[jobId].tsx` (5-star, conditional tags matching web ids, comment), inserts into `reviews` (reviewer_type `client`); guards completed-only / not-already-reviewed; CTA added on completed jobs in `job/[id].tsx`. Uses existing `reviews` RLS (public read + own insert) — no migration needed.
-- Client: wallet/credits, saved addresses (`saved_addresses`), referral (`referrals`), transaction details, help center, app settings.
+- ~~Saved addresses~~ **✅ BUILT** — `(client)/addresses.tsx` (list, add via sheet with label presets, set-default, delete) on `saved_addresses`. Reachable from client profile.
+- ~~Referral~~ **✅ BUILT** — shared `components/referral/ReferralView.tsx` + `(client)/referral.tsx` & `(driver)/referral.tsx`: shows `users.referral_code`, native Share + WhatsApp link, stats (invited / rewarded / DT earned) from `referrals`. Reachable from both profiles.
+- Added migration `017_addresses_referrals_rls.sql` (own-row RLS for both tables).
+- Client: wallet/credits, transaction details, help center, app settings.
 - Driver: earnings detail, my vehicle / add vehicle, my documents, driver settings.
 
 ### Deploy steps (pending)
-- Run `supabase db push` to apply `016_notifications_rls.sql` (without it, the Notifications screen reads empty).
+- Run `supabase db push` to apply `016_notifications_rls.sql` and `017_addresses_referrals_rls.sql` (without them, Notifications / Mes adresses / Parrainage read empty).
 
 ---
 

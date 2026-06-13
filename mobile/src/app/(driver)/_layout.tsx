@@ -84,6 +84,7 @@ export default function DriverTabLayout() {
       <Tabs.Screen name="bid/[id]" options={{ href: null }} />
       <Tabs.Screen name="chat/[id]" options={{ href: null, tabBarStyle: { display: 'none' } }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="referral" options={{ href: null }} />
     </Tabs>
   );
 }

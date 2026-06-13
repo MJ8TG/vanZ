@@ -83,6 +83,36 @@ export default function ClientProfileScreen() {
             </PressableCard>
           </Animated.View>
 
+          <Animated.View entering={FadeInDown.delay(180).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(client)/addresses' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">📍</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'عناويني' : 'Mes adresses'}</Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(190).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(client)/referral' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">🎁</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'الإحالة' : 'Parrainage'}</Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
+
           <Animated.View entering={FadeInDown.delay(200).springify()}>
             <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
               <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
