@@ -1,15 +1,18 @@
 import { Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { StyleSheet, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TabIcon from '@/components/ui/TabIcon';
 import { useI18n } from '@/i18n';
 
 export default function DriverTabLayout() {
   const { t } = useI18n();
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, 12);
 
   return (
-    <Tabs 
-      screenOptions={{ 
+    <Tabs
+      screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#F5C800', // vanz-yellow for driver mode
         tabBarInactiveTintColor: '#64748b',
@@ -18,9 +21,9 @@ export default function DriverTabLayout() {
           position: 'absolute',
           elevation: 0,
           borderTopWidth: 0,
-          height: 88,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-          paddingTop: 12,
+          height: 60 + bottomPad,
+          paddingBottom: bottomPad,
+          paddingTop: 10,
         },
         tabBarBackground: () => (
           <BlurView 
@@ -50,8 +53,17 @@ export default function DriverTabLayout() {
           ),
         }} 
       />
-      <Tabs.Screen 
-        name="wallet" 
+      <Tabs.Screen
+        name="messages"
+        options={{
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon="💬" label={t('chat.messages')} focused={focused} color={color as string} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="wallet"
         options={{ 
           title: '',
           tabBarIcon: ({ color, focused }) => (
@@ -70,6 +82,8 @@ export default function DriverTabLayout() {
       />
       <Tabs.Screen name="verify" options={{ href: null }} />
       <Tabs.Screen name="bid/[id]" options={{ href: null }} />
+      <Tabs.Screen name="chat/[id]" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>
   );
 }

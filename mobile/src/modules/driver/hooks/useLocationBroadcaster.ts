@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
 import { datasql } from '@/lib/supabase';
+import { driverTrackingChannel, LOCATION_UPDATE_EVENT } from '@/lib/realtime';
 
 interface BroadcasterOptions {
   driverId: string | null;
@@ -31,7 +32,7 @@ export function useLocationBroadcaster({ driverId, isActive, jobId }: Broadcaste
     }
 
     // 1. Subscribe to Supabase Realtime broadcast channel
-    const channel = datasql.channel(`tracking:${driverId}`, {
+    const channel = datasql.channel(driverTrackingChannel(driverId), {
       config: { broadcast: { self: true } }
     });
     
@@ -70,8 +71,8 @@ export function useLocationBroadcaster({ driverId, isActive, jobId }: Broadcaste
             if (channelRef.current) {
               channelRef.current.send({
                 type: 'broadcast',
-                event: 'location_update',
-                payload: { 
+                event: LOCATION_UPDATE_EVENT,
+                payload: {
                   lat: latitude, 
                   lng: longitude, 
                   heading: heading || 0,

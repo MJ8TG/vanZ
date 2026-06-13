@@ -1,14 +1,16 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import PressableCard from '@/components/ui/PressableCard';
 
 export default function ClientProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session, logout } = useAuthStore();
   const { t, locale, setLocale } = useI18n();
 
@@ -44,7 +46,8 @@ export default function ClientProfileScreen() {
         colors={['#0B1021', '#131B36', '#1A2444']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="pt-20 pb-12 px-6 items-center rounded-b-[40px] shadow-glow-teal relative z-10"
+        className="pb-12 px-6 items-center rounded-b-[40px] shadow-glow-teal relative z-10"
+        style={{ paddingTop: Math.max(insets.top, 16) + 32 }}
       >
         <Animated.View entering={FadeInDown.delay(100).springify()} className="items-center">
           <View className="w-28 h-28 bg-vanz-teal/20 rounded-full items-center justify-center mb-4 border-2 border-white/10 relative">
@@ -63,6 +66,23 @@ export default function ClientProfileScreen() {
       {/* Profile Options List */}
       <ScrollView className="flex-1 px-5 pt-8" contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         <View className="gap-4">
+          <Animated.View entering={FadeInDown.delay(150).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(client)/notifications' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">🔔</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">
+                  {locale === 'ar' ? 'الإشعارات' : 'Notifications'}
+                </Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
+
           <Animated.View entering={FadeInDown.delay(200).springify()}>
             <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
               <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>

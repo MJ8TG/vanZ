@@ -1,15 +1,17 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, withRepeat, withTiming, useSharedValue, useAnimatedStyle, Easing } from 'react-native-reanimated';
 import PressableCard from '@/components/ui/PressableCard';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DriverProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session, logout } = useAuthStore();
   const { t, locale, setLocale } = useI18n();
 
@@ -35,7 +37,18 @@ export default function DriverProfileScreen() {
   const userPhone = session?.user?.phone || '+216 XX XXX XXX';
   const userName = session?.user?.user_metadata?.full_name || (locale === 'ar' ? 'ناقل' : 'Transporteur');
   const initial = userName[0]?.toUpperCase() || 'T';
-  const isVerified = false; // Mock
+
+  // Real verification status from the drivers table (same as web: drivers.status === 'approved')
+  const [isVerified, setIsVerified] = useState(true); // optimistic to avoid banner flash
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    datasql
+      .from('drivers')
+      .select('status')
+      .eq('id', session.user.id)
+      .single()
+      .then(({ data }) => setIsVerified(data?.status === 'approved'));
+  }, [session?.user?.id]);
 
   const pulseValue = useSharedValue(1);
 
@@ -60,7 +73,8 @@ export default function DriverProfileScreen() {
         colors={['#0B1021', '#131B36', '#1A2444']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="pt-20 pb-12 px-6 items-center rounded-b-[40px] shadow-glow-yellow relative z-10"
+        className="pb-12 px-6 items-center rounded-b-[40px] shadow-glow-yellow relative z-10"
+        style={{ paddingTop: Math.max(insets.top, 16) + 32 }}
       >
         <Animated.View entering={FadeInDown.delay(100).springify()} className="items-center">
           <View className="w-28 h-28 bg-vanz-yellow/20 rounded-full items-center justify-center mb-4 border-2 border-white/10 relative">
@@ -103,6 +117,23 @@ export default function DriverProfileScreen() {
               </PressableCard>
             </Animated.View>
           )}
+
+          <Animated.View entering={FadeInDown.delay(250).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(driver)/notifications' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">🔔</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">
+                  {locale === 'ar' ? 'الإشعارات' : 'Notifications'}
+                </Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(300).springify()}>
             <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>

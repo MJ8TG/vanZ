@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Linking, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Linking } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { authApiFetch } from '@/lib/api';
 import { datasql } from '@/lib/supabase';
+import { driverTrackingChannel, LOCATION_UPDATE_EVENT } from '@/lib/realtime';
 import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
@@ -107,8 +108,8 @@ export default function ClientJobDetailsScreen() {
     
     // Subscribe to coordinates broadcast by driver
     const trackingChannel = datasql
-      .channel(`client-tracking-${driverId}`)
-      .on('broadcast', { event: 'location_update' }, (payload: any) => {
+      .channel(driverTrackingChannel(driverId))
+      .on('broadcast', { event: LOCATION_UPDATE_EVENT }, (payload: any) => {
         if (payload?.payload?.lat && payload?.payload?.lng) {
           setDriverLocation({
             latitude: payload.payload.lat,
@@ -123,6 +124,25 @@ export default function ClientJobDetailsScreen() {
       datasql.removeChannel(trackingChannel);
     };
   }, [job, bids]);
+
+  const openChat = async (driverId: string) => {
+    try {
+      const { data: conv } = await datasql
+        .from('conversations')
+        .select('id')
+        .eq('job_id', id)
+        .eq('driver_id', driverId)
+        .maybeSingle();
+
+      if (conv?.id) {
+        router.push(`/(client)/chat/${conv.id}`);
+      } else {
+        Alert.alert(t('common.error'), locale === 'ar' ? 'المحادثة غير متوفرة بعد.' : 'Conversation pas encore disponible.');
+      }
+    } catch (e) {
+      console.error('Failed to open chat:', e);
+    }
+  };
 
   const handleAcceptBid = async (bid: ClientBid) => {
     if (!job) return;
@@ -366,15 +386,28 @@ export default function ClientJobDetailsScreen() {
           </Animated.Text>
           
           {/* Driver Bids Loop */}
-          {bids.map((bid, index) => {
+          {(() => {
+            const lowestAmount = bids.length > 1
+              ? Math.min(...bids.map((b) => Number(b.amount)))
+              : null;
+            return bids.map((bid, index) => {
             const driverUser = bid.drivers?.users;
             const driverName = driverUser ? `${driverUser.first_name || ''} ${driverUser.last_name || ''}`.trim() : 'Transporteur';
             const driverRating = driverUser?.cached_rating ? Number(driverUser.cached_rating) : null;
             const initial = driverName[0]?.toUpperCase() || 'T';
+            const isBestPrice = lowestAmount !== null && Number(bid.amount) === lowestAmount;
 
             return (
               <Animated.View key={bid.id} entering={FadeInDown.delay(300 + index * 100).springify()}>
-                <PressableCard className="mb-4 overflow-hidden">
+                <PressableCard className={`mb-4 overflow-hidden ${isBestPrice ? 'border-2 border-vanz-yellow' : ''}`}>
+                  {/* Best price badge — Stitch "Meilleur Prix" */}
+                  {isBestPrice && (
+                    <View className={`absolute top-0 ${isRtl ? 'left-0 rounded-br-xl' : 'right-0 rounded-bl-xl'} bg-vanz-yellow px-3 py-1 z-10`}>
+                      <Text className="text-vanz-navy font-black text-[10px] uppercase tracking-wide">
+                        {locale === 'ar' ? 'أفضل سعر' : 'Meilleur Prix'}
+                      </Text>
+                    </View>
+                  )}
                   <View className="p-5">
                     <View className={`flex-row items-center justify-between mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                       <View className={`flex-row items-center flex-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
@@ -387,54 +420,88 @@ export default function ClientJobDetailsScreen() {
                           <Text className={`text-vanz-navy font-bold text-base ${isRtl ? 'text-right' : ''}`}>
                             {driverName}
                           </Text>
-                          {driverRating ? (
-                            <View className={`flex-row items-center mt-0.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                              <Text className="text-vanz-yellow text-xs mr-1">⭐</Text>
-                              <Text className="text-vanz-navy/70 font-bold text-xs">{driverRating.toFixed(1)}/5</Text>
-                            </View>
-                          ) : (
-                            <View className={`flex-row items-center mt-0.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                              <View className="bg-vanz-green/10 px-2 py-0.5 rounded">
+                          <View className={`flex-row items-center mt-0.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            {driverRating ? (
+                              <>
+                                <Text className="text-vanz-yellow text-xs mr-1">⭐</Text>
+                                <Text className="text-vanz-navy/70 font-bold text-xs mr-2 ml-2">{driverRating.toFixed(1)}</Text>
+                              </>
+                            ) : (
+                              <View className="bg-vanz-green/10 px-2 py-0.5 rounded mr-2 ml-2">
                                 <Text className="text-vanz-green font-bold text-[10px] uppercase">Nouveau</Text>
                               </View>
-                            </View>
-                          )}
+                            )}
+                            {bid.drivers?.vehicle_type ? (
+                              <Text className="text-gray-400 font-semibold text-xs">🚐 {bid.drivers.vehicle_type}</Text>
+                            ) : null}
+                          </View>
                         </View>
                       </View>
-                      <View className="bg-vanz-teal/10 px-4 py-2 rounded-xl">
-                        <Text className="text-vanz-teal font-black text-xl">{bid.amount} {t('common.currency')}</Text>
+                      <View className="items-end">
+                        <Text className="text-vanz-navy font-black text-2xl">{bid.amount}</Text>
+                        <Text className="text-gray-400 font-bold text-xs uppercase">{t('common.currency')}</Text>
                       </View>
                     </View>
 
                     {bid.note ? (
-                      <View className="bg-gray-50/80 p-3.5 rounded-xl mb-5">
+                      <View className="bg-gray-50/80 p-3.5 rounded-xl mb-4">
                         <Text className={`text-vanz-navy/70 text-xs italic font-medium leading-relaxed ${isRtl ? 'text-right' : ''}`}>
                           "{bid.note}"
                         </Text>
                       </View>
                     ) : null}
 
+                    {/* Side-by-side actions — Stitch layout: Discuter (gray) + Accepter (filled) */}
                     {currentStatus === 'open' && bid.status !== 'rejected' && (
-                      <TouchableOpacity 
-                        onPress={() => handleAcceptBid(bid)}
-                        disabled={accepting === bid.id}
-                        className="w-full h-12 rounded-xl overflow-hidden shadow-glow-green active:opacity-90 mt-2"
-                      >
-                        <LinearGradient
-                          colors={accepting === bid.id ? ['#22C55E80', '#16A34A80'] : ['#22C55E', '#16A34A']}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          className="w-full h-full items-center justify-center flex-row"
+                      <View className={`flex-row gap-3 mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <TouchableOpacity
+                          onPress={() => openChat(bid.driver_id)}
+                          className="flex-1 h-12 bg-gray-50 border border-gray-200 rounded-xl items-center justify-center flex-row active:bg-gray-100"
                         >
-                          {accepting === bid.id ? (
-                            <ActivityIndicator color="#fff" />
-                          ) : (
-                            <>
-                              <Text className="text-white text-sm mr-2 ml-2">✓</Text>
-                              <Text className="text-white font-black text-sm uppercase tracking-wide">{t('client.accept')}</Text>
-                            </>
-                          )}
-                        </LinearGradient>
+                          <Text className="text-sm mr-1.5 ml-1.5">💬</Text>
+                          <Text className="text-vanz-navy font-extrabold text-sm">
+                            {locale === 'ar' ? 'مراسلة' : 'Discuter'}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleAcceptBid(bid)}
+                          disabled={accepting === bid.id}
+                          className={`flex-1 h-12 rounded-xl overflow-hidden active:opacity-90 ${isBestPrice ? 'shadow-glow-yellow' : 'shadow-glow-teal'}`}
+                        >
+                          <LinearGradient
+                            colors={
+                              accepting === bid.id
+                                ? ['#38B6FF80', '#2196D680']
+                                : isBestPrice
+                                  ? ['#F5C800', '#D4AD00']
+                                  : ['#38B6FF', '#2196D6']
+                            }
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            className="w-full h-full items-center justify-center flex-row"
+                          >
+                            {accepting === bid.id ? (
+                              <ActivityIndicator color="#fff" />
+                            ) : (
+                              <Text className={`font-black text-sm uppercase tracking-wide ${isBestPrice ? 'text-vanz-navy' : 'text-white'}`}>
+                                {t('client.accept')}
+                              </Text>
+                            )}
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+
+                    {/* Chat shortcut when job no longer open */}
+                    {currentStatus !== 'open' && bid.status === 'accepted' && (
+                      <TouchableOpacity
+                        onPress={() => openChat(bid.driver_id)}
+                        className={`flex-row items-center justify-center bg-vanz-navy/5 py-2.5 rounded-xl mb-2 active:bg-vanz-navy/10 ${isRtl ? 'flex-row-reverse' : ''}`}
+                      >
+                        <Text className="text-base mr-2 ml-2">💬</Text>
+                        <Text className="text-vanz-navy font-extrabold text-xs uppercase tracking-wide">
+                          {locale === 'ar' ? 'مراسلة الناقل' : 'Discuter avec le transporteur'}
+                        </Text>
                       </TouchableOpacity>
                     )}
 
@@ -452,7 +519,8 @@ export default function ClientJobDetailsScreen() {
                 </PressableCard>
               </Animated.View>
             );
-          })}
+          });
+          })()}
 
           {bids.length === 0 && (
             <Animated.View entering={FadeInDown.delay(400)} className="bg-white p-8 rounded-card items-center border border-gray-100 shadow-sm mt-2">
