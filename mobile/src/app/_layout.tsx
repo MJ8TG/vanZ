@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
-import { Platform, View, Image, Text, StyleSheet } from 'react-native';
+import { Platform, View, Image, Text } from 'react-native';
 import { datasql } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
@@ -116,30 +116,30 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [session, mode, segments, isReady, showSplash, navState?.key]);
 
-  // The navigator (children) is ALWAYS mounted so the navigation context exists
-  // from the first frame. The splash is an overlay on top while booting.
-  return (
-    <View style={{ flex: 1 }}>
-      {children}
-      {showSplash && (
-        <Animated.View
-          exiting={FadeOut.duration(400)}
-          style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
-          className="items-center justify-center bg-vanz-navy"
-        >
-          <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
-            <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
-              <Image
-                source={require('../../assets/images/logo-mark.png')}
-                className="w-44 h-20"
-                resizeMode="contain"
-              />
-            </View>
-            <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
-          </Animated.View>
+  if (showSplash) {
+    return (
+      <Animated.View
+        exiting={FadeOut.duration(400)}
+        className="flex-1 items-center justify-center bg-vanz-navy"
+      >
+        <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
+          <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
+            <Image
+              source={require('../../assets/images/logo-mark.png')}
+              className="w-44 h-20"
+              resizeMode="contain"
+            />
+          </View>
+          <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
         </Animated.View>
-      )}
-    </View>
+      </Animated.View>
+    );
+  }
+
+  return (
+    <Animated.View entering={FadeIn.duration(400)} className="flex-1">
+      {children}
+    </Animated.View>
   );
 }
 
