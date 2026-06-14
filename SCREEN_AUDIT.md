@@ -77,7 +77,7 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 5. **Auth is email/password**, not the Stitch phone+OTP flow.
 
 ### Missing screens (table exists, no UI)
-- ~~Notifications~~ **✅ BUILT** — shared `components/notifications/NotificationsView.tsx` + `(client)/notifications.tsx` & `(driver)/notifications.tsx` (realtime INSERT stream, mark-all/single read, typed icons, time-ago, bilingual), reachable from both profiles. Added migration `016_notifications_rls.sql` (own-row SELECT/UPDATE + realtime publication) — **requires `supabase db push`**.
+- ~~Notifications~~ **✅ BUILT** — shared `components/notifications/NotificationsView.tsx` + `(client)/notifications.tsx` & `(driver)/notifications.tsx` (realtime INSERT stream, mark-all/single read, typed icons, time-ago, bilingual), reachable from both profiles. Added `016_notifications_rls.sql` (own-row SELECT/UPDATE + realtime publication) — **must be run in the Supabase SQL Editor** (this repo applies loose numbered SQL files manually, in order — there is no `supabase/migrations/`, so `supabase db push` does nothing). See `supabase/README_SQL.md`.
 - ~~Post-job review~~ **✅ BUILT** — `(client)/review/[jobId].tsx` (5-star, conditional tags matching web ids, comment), inserts into `reviews` (reviewer_type `client`); guards completed-only / not-already-reviewed; CTA added on completed jobs in `job/[id].tsx`. Uses existing `reviews` RLS (public read + own insert) — no migration needed.
 - ~~Saved addresses~~ **✅ BUILT** — `(client)/addresses.tsx` (list, add via sheet with label presets, set-default, delete) on `saved_addresses`. Reachable from client profile.
 - ~~Referral~~ **✅ BUILT** — shared `components/referral/ReferralView.tsx` + `(client)/referral.tsx` & `(driver)/referral.tsx`: shows `users.referral_code`, native Share + WhatsApp link, stats (invited / rewarded / DT earned) from `referrals`. Reachable from both profiles.
@@ -91,7 +91,7 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 - Remaining: client transaction-detail (minor — wallet list already shows note/amount/date inline).
 
 ### Deploy steps (pending)
-- Run `supabase db push` to apply `016`/`017`/`018` RLS migrations (without them, Notifications / Mes adresses / Parrainage / Portefeuille read empty).
+- Apply `016`/`017`/`018` to the database by running each file **in the Supabase SQL Editor**, in order (without them, Notifications / Mes adresses / Parrainage / Portefeuille read empty). This repo applies loose numbered SQL files manually — there is no `supabase/migrations/`, so `supabase db push` does nothing. See `supabase/README_SQL.md`.
 
 ---
 
