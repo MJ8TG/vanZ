@@ -16,6 +16,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [role, setRole] = useState<'client' | 'driver'>('client');
   
   const [focusedInput, setFocusedInput] = useState<'name' | 'email' | 'phone' | 'password' | null>(null);
 
@@ -43,6 +44,7 @@ export default function RegisterScreen() {
           data: {
             full_name: name,
             phone: formattedPhone ? `+216${formattedPhone}` : null,
+            role: role,
           }
         }
       });
@@ -128,6 +130,26 @@ export default function RegisterScreen() {
           </View>
 
           <View className="mb-8 gap-5">
+            {/* Role Selection */}
+            <View className={`bg-gray-100 p-1.5 rounded-2xl flex-row shadow-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <TouchableOpacity
+                onPress={() => setRole('client')}
+                className={`flex-1 py-3 rounded-xl items-center justify-center ${role === 'client' ? 'bg-white shadow-sm' : ''}`}
+              >
+                <Text className={`font-extrabold text-base ${role === 'client' ? 'text-vanz-navy' : 'text-gray-400'}`}>
+                  {t('auth.roleClient')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setRole('driver')}
+                className={`flex-1 py-3 rounded-xl items-center justify-center ${role === 'driver' ? 'bg-vanz-teal shadow-glow-teal' : ''}`}
+              >
+                <Text className={`font-extrabold text-base ${role === 'driver' ? 'text-white' : 'text-gray-400'}`}>
+                  {t('auth.roleDriver')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <View>
               <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.nameLabel')}</Text>
               <TextInput

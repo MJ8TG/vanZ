@@ -28,9 +28,25 @@ export async function POST(req: Request) {
     const { data: existingBid } = await supabase.from('bids').select('id').eq('job_id', job_id).eq('driver_id', driver_id).single();
     if (existingBid) return NextResponse.json({ error: 'Offre déjà envoyée.' }, { status: 409 });
 
-    const { data: driverProfile } = await supabase.from('drivers').select('id').eq('id', driver_id).maybeSingle();
+    // Driver must be a verified (approved) driver to bid. A self-selected
+    // "driver" role only routes them into onboarding; it grants no capability
+    // until an admin approves their documents (drivers.status = 'approved').
+    const { data: driverProfile } = await supabase
+      .from('drivers')
+      .select('status')
+      .eq('id', driver_id)
+      .maybeSingle();
     if (!driverProfile) {
-      await supabase.from('drivers').insert({ id: driver_id, cin_number: `123${Math.floor(10000+Math.random()*90000)}`, cin_expiry: '2030-01-01', date_of_birth: '1990-01-01', vehicle_type: 'van', vehicle_plate: `TEST-${Math.floor(1000+Math.random()*9000)}-TN`, status: 'approved' });
+      return NextResponse.json(
+        { error: "Vous devez compléter votre inscription chauffeur avant de proposer une offre." },
+        { status: 403 }
+      );
+    }
+    if (driverProfile.status !== 'approved') {
+      return NextResponse.json(
+        { error: "Votre compte chauffeur est en cours de vérification. Vous pourrez proposer des offres une fois validé." },
+        { status: 403 }
+      );
     }
 
     const { data: newBid, error: insertErr } = await supabase.from('bids').insert({ job_id, driver_id, amount, note: note||null, estimated_duration_minutes: estimated_duration_minutes||null, status: 'pending' }).select('id').single();

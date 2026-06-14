@@ -52,6 +52,8 @@
     "invalidLoginError": "Email ou mot de passe incorrect",
     "registerTitle": "Créer un compte",
     "registerSubtitle": "Rejoignez la communauté VanZ.",
+    "roleClient": "Client",
+    "roleDriver": "Chauffeur",
     "nameLabel": "Nom et Prénom *",
     "namePlaceholder": "Foulen Ben Foulen",
     "phoneLabel": "Numéro de téléphone (Optionnel)",
@@ -159,10 +161,35 @@
     "unverified": "Compte non vérifié",
     "logout": "Déconnexion"
   },
+  "chat": {
+    "messages": "Messages",
+    "title": "Discussion",
+    "emptyTitle": "Aucune conversation",
+    "emptyDesc": "Vos messages avec les clients ou transporteurs apparaîtront ici après une offre.",
+    "noMessagesYet": "Aucun message",
+    "startConversation": "Envoyez le premier message pour démarrer la discussion.",
+    "inputPlaceholder": "Écrivez votre message...",
+    "preBidNotice": "Le partage de numéros de téléphone et de liens est bloqué avant l'acceptation de l'offre."
+  },
+  "wallet": {
+    "available": "Solde disponible",
+    "pendingDebt": "Commission en attente",
+    "withdrawTitle": "Demande de retrait",
+    "withdrawPrompt": "Montant à retirer (TND)",
+    "withdrawConfirm": "Confirmer",
+    "withdrawSuccess": "Demande de retrait envoyée. Elle sera traitée par l'équipe VanZ.",
+    "withdrawInvalid": "Montant invalide ou supérieur au solde disponible.",
+    "withdrawPending": "Retrait en attente",
+    "earning": "Gains de mission",
+    "refund": "Remboursement",
+    "penalty": "Pénalité",
+    "withdrawal": "Retrait"
+  },
   "common": {
     "currency": "TND",
     "error": "Erreur",
     "ok": "OK",
+    "cancel": "Annuler",
     "loading": "Chargement..."
   }
 }

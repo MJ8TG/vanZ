@@ -52,6 +52,8 @@
     "invalidLoginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "registerTitle": "إنشاء حساب",
     "registerSubtitle": "انضم إلى مجتمع VanZ.",
+    "roleClient": "عميل",
+    "roleDriver": "سائق",
     "nameLabel": "الاسم واللقب *",
     "namePlaceholder": "فلان بن فلان",
     "phoneLabel": "رقم الهاتف (اختياري)",
@@ -159,10 +161,35 @@
     "unverified": "حساب غير موثق",
     "logout": "تسجيل الخروج"
   },
+  "chat": {
+    "messages": "الرسائل",
+    "title": "محادثة",
+    "emptyTitle": "لا توجد محادثات",
+    "emptyDesc": "ستظهر رسائلك مع العملاء أو الناقلين هنا بعد تقديم عرض.",
+    "noMessagesYet": "لا توجد رسائل",
+    "startConversation": "أرسل أول رسالة لبدء المحادثة.",
+    "inputPlaceholder": "اكتب رسالتك...",
+    "preBidNotice": "مشاركة أرقام الهاتف والروابط محظورة قبل قبول العرض."
+  },
+  "wallet": {
+    "available": "الرصيد المتاح",
+    "pendingDebt": "عمولة معلقة",
+    "withdrawTitle": "طلب سحب",
+    "withdrawPrompt": "المبلغ المراد سحبه (د.ت)",
+    "withdrawConfirm": "تأكيد",
+    "withdrawSuccess": "تم إرسال طلب السحب. سيعالجه فريق VanZ.",
+    "withdrawInvalid": "مبلغ غير صالح أو أكبر من الرصيد المتاح.",
+    "withdrawPending": "سحب قيد الانتظار",
+    "earning": "أرباح مهمة",
+    "refund": "استرجاع",
+    "penalty": "غرامة",
+    "withdrawal": "سحب"
+  },
   "common": {
     "currency": "د.ت",
     "error": "خطأ",
     "ok": "حسنا",
+    "cancel": "إلغاء",
     "loading": "جاري التحميل..."
   }
 }
