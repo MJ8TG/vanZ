@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, TouchableOpacity, useWindowDimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import Animated, { 
@@ -14,10 +14,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
-
-const Dot = ({ index, scrollX }: { index: number; scrollX: SharedValue<number> }) => {
+const Dot = ({ index, scrollX, width }: { index: number; scrollX: SharedValue<number>; width: number }) => {
   const animatedDotStyle = useAnimatedStyle(() => {
     const widthAnimation = interpolate(
       scrollX.value,
@@ -77,6 +76,8 @@ const slides = [
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { t, locale, setLocale } = useI18n();
   const scrollX = useSharedValue(0);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,13 +96,13 @@ export default function WelcomeScreen() {
 
   const renderItem = ({ item, index }: { item: typeof slides[0], index: number }) => {
     return (
-      <View style={{ width }} className="items-center justify-center px-8 pt-10">
-        <Animated.View 
+      <View style={{ width }} className="items-center justify-center px-8 py-4">
+        <Animated.View
           entering={FadeInDown.delay(index * 100).springify()}
-          className={`w-40 h-40 rounded-full ${item.color} items-center justify-center mb-12 ${item.glow}`}
+          className={`w-36 h-36 rounded-full ${item.color} items-center justify-center mb-8 ${item.glow}`}
         >
-          <View className="w-32 h-32 rounded-full bg-white/20 items-center justify-center border-4 border-white/30">
-            <Text className="text-7xl">{item.icon}</Text>
+          <View className="w-28 h-28 rounded-full bg-white/20 items-center justify-center border-4 border-white/30">
+            <Text className="text-6xl">{item.icon}</Text>
           </View>
         </Animated.View>
         
@@ -127,18 +128,18 @@ export default function WelcomeScreen() {
       {/* Header Logo with Gradient */}
       <LinearGradient
         colors={['#0B1021', '#131B36', 'transparent']}
-        className="pt-20 pb-16 items-center absolute top-0 w-full z-10"
+        className="pb-16 items-center absolute top-0 w-full z-10"
+        style={{ paddingTop: Math.max(insets.top, 16) + 24 }}
       >
-        <Image 
-          source={require('../../assets/images/logo.png')} 
-          className="w-48 h-16" 
-          resizeMode="contain" 
-          style={{ tintColor: '#ffffff' }}
+        <Image
+          source={require('../../assets/images/logo-mark.png')}
+          className="w-44 h-20"
+          resizeMode="contain"
         />
       </LinearGradient>
 
-      {/* Carousel */}
-      <View className="flex-[3] mt-20">
+      {/* Carousel — takes all remaining vertical space */}
+      <View className="flex-1" style={{ marginTop: Math.max(insets.top, 16) + 64 }}>
         <Animated.FlatList
           data={slides}
           keyExtractor={(item) => item.id}
@@ -154,13 +155,13 @@ export default function WelcomeScreen() {
         />
       </View>
 
-      {/* Footer & Controls with Glass Effect */}
-      <View className="flex-1 px-8 pb-12 justify-end gap-8 bg-card-glass border-t border-white/50 shadow-elevated">
-        
+      {/* Footer & Controls with Glass Effect — content-sized so it never clips on small screens */}
+      <View className="px-8 pb-10 gap-5 bg-card-glass border-t border-white/50 shadow-elevated">
+
         {/* Pagination Indicators */}
-        <View className="flex-row justify-center gap-2 mb-2 pt-6">
+        <View className="flex-row justify-center gap-2 pt-5">
           {slides.map((_, i) => (
-            <Dot key={i} index={i} scrollX={scrollX} />
+            <Dot key={i} index={i} scrollX={scrollX} width={width} />
           ))}
         </View>
 

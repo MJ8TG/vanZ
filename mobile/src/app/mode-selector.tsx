@@ -41,11 +41,10 @@ export default function ModeSelectorScreen() {
       <View className="absolute inset-0 bg-vanz-teal/5" />
       
       <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-12 items-center">
-        <Image 
-          source={require('../../assets/images/logo.png')} 
-          className="w-40 h-12 mb-8" 
-          resizeMode="contain" 
-          style={{ tintColor: '#ffffff' }}
+        <Image
+          source={require('../../assets/images/logo-mark.png')}
+          className="w-36 h-20 mb-8"
+          resizeMode="contain"
         />
         <Text className="text-white text-3xl font-black mb-3 text-center tracking-tight">
           {t('modeSelector.title')}

@@ -119,11 +119,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       >
         <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
           <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
-            <Image 
-              source={require('../../assets/images/logo.png')} 
-              className="w-48 h-16" 
-              resizeMode="contain" 
-              style={{ tintColor: '#ffffff' }}
+            <Image
+              source={require('../../assets/images/logo-mark.png')}
+              className="w-44 h-20"
+              resizeMode="contain"
             />
           </View>
           <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
