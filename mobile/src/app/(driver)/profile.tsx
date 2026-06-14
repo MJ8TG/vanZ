@@ -169,8 +169,28 @@ export default function DriverProfileScreen() {
             </PressableCard>
           </Animated.View>
 
+          <Animated.View entering={FadeInDown.delay(350).springify()}>
+            <PressableCard
+              onPress={() => router.push('/(driver)/earnings' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
+                  <Text className="text-lg">📈</Text>
+                </View>
+                <Text className="text-vanz-navy text-base font-extrabold">
+                  {locale === 'ar' ? 'أرباحي' : 'Mes gains'}
+                </Text>
+              </View>
+              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
+            </PressableCard>
+          </Animated.View>
+
           <Animated.View entering={FadeInDown.delay(400).springify()}>
-            <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <PressableCard
+              onPress={() => router.push('/(driver)/settings' as Href)}
+              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
               <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
                   <Text className="text-lg">🔐</Text>

@@ -85,7 +85,10 @@ Typecheck: `mobile` passes `tsc --noEmit` (exit 0).
 - ~~Client wallet/credits~~ **✅ BUILT** — `(client)/wallet.tsx`: `credit_balance`, `loyalty_points`, `wallet_transactions` history (typed by schema `credit/debit/promo/referral/refund`). Reachable from client profile.
 - ~~Driver my vehicle / my documents~~ **✅ BUILT** — `(driver)/vehicle.tsx`: reads `drivers` row, shows vehicle + identity + document checklist + status badge, with update-docs link to `verify`. Fills the previously-dead "Mon Véhicule" button.
 - Added migration `018_wallet_loyalty_rls.sql` (own-row read for `wallet_transactions`/`loyalty_transactions` — also unblocks the existing **driver wallet**, which had the same missing-policy issue).
-- Remaining: client transaction-detail, help center, app settings; driver earnings detail, driver settings.
+- ~~Help center~~ **✅ BUILT** — shared `components/help/HelpView.tsx` + client/driver routes: FAQ accordion + WhatsApp contact (`EXPO_PUBLIC_SUPPORT_PHONE`).
+- ~~App settings~~ **✅ BUILT** — shared `components/settings/SettingsView.tsx` + client/driver routes: account info, language, legal links (open web `/<locale>/...`), help link, logout. Wires the previously-dead "Account settings" buttons on both profiles.
+- ~~Driver earnings detail~~ **✅ BUILT** — `(driver)/earnings.tsx`: total payout + commission, per-mission breakdown from completed trips (`driver_payout`/`commission_amount`/`accepted_bid_amount`). Reachable via "Mes gains" in the driver profile.
+- Remaining: client transaction-detail (minor — wallet list already shows note/amount/date inline).
 
 ### Deploy steps (pending)
 - Run `supabase db push` to apply `016`/`017`/`018` RLS migrations (without them, Notifications / Mes adresses / Parrainage / Portefeuille read empty).

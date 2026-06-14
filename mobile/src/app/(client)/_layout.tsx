@@ -79,6 +79,8 @@ export default function ClientTabLayout() {
       <Tabs.Screen name="addresses" options={{ href: null }} />
       <Tabs.Screen name="referral" options={{ href: null }} />
       <Tabs.Screen name="wallet" options={{ href: null }} />
+      <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="help" options={{ href: null }} />
     </Tabs>
   );
 }
