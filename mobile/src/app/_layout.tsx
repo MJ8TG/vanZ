@@ -1,14 +1,15 @@
 import '../global.css';
 
 import { useEffect, useState } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
-import { Platform, View, Image, Text } from 'react-native';
+import { Platform, View, Image, Text, StyleSheet } from 'react-native';
 import { datasql } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import QueryProvider from '@/components/providers/QueryProvider';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -21,6 +22,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const { session, setSession, mode, setMode } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
+  const navState = useRootNavigationState();
   const [isReady, setIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
 
@@ -89,6 +91,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isReady || showSplash) return;
+    // Don't dispatch navigation until the root navigator is actually mounted,
+    // otherwise expo-router throws "Couldn't find a navigation context".
+    if (!navState?.key) return;
 
     const inAuthGroup = segments[0] === 'auth' || segments[0] === 'welcome';
 
@@ -109,37 +114,34 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     }
-  }, [session, mode, segments, isReady, showSplash]);
+  }, [session, mode, segments, isReady, showSplash, navState?.key]);
 
-  if (showSplash) {
-    return (
-      <Animated.View 
-        exiting={FadeOut.duration(400)}
-        className="flex-1 items-center justify-center bg-vanz-navy"
-      >
-        <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
-          <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
-            <Image
-              source={require('../../assets/images/logo-mark.png')}
-              className="w-44 h-20"
-              resizeMode="contain"
-            />
-          </View>
-          <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
-        </Animated.View>
-      </Animated.View>
-    );
-  }
-
+  // The navigator (children) is ALWAYS mounted so the navigation context exists
+  // from the first frame. The splash is an overlay on top while booting.
   return (
-    <Animated.View entering={FadeIn.duration(400)} className="flex-1">
+    <View style={{ flex: 1 }}>
       {children}
-    </Animated.View>
+      {showSplash && (
+        <Animated.View
+          exiting={FadeOut.duration(400)}
+          style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
+          className="items-center justify-center bg-vanz-navy"
+        >
+          <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
+            <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
+              <Image
+                source={require('../../assets/images/logo-mark.png')}
+                className="w-44 h-20"
+                resizeMode="contain"
+              />
+            </View>
+            <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
+          </Animated.View>
+        </Animated.View>
+      )}
+    </View>
   );
 }
-
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import QueryProvider from '@/components/providers/QueryProvider';
 
 export default function RootLayout() {
   useEffect(() => {

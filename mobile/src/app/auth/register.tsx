@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown, withSpring, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { setMode } = useAuthStore();
   const { t, locale } = useI18n();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,7 +54,11 @@ export default function RegisterScreen() {
       if (error) throw error;
       
       if (data.session) {
-        router.replace('/mode-selector');
+        // Role is already chosen on this screen — set it locally and go
+        // straight to the right area (skip the mode selector). Drivers land on
+        // the driver tab, which routes them into the verification wizard.
+        setMode(role);
+        router.replace(role === 'driver' ? '/(driver)' : '/(client)');
       } else {
         setSuccess(true);
       }
