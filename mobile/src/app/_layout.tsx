@@ -116,29 +116,59 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [session, mode, segments, isReady, showSplash, navState?.key]);
 
-  if (showSplash) {
-    return (
-      <Animated.View
-        exiting={FadeOut.duration(400)}
-        className="flex-1 items-center justify-center bg-vanz-navy"
-      >
-        <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
-          <View className="bg-white/10 p-6 rounded-3xl mb-6 items-center shadow-glow-teal border border-white/20">
-            <Image
-              source={require('../../assets/images/logo-mark.png')}
-              className="w-44 h-20"
-              resizeMode="contain"
-            />
-          </View>
-          <Text className="text-white/60 text-center font-extrabold tracking-widest text-sm uppercase">Loading</Text>
-        </Animated.View>
-      </Animated.View>
-    );
-  }
-
   return (
     <Animated.View entering={FadeIn.duration(400)} className="flex-1">
       {children}
+      {showSplash && (
+        <Animated.View
+          pointerEvents="none"
+          exiting={FadeOut.duration(400)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0B1021',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+          }}
+        >
+          <Animated.View entering={FadeIn.duration(600).springify()} layout={Layout.springify()}>
+            <View style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: 24,
+              borderRadius: 24,
+              marginBottom: 24,
+              alignItems: 'center',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderWidth: 1,
+              shadowColor: '#38B6FF',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 24,
+              elevation: 8,
+            }}>
+              <Image
+                source={require('../../assets/images/logo-mark.png')}
+                style={{ width: 176, height: 80 }}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={{
+              color: 'rgba(255, 255, 255, 0.6)',
+              textAlign: 'center',
+              fontWeight: '800',
+              letterSpacing: 2,
+              fontSize: 14,
+              textTransform: 'uppercase'
+            }}>
+              Loading
+            </Text>
+          </Animated.View>
+        </Animated.View>
+      )}
     </Animated.View>
   );
 }

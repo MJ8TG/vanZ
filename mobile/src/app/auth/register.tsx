@@ -136,21 +136,26 @@ export default function RegisterScreen() {
           </View>
 
           <View className="mb-8 gap-5">
-            {/* Role Selection */}
-            <View className={`bg-gray-100 p-1.5 rounded-2xl flex-row shadow-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+            {/* Role Selection — dynamic colors via inline style to avoid
+                NativeWind CSS-variable churn (which remounts and eats taps). */}
+            <View className="bg-gray-100 p-1.5 rounded-2xl flex-row" style={{ flexDirection: isRtl ? 'row-reverse' : 'row' }}>
               <TouchableOpacity
                 onPress={() => setRole('client')}
-                className={`flex-1 py-3 rounded-xl items-center justify-center ${role === 'client' ? 'bg-white shadow-sm' : ''}`}
+                activeOpacity={0.8}
+                className="flex-1 py-3 rounded-xl items-center justify-center"
+                style={{ backgroundColor: role === 'client' ? '#ffffff' : 'transparent' }}
               >
-                <Text className={`font-extrabold text-base ${role === 'client' ? 'text-vanz-navy' : 'text-gray-400'}`}>
+                <Text className="font-extrabold text-base" style={{ color: role === 'client' ? '#0B1021' : '#9CA3AF' }}>
                   {t('auth.roleClient')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setRole('driver')}
-                className={`flex-1 py-3 rounded-xl items-center justify-center ${role === 'driver' ? 'bg-vanz-teal shadow-glow-teal' : ''}`}
+                activeOpacity={0.8}
+                className="flex-1 py-3 rounded-xl items-center justify-center"
+                style={{ backgroundColor: role === 'driver' ? '#38B6FF' : 'transparent' }}
               >
-                <Text className={`font-extrabold text-base ${role === 'driver' ? 'text-white' : 'text-gray-400'}`}>
+                <Text className="font-extrabold text-base" style={{ color: role === 'driver' ? '#ffffff' : '#9CA3AF' }}>
                   {t('auth.roleDriver')}
                 </Text>
               </TouchableOpacity>
