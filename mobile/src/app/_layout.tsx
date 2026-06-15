@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { Platform, View, Image, Text } from 'react-native';
 import { datasql } from '@/lib/supabase';
+import { registerPushToken } from '@/lib/registerPushToken';
 import { useAuthStore } from '@/store/useAuthStore';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -78,6 +79,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (e) {
           console.error('onAuthStateChange role fetch error:', e);
         }
+        // Register this device for push notifications (fire-and-forget).
+        registerPushToken(session.user.id);
       } else {
         setMode(null);
       }
