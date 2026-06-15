@@ -29,6 +29,9 @@ function iconForType(type: string): string {
   if (t.includes('sos') || t.includes('alert')) return '🚨';
   if (t.includes('referral') || t.includes('parrain')) return '🎁';
   if (t.includes('message') || t.includes('chat')) return '💬';
+  if (t.includes('approved') || t.includes('activ')) return '✅';
+  if (t.includes('rejected') || t.includes('rejet')) return '⚠️';
+  if (t.includes('driver') || t.includes('chauffeur') || t.includes('document') || t.includes('verif')) return '📋';
   return '🔔';
 }
 
