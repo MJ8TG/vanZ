@@ -32,6 +32,11 @@ export default function RegisterScreen() {
     }
 
     const formattedPhone = phone ? phone.replace(/\D/g, '') : '';
+    // Drivers must provide a phone number — clients and dispatch need to reach them.
+    if (role === 'driver' && !formattedPhone) {
+      setError(t('auth.phoneRequiredDriverError'));
+      return;
+    }
     if (formattedPhone && !/^[2459]\d{7}$/.test(formattedPhone)) {
       setError(t('auth.phoneError'));
       return;
@@ -190,7 +195,7 @@ export default function RegisterScreen() {
             </View>
 
             <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.phoneLabel')}</Text>
+              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{role === 'driver' ? `${t('auth.phoneLabelDriver')} *` : t('auth.phoneLabel')}</Text>
               <View className={`flex-row items-center bg-white rounded-2xl border-2 shadow-sm px-4 h-16 ${focusedInput === 'phone' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <View className="bg-vanz-iceblue px-3 py-1.5 rounded-lg border border-gray-100">
                   <Text className="text-vanz-navy text-sm font-bold">+216</Text>

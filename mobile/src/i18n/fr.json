@@ -57,6 +57,8 @@
     "nameLabel": "Nom et Prénom *",
     "namePlaceholder": "Foulen Ben Foulen",
     "phoneLabel": "Numéro de téléphone (Optionnel)",
+    "phoneLabelDriver": "Numéro de téléphone",
+    "phoneRequiredDriverError": "Le numéro de téléphone est obligatoire pour les chauffeurs.",
     "passwordRequiredLabel": "Mot de passe *",
     "registerButton": "Créer mon compte",
     "alreadyHaveAccount": "Vous avez déjà un compte ? ",

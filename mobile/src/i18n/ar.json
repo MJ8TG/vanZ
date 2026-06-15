@@ -57,6 +57,8 @@
     "nameLabel": "الاسم واللقب *",
     "namePlaceholder": "فلان بن فلان",
     "phoneLabel": "رقم الهاتف (اختياري)",
+    "phoneLabelDriver": "رقم الهاتف",
+    "phoneRequiredDriverError": "رقم الهاتف إلزامي للسائقين.",
     "passwordRequiredLabel": "كلمة المرور *",
     "registerButton": "إنشاء حسابي",
     "alreadyHaveAccount": "هل لديك حساب بالفعل؟ ",
