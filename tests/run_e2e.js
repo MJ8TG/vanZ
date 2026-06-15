@@ -143,9 +143,9 @@ async function runTests() {
     if (mathErr) throw mathErr;
     const { data: driverMath } = await supabase.from('users').select('pending_commission_debt').eq('id', driverId).single();
     
-    const expectedCommission = 150 * 0.15; // 15% standard
+    const expectedCommission = 150 * 0.11; // 11% tier (mission >= 100 TND)
     if (jobMath.commission_amount === expectedCommission) {
-       console.log(`✅ Job Commission Math Passed: ${expectedCommission} TND (15%)`);
+       console.log(`✅ Job Commission Math Passed: ${expectedCommission} TND (11%)`);
     } else {
        console.error(`❌ Job Commission Math Failed: Expected ${expectedCommission}, Got ${jobMath.commission_amount}`);
     }

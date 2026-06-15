@@ -145,7 +145,7 @@
     "yourPrice": "Votre Prix (TND)",
     "messageClient": "Message pour le client (Optionnel)",
     "messagePlaceholder": "Ex: Je suis disponible dès maintenant...",
-    "commissionNote": "N'oubliez pas que le prix inclut la commission VanZ (12%).",
+    "commissionNote": "Le prix inclut la commission VanZ : 15% en dessous de 100 TND, 11% à partir de 100 TND.",
     "sendOffer": "Envoyer l'offre",
     "offerSent": "Votre offre a été envoyée au client.",
     "trips": "Mes Trajets",

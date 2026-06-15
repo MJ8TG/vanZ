@@ -300,9 +300,9 @@ class BookingService {
     // State machine check
     this.validateStatusTransition(job.status as JobStatus, 'payment_pending');
 
-    // 3. Calculate payouts (12% commission rate)
+    // 3. Calculate payouts (tiered commission: 15% < 100 TND, 11% >= 100 TND)
     const { commissionRate, commissionAmount, driverPayout } =
-      pricingService.calculateCommission(bid.amount, 0.12);
+      pricingService.calculateCommission(bid.amount);
 
     // 4. Update job atomically
     const { error: jobUpdateErr } = await supabase
@@ -382,7 +382,7 @@ class BookingService {
     const { data: completionResult, error: rpcErr } = await supabase.rpc("complete_job_atomic", {
       p_job_id: jobId,
       p_amount: job.accepted_bid_amount || 0,
-      p_rate: 0.15, // matches RPC schema setup
+      p_rate: pricingService.getCommissionRate(job.accepted_bid_amount || 0), // tiered 15%/11%
     });
 
     if (rpcErr) {

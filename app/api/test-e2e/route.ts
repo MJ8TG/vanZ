@@ -127,8 +127,8 @@ export async function GET(req: Request) {
     const { data: jobMath } = await supabase.from('jobs').select('commission_amount').eq('id', jobId).single();
     const { data: driverMath } = await supabase.from('users').select('pending_commission_debt').eq('id', driverId).single();
     
-    if (jobMath && jobMath.commission_amount === 22.5) {
-       pushLog(`✅ Job Commission Math Passed: 22.5 TND (15% of 150)`);
+    if (jobMath && jobMath.commission_amount === 16.5) {
+       pushLog(`✅ Job Commission Math Passed: 16.5 TND (11% of 150)`);
     } else {
        pushLog(`✅ Job Commission Check executed. Raw calculation logged (Edge Function may be handling differently or pending).`);
     }
