@@ -80,19 +80,12 @@ export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const { t, locale, setLocale } = useI18n();
   const scrollX = useSharedValue(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollX.value = event.contentOffset.x;
     },
   });
-
-  const onViewableItemsChanged = ({ viewableItems }: any) => {
-    if (viewableItems[0]) {
-      setCurrentIndex(viewableItems[0].index);
-    }
-  };
 
   const renderItem = ({ item, index }: { item: typeof slides[0], index: number }) => {
     return (
@@ -150,8 +143,6 @@ export default function WelcomeScreen() {
           bounces={false}
           onScroll={scrollHandler}
           scrollEventThrottle={16}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         />
       </View>
 

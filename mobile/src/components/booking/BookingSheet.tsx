@@ -231,7 +231,7 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
                         >
                           {option.icon}
                         </Animated.Text>
-                        <Text className="text-sm font-extrabold text-vanz-navy capitalize text-center">{option.label}</Text>
+                        <Text className="text-sm font-extrabold text-vanz-navy text-center">{option.key === 'moto' ? t('createJob.vehMoto') : option.key === 'van_s' ? t('createJob.vehVanS') : option.key === 'van_xl' ? t('createJob.vehVanXl') : t('createJob.vehCamion')}</Text>
                         <Text className="text-[10px] text-gray-400 font-semibold text-center mt-0.5">{option.capacity}</Text>
                       </TouchableOpacity>
                     );
@@ -316,7 +316,7 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
                 </View>
 
                 <Text className={`text-vanz-navy font-extrabold text-sm mb-3.5 ${isRtl ? 'text-right' : ''}`}>
-                  {t('createJob.datePlaceholder')}
+                  {t('createJob.timeSlotLabel')}
                 </Text>
                 
                 {/* Time Slots Grid */}
@@ -328,8 +328,8 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
                       className={`flex-1 items-center py-4 rounded-2xl border-2 ${timeSlot === slotKey ? 'border-vanz-teal bg-vanz-teal/5' : 'border-gray-100 bg-white shadow-sm'}`}
                     >
                       <Text className="text-2xl mb-1.5">{slotKey === 'matin' ? '🌅' : slotKey === 'après-midi' ? '☀️' : '🌌'}</Text>
-                      <Text className={`text-xs font-extrabold capitalize text-center ${timeSlot === slotKey ? 'text-vanz-teal' : 'text-vanz-navy'}`}>
-                        {slotKey}
+                      <Text className={`text-xs font-extrabold text-center ${timeSlot === slotKey ? 'text-vanz-teal' : 'text-vanz-navy'}`}>
+                        {slotKey === 'matin' ? t('createJob.slotMorning') : slotKey === 'après-midi' ? t('createJob.slotAfternoon') : t('createJob.slotEvening')}
                       </Text>
                     </TouchableOpacity>
                   ))}

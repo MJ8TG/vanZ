@@ -77,6 +77,7 @@
     "resetError": "خطأ أثناء إعادة التعيين"
   },
   "client": {
+    "home": "الرئيسية",
     "hello": "مرحبا!",
     "whatToTransport": "ماذا تريد أن تنقل؟",
     "publishJob": "نشر مهمة",
@@ -113,6 +114,14 @@
     "descriptionPlaceholder": "مثال: 3 صناديق، غسالة واحدة...",
     "dateLabel": "التاريخ والوقت",
     "datePlaceholder": "مثال: في أقرب وقت ممكن، أو غدا 14:00",
+    "timeSlotLabel": "الفترة الزمنية",
+    "slotMorning": "صباحًا",
+    "slotAfternoon": "بعد الظهر",
+    "slotEvening": "مساءً",
+    "vehMoto": "دراجة",
+    "vehVanS": "فان صغير",
+    "vehVanXl": "فان كبير",
+    "vehCamion": "شاحنة",
     "budgetTitle": "ميزانيتك المقدرة",
     "budgetSubtitle": "حدد المبلغ الذي ترغب في دفعه.",
     "budgetTip": "💡 نصيحة: ميزانية واقعية تجذب ناقلين ذوي جودة بسرعة أكبر!",

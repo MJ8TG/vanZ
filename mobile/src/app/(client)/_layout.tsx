@@ -40,7 +40,7 @@ export default function ClientTabLayout() {
         options={{ 
           title: '', // Custom label inside TabIcon
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon="🏠" label={t('client.home') || 'Accueil'} focused={focused} color={color as string} />
+            <TabIcon icon="🏠" label={t('client.home')} focused={focused} color={color as string} />
           ),
         }} 
       />

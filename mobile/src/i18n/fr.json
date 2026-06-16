@@ -77,6 +77,7 @@
     "resetError": "Erreur lors de la réinitialisation"
   },
   "client": {
+    "home": "Accueil",
     "hello": "Bonjour !",
     "whatToTransport": "Que souhaitez-vous transporter ?",
     "publishJob": "Publier un Job",
@@ -113,6 +114,14 @@
     "descriptionPlaceholder": "Ex: 3 cartons, 1 machine à laver...",
     "dateLabel": "Date et Heure",
     "datePlaceholder": "Ex: Le plus tôt possible, ou Demain 14:00",
+    "timeSlotLabel": "Créneau horaire",
+    "slotMorning": "Matin",
+    "slotAfternoon": "Après-midi",
+    "slotEvening": "Soir",
+    "vehMoto": "Moto",
+    "vehVanS": "Petit Van",
+    "vehVanXl": "Grand Van",
+    "vehCamion": "Camion",
     "budgetTitle": "Votre budget estimé",
     "budgetSubtitle": "Indiquez combien vous êtes prêt à payer.",
     "budgetTip": "💡 Astuce : Un budget réaliste attire plus vite des transporteurs de qualité !",

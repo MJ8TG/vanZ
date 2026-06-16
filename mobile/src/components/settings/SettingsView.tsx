@@ -12,6 +12,16 @@ interface Props {
   helpHref: string;
 }
 
+// Defined at module scope (not inside the render) so React keeps a stable
+// component identity and doesn't remount on every parent re-render.
+function Section({ title, isRtl }: { title: string; isRtl: boolean }) {
+  return (
+    <Text className={`text-vanz-navy/40 font-black text-xs uppercase tracking-wider mb-3 mt-6 ${isRtl ? 'text-right' : ''}`}>
+      {title}
+    </Text>
+  );
+}
+
 export default function SettingsView({ helpHref }: Props) {
   const router = useRouter();
   const { session, logout } = useAuthStore();
@@ -58,14 +68,10 @@ export default function SettingsView({ helpHref }: Props) {
     { path: 'cookies', fr: 'Cookies', ar: 'ملفات الارتباط', icon: '🍪' },
   ];
 
-  const Section = ({ title }: { title: string }) => (
-    <Text className={`text-vanz-navy/40 font-black text-xs uppercase tracking-wider mb-3 mt-6 ${isRtl ? 'text-right' : ''}`}>{title}</Text>
-  );
-
   return (
     <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
       {/* Account info */}
-      <Section title={ar ? 'الحساب' : 'Compte'} />
+      <Section title={ar ? 'الحساب' : 'Compte'} isRtl={isRtl} />
       <Animated.View entering={FadeInDown.delay(80).springify()}>
         <View className="bg-white rounded-2xl p-5 border border-gray-100 shadow-card">
           <View className={`flex-row justify-between py-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
@@ -84,7 +90,7 @@ export default function SettingsView({ helpHref }: Props) {
       </Animated.View>
 
       {/* Preferences */}
-      <Section title={ar ? 'التفضيلات' : 'Préférences'} />
+      <Section title={ar ? 'التفضيلات' : 'Préférences'} isRtl={isRtl} />
       <Animated.View entering={FadeInDown.delay(140).springify()}>
         <PressableCard onPress={() => setLocale(ar ? 'fr' : 'ar')} className={`p-4 rounded-2xl flex-row items-center justify-between mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
           <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
@@ -104,7 +110,7 @@ export default function SettingsView({ helpHref }: Props) {
       </Animated.View>
 
       {/* Legal */}
-      <Section title={ar ? 'قانوني' : 'Légal'} />
+      <Section title={ar ? 'قانوني' : 'Légal'} isRtl={isRtl} />
       <Animated.View entering={FadeInDown.delay(200).springify()} className="gap-3">
         {legal.map((l) => (
           <PressableCard key={l.path} onPress={() => openWeb(l.path)} className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>

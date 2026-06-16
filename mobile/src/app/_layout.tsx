@@ -8,6 +8,7 @@ import { Platform, View, Image, Text } from 'react-native';
 import { datasql } from '@/lib/supabase';
 import { registerPushToken } from '@/lib/registerPushToken';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useI18n } from '@/i18n';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import QueryProvider from '@/components/providers/QueryProvider';
@@ -21,6 +22,7 @@ Notifications.setNotificationHandler({
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const { session, setSession, mode, setMode } = useAuthStore();
+  const { t } = useI18n();
   const segments = useSegments();
   const router = useRouter();
   const navState = useRootNavigationState();
@@ -167,7 +169,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
               fontSize: 14,
               textTransform: 'uppercase'
             }}>
-              Loading
+              {t('common.loading')}
             </Text>
           </Animated.View>
         </Animated.View>

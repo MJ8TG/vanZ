@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { datasql } from '@/lib/supabase';
+import { authApiFetch } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
@@ -46,21 +46,28 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
 
     setIsSubmitting(true);
     try {
-      const { error } = await datasql.from('bids').insert({
-        job_id: job.id,
-        driver_id: session.user.id,
-        amount: numericAmount,
-        note: note.trim() ? note.trim() : null,
+      // Use the web API so the conversation + system message are created
+      // and validations run server-side (same workflow as the web app).
+      const res = await authApiFetch('/api/bids/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          job_id: job.id,
+          driver_id: session.user.id,
+          amount: numericAmount,
+          note: note.trim() ? note.trim() : null,
+        }),
       });
 
-      if (error) {
-        if (error.code === '23505') {
+      const payload = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409 && payload?.error?.includes('Offre déjà envoyée')) {
           Alert.alert(
             locale === 'ar' ? 'تم تقديم العرض مسبقاً' : 'Offre déjà soumise',
             locale === 'ar' ? 'لقد قدمت عرضاً لهذه المهمة بالفعل.' : 'Vous avez déjà fait une offre pour cette mission.'
           );
         } else {
-          throw error;
+          throw new Error(payload?.error || "Impossible d'envoyer l'offre.");
         }
       } else {
         Alert.alert(
@@ -150,7 +157,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
 
           {/* Bidding Section */}
           <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
-            {locale === 'ar' ? 'اقتراح سعر (TND)' : 'Proposer un prix (TND)'}
+            {(locale === 'ar' ? 'اقتراح سعر' : 'Proposer un prix') + ` (${t('common.currency')})`}
           </Text>
           
           <View className={`flex-row items-center mb-5 gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
@@ -170,7 +177,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
                 placeholder="0"
                 placeholderTextColor="#CBD5E1"
               />
-              <Text className="absolute right-4 top-4 text-vanz-teal font-extrabold">TND</Text>
+              <Text className="absolute right-4 top-4 text-vanz-teal font-extrabold">{t('common.currency')}</Text>
             </View>
 
             <TouchableOpacity 
