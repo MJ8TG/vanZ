@@ -157,6 +157,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
             }}>
               <Image
                 source={require('../../assets/images/logo-mark.png')}
+                accessibilityLabel="VanZ"
                 style={{ width: 176, height: 80 }}
                 resizeMode="contain"
               />
@@ -182,11 +183,9 @@ export default function RootLayout() {
   useEffect(() => {
     async function requestPermissions() {
       if (Platform.OS !== 'web') {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status !== 'granted') {
+          await Notifications.requestPermissionsAsync();
         }
       }
     }

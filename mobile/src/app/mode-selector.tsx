@@ -43,6 +43,7 @@ export default function ModeSelectorScreen() {
       <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-12 items-center">
         <Image
           source={require('../../assets/images/logo-mark.png')}
+          accessibilityLabel="VanZ"
           className="w-36 h-20 mb-8"
           resizeMode="contain"
         />

@@ -83,6 +83,8 @@ export default function WelcomeScreen() {
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
+      // Mutating a Reanimated shared value inside a worklet is the intended API.
+      // eslint-disable-next-line react-hooks/immutability
       scrollX.value = event.contentOffset.x;
     },
   });
@@ -126,6 +128,7 @@ export default function WelcomeScreen() {
       >
         <Image
           source={require('../../assets/images/logo-mark.png')}
+          accessibilityLabel="VanZ"
           className="w-44 h-20"
           resizeMode="contain"
         />

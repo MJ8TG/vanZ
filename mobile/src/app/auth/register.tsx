@@ -80,7 +80,8 @@ export default function RegisterScreen() {
         <Animated.View entering={FadeInDown.delay(100).springify()} className="items-center w-full">
           <View className="bg-white p-4 rounded-3xl shadow-elevated mb-10">
             <Image 
-              source={require('../../../assets/images/logo.png')} 
+              source={require('../../../assets/images/logo.png')}
+              accessibilityLabel="VanZ"
               className="w-32 h-10" 
               resizeMode="contain" 
             />
@@ -129,7 +130,8 @@ export default function RegisterScreen() {
           <View className="items-center mb-8 mt-4">
             <View className="bg-white p-4 rounded-3xl shadow-elevated mb-6">
               <Image 
-                source={require('../../../assets/images/logo.png')} 
+                source={require('../../../assets/images/logo.png')}
+              accessibilityLabel="VanZ"
                 className="w-32 h-10" 
                 resizeMode="contain" 
               />
@@ -227,6 +229,26 @@ export default function RegisterScreen() {
                 onFocus={() => setFocusedInput('password')}
                 onBlur={() => setFocusedInput(null)}
               />
+              {password.length > 0 && (() => {
+                const score = (password.length >= 8 ? 1 : 0) + (/\d/.test(password) ? 1 : 0) + (/[^A-Za-z0-9]/.test(password) ? 1 : 0);
+                const meta = [
+                  { fr: 'Faible', ar: 'ضعيف', c: '#EF4444' },
+                  { fr: 'Moyen', ar: 'متوسط', c: '#F59E0B' },
+                  { fr: 'Bon', ar: 'جيد', c: '#22C55E' },
+                  { fr: 'Fort', ar: 'قوي', c: '#16A34A' },
+                ][score];
+                const filled = Math.max(1, score);
+                return (
+                  <View className={`flex-row items-center mt-2 px-1 gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                    <View className={`flex-1 flex-row gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                      {[0, 1, 2].map((i) => (
+                        <View key={i} className="flex-1 h-1.5 rounded-full" style={{ backgroundColor: i < filled ? meta.c : '#E5E7EB' }} />
+                      ))}
+                    </View>
+                    <Text className="text-xs font-bold" style={{ color: meta.c }}>{isRtl ? meta.ar : meta.fr}</Text>
+                  </View>
+                );
+              })()}
             </View>
 
             {error ? (

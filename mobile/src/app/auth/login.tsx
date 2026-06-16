@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { useI18n } from '@/i18n';
@@ -47,7 +47,11 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-vanz-iceblue"
     >
-      <View className="flex-1 justify-center">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         {/* Top Gradient Wash */}
         <LinearGradient
           colors={['#E4EDF3', '#F0F6FA', 'transparent']}
@@ -58,7 +62,8 @@ export default function LoginScreen() {
           <View className="items-center mb-10">
             <View className="bg-white p-4 rounded-3xl shadow-elevated mb-6">
               <Image 
-                source={require('../../../assets/images/logo.png')} 
+                source={require('../../../assets/images/logo.png')}
+                accessibilityLabel="VanZ"
                 className="w-32 h-10" 
                 resizeMode="contain" 
               />
@@ -136,7 +141,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
