@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
@@ -114,6 +115,7 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
         .single();
 
       if (error) throw error;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.push(`/(client)/job/${data.id}`);
     } catch (error) {
       console.error(error);

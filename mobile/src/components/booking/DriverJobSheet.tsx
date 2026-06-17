@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { authApiFetch } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -27,6 +28,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
   const isRtl = locale === 'ar';
 
   const adjustBid = (amount: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const current = parseFloat(bidAmount || '0');
     if (!isNaN(current)) {
       setBidAmount(Math.max(0, current + amount).toString());
@@ -70,6 +72,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
           throw new Error(payload?.error || "Impossible d'envoyer l'offre.");
         }
       } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         Alert.alert(
           locale === 'ar' ? 'تم الإرسال!' : 'Offre envoyée !',
           locale === 'ar' ? 'تم إرسال عرضك للعميل.' : 'Votre offre a été envoyée au client.'

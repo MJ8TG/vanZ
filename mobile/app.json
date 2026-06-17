@@ -61,7 +61,8 @@
           "cameraPermission": "L'application a besoin d'accéder à votre caméra pour scanner vos documents."
         }
       ],
-      "expo-image"
+      "expo-image",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

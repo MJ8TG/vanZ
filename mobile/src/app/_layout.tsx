@@ -12,6 +12,7 @@ import { useI18n } from '@/i18n';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import QueryProvider from '@/components/providers/QueryProvider';
+import OfflineBanner from '@/components/ui/OfflineBanner';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -230,6 +231,7 @@ export default function RootLayout() {
             <Stack.Screen name="auth" />
           </Stack>
         </AuthProvider>
+        <OfflineBanner />
       </QueryProvider>
     </GestureHandlerRootView>
   );

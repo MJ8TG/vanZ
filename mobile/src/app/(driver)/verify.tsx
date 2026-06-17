@@ -1,4 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
@@ -45,6 +46,11 @@ function isValidDate(s: string): boolean {
   return !isNaN(d.getTime());
 }
 
+/** Local YYYY-MM-DD (avoids the UTC shift of toISOString). */
+function fmtDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default function DriverOnboardingScreen() {
   const router = useRouter();
   const { session } = useAuthStore();
@@ -68,6 +74,8 @@ export default function DriverOnboardingScreen() {
   const [cin, setCin] = useState('');
   const [dob, setDob] = useState('');
   const [cinExpiry, setCinExpiry] = useState('');
+  const [showDobPicker, setShowDobPicker] = useState(false);
+  const [showExpiryPicker, setShowExpiryPicker] = useState(false);
 
   // Vehicle
   const [vehicleType, setVehicleType] = useState<VehicleTypeId | ''>('');
@@ -284,11 +292,31 @@ export default function DriverOnboardingScreen() {
               </View>
               <View>
                 <Text className={labelClass}>{ar ? 'تاريخ الميلاد' : 'Date de naissance'} *</Text>
-                <TextInput className={inputClass} value={dob} onChangeText={setDob} maxLength={10} placeholder="AAAA-MM-JJ" placeholderTextColor="#9CA3AF" keyboardType="numbers-and-punctuation" />
+                <TouchableOpacity onPress={() => setShowDobPicker(true)} className={`bg-white rounded-2xl border-2 border-gray-100 px-4 h-14 flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <Text className={`text-base ${dob ? 'text-vanz-navy' : 'text-gray-400'}`}>{dob || 'AAAA-MM-JJ'}</Text>
+                </TouchableOpacity>
+                {showDobPicker && (
+                  <DateTimePicker
+                    value={dob ? new Date(dob) : new Date(2000, 0, 1)}
+                    mode="date"
+                    maximumDate={new Date()}
+                    onChange={(event, d) => { setShowDobPicker(false); if (event.type === 'set' && d) setDob(fmtDate(d)); }}
+                  />
+                )}
               </View>
               <View>
                 <Text className={labelClass}>{ar ? 'انتهاء صلاحية البطاقة' : 'Expiration CIN'} *</Text>
-                <TextInput className={inputClass} value={cinExpiry} onChangeText={setCinExpiry} maxLength={10} placeholder="AAAA-MM-JJ" placeholderTextColor="#9CA3AF" keyboardType="numbers-and-punctuation" />
+                <TouchableOpacity onPress={() => setShowExpiryPicker(true)} className={`bg-white rounded-2xl border-2 border-gray-100 px-4 h-14 flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <Text className={`text-base ${cinExpiry ? 'text-vanz-navy' : 'text-gray-400'}`}>{cinExpiry || 'AAAA-MM-JJ'}</Text>
+                </TouchableOpacity>
+                {showExpiryPicker && (
+                  <DateTimePicker
+                    value={cinExpiry ? new Date(cinExpiry) : new Date()}
+                    mode="date"
+                    minimumDate={new Date()}
+                    onChange={(event, d) => { setShowExpiryPicker(false); if (event.type === 'set' && d) setCinExpiry(fmtDate(d)); }}
+                  />
+                )}
               </View>
             </Animated.View>
           )}
