@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { datasql } from '@/lib/supabase';
+import { authApiFetch } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
@@ -84,19 +85,26 @@ export default function BidScreen() {
         return;
       }
 
-      const { error } = await datasql.from('bids').insert({
-        job_id: id,
-        driver_id: session.user.id,
-        amount: parseFloat(price),
-        note: notes || null,
-        status: 'pending',
+      // Go through the web API so the conversation + system message are created
+      // and server-side validations run (same workflow as the web app).
+      const res = await authApiFetch('/api/bids/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          job_id: id,
+          driver_id: session.user.id,
+          amount: parseFloat(price),
+          note: notes || null,
+        }),
       });
-      
-      if (error) throw error;
-      
+
+      const payload = await res.json();
+      if (!res.ok) {
+        throw new Error(payload?.error || "Impossible d'envoyer l'offre.");
+      }
+
       Alert.alert(
-        locale === 'ar' ? 'نجاح' : 'Succès', 
-        t('driver.offerSent'), 
+        locale === 'ar' ? 'نجاح' : 'Succès',
+        t('driver.offerSent'),
         [{ text: t('common.ok'), onPress: () => router.back() }]
       );
     } catch (e: any) {

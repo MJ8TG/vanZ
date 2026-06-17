@@ -9,6 +9,7 @@ import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import DriverStatsHeader from '@/components/driver/DriverStatsHeader';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -331,6 +332,7 @@ export default function DriverTripsScreen() {
             renderItem={renderTrip}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
+            ListHeaderComponent={tab === 'active' ? <DriverStatsHeader /> : null}
             ListEmptyComponent={() => (
               <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-20 mt-10">
                 <View className="w-32 h-32 bg-white rounded-full items-center justify-center shadow-card mb-6">

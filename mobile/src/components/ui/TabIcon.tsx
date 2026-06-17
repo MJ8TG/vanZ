@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { Text } from 'react-native';
+import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 
 interface TabIconProps {
   icon: string;
@@ -9,16 +9,26 @@ interface TabIconProps {
   color: string;
 }
 
+/**
+ * Tab icon with the Stitch bottom-nav active pill:
+ * focused tab gets a tinted pill behind the icon.
+ */
 export default function TabIcon({ icon, label, focused, color }: TabIconProps) {
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: withSpring(focused ? 1.15 : 1, { damping: 12, stiffness: 150 }) }],
+    transform: [{ scale: withSpring(focused ? 1.1 : 1, { damping: 12, stiffness: 150 }) }],
+  }));
+
+  const pillStyle = useAnimatedStyle(() => ({
+    backgroundColor: withTiming(focused ? `${color}26` : 'transparent', { duration: 200 }), // ~15% alpha
   }));
 
   return (
     <Animated.View style={animatedStyle} className="items-center justify-center pt-1">
-      <Text style={{ color }} className="text-xl mb-0.5">{icon}</Text>
-      <Text 
-        style={{ color }} 
+      <Animated.View style={pillStyle} className="px-4 py-1 rounded-full items-center justify-center mb-0.5">
+        <Text style={{ color }} className="text-xl">{icon}</Text>
+      </Animated.View>
+      <Text
+        style={{ color }}
         className={`text-2xs ${focused ? 'font-bold' : 'font-medium'}`}
       >
         {label}

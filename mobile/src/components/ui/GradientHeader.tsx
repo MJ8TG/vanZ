@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useI18n } from '@/i18n';
 
 interface GradientHeaderProps {
@@ -22,6 +23,7 @@ export default function GradientHeader({
   tall = false 
 }: GradientHeaderProps) {
   const { locale } = useI18n();
+  const insets = useSafeAreaInsets();
   const isRtl = locale === 'ar';
 
   return (
@@ -29,7 +31,8 @@ export default function GradientHeader({
       colors={['#0B1021', '#131B36', '#1A2444']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className={`${tall ? 'pt-14 pb-8' : 'pt-14 pb-6'} px-6`}
+      className={`${tall ? 'pb-8' : 'pb-6'} px-6`}
+      style={{ paddingTop: Math.max(insets.top, 16) + 12 }}
     >
       <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
         {backButton && (

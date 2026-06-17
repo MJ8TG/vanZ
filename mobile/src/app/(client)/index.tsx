@@ -7,6 +7,7 @@ import BookingSheet from '@/components/booking/BookingSheet';
 import { useI18n } from '@/i18n';
 import type { PlaceSelection } from '@/types/domain';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -14,6 +15,7 @@ const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 export default function ClientHomeScreen() {
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
+  const insets = useSafeAreaInsets();
   const { t, locale } = useI18n();
   
   const [pickup, setPickup] = useState<PlaceSelection | null>(null);
@@ -82,7 +84,7 @@ export default function ClientHomeScreen() {
       </MapView>
 
       {/* Floating Menu Button with Glass Effect */}
-      <Animated.View entering={FadeIn.delay(300)} className={`absolute top-14 ${isRtl ? 'right-5' : 'left-5'} z-10`}>
+      <Animated.View entering={FadeIn.delay(300)} className={`absolute ${isRtl ? 'right-5' : 'left-5'} z-10`} style={{ top: Math.max(insets.top, 16) + 8 }}>
         <TouchableOpacity 
           className="w-12 h-12 bg-card-glass rounded-full justify-center items-center shadow-elevated border border-white/50 active:opacity-90"
           onPress={() => router.push('/(client)/profile')}
@@ -103,7 +105,8 @@ export default function ClientHomeScreen() {
         <View className="flex-1 bg-vanz-iceblue">
           <LinearGradient
             colors={['#0B1021', '#131B36']}
-            className={`pt-14 pb-6 px-6 flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}
+            className={`pb-6 px-6 flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}
+            style={{ paddingTop: Math.max(insets.top, 16) + 8 }}
           >
             <TouchableOpacity 
               onPress={() => setActiveInput(null)}
