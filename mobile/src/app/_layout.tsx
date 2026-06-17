@@ -13,6 +13,14 @@ import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import QueryProvider from '@/components/providers/QueryProvider';
 import OfflineBanner from '@/components/ui/OfflineBanner';
+import {
+  useFonts,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -204,6 +212,14 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    'Plus Jakarta Sans': PlusJakartaSans_400Regular,
+    'Plus Jakarta Sans Medium': PlusJakartaSans_500Medium,
+    'Plus Jakarta Sans SemiBold': PlusJakartaSans_600SemiBold,
+    'Plus Jakarta Sans Bold': PlusJakartaSans_700Bold,
+    'Plus Jakarta Sans ExtraBold': PlusJakartaSans_800ExtraBold,
+  });
+
   useEffect(() => {
     async function requestPermissions() {
       if (Platform.OS !== 'web') {
@@ -215,6 +231,12 @@ export default function RootLayout() {
     }
     requestPermissions();
   }, []);
+
+  // Hold on a navy screen (matching the splash) until fonts are ready, so text
+  // doesn't flash in a fallback font. Don't block forever if loading errors.
+  if (!fontsLoaded && !fontError) {
+    return <View style={{ flex: 1, backgroundColor: '#0B1021' }} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

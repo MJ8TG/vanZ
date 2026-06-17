@@ -4,6 +4,13 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        'jakarta-medium': ['"Plus Jakarta Sans Medium"'],
+        'jakarta-semibold': ['"Plus Jakarta Sans SemiBold"'],
+        'jakarta-bold': ['"Plus Jakarta Sans Bold"'],
+        'jakarta-extrabold': ['"Plus Jakarta Sans ExtraBold"'],
+      },
       colors: {
         vanz: {
           teal: '#38B6FF',
