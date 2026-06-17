@@ -1,7 +1,7 @@
 import '../global.css';
 
 import { useEffect, useState } from 'react';
-import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { Platform, View, Image, Text } from 'react-native';
@@ -120,6 +120,29 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [session, mode, segments, isReady, showSplash, navState?.key]);
+
+  // Deep-link: route the user to the relevant screen when they tap a push.
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = (response.notification.request.content.data ?? {}) as {
+        job_id?: string;
+        conversation_id?: string;
+      };
+      const group = useAuthStore.getState().mode === 'driver' ? 'driver' : 'client';
+      try {
+        if (data.conversation_id) {
+          router.push(`/(${group})/chat/${data.conversation_id}` as Href);
+        } else if (data.job_id && group === 'client') {
+          router.push(`/(client)/job/${data.job_id}` as Href);
+        } else {
+          router.push(`/(${group})/notifications` as Href);
+        }
+      } catch (e) {
+        console.error('Notification deep-link failed:', e);
+      }
+    });
+    return () => sub.remove();
+  }, [router]);
 
   return (
     <Animated.View entering={FadeIn.duration(400)} className="flex-1">

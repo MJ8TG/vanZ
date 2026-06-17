@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
+import { serviceLabel } from '@/lib/serviceLabel';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
@@ -54,7 +55,7 @@ export default function ClientMissionsScreen() {
       minBid = Math.min(...bids.map((b) => Number(b.amount || 0)));
     }
 
-    const title = item.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (item.service_type || 'Mission');
+    const title = serviceLabel(item.service_type, t);
 
     return (
       <Animated.View entering={FadeInDown.delay(index * 100).springify()}>

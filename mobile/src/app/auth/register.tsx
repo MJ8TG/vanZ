@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
+import { getApiBaseUrl } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,6 +20,7 @@ export default function RegisterScreen() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [role, setRole] = useState<'client' | 'driver'>('client');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const [focusedInput, setFocusedInput] = useState<'name' | 'email' | 'phone' | 'password' | null>(null);
 
@@ -28,6 +30,11 @@ export default function RegisterScreen() {
     setError('');
     if (!email || !password || !name) {
       setError(t('auth.fillRequiredFieldsError'));
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError(t('auth.termsRequiredError'));
       return;
     }
 
@@ -259,13 +266,33 @@ export default function RegisterScreen() {
             ) : null}
           </View>
 
-          <TouchableOpacity 
+          {/* Terms acceptance (CGU) */}
+          <TouchableOpacity
+            onPress={() => setTermsAccepted((v) => !v)}
+            activeOpacity={0.7}
+            className={`flex-row items-center mb-5 px-1 ${isRtl ? 'flex-row-reverse' : ''}`}
+          >
+            <View className={`w-6 h-6 rounded-md border-2 items-center justify-center ${termsAccepted ? 'bg-vanz-teal border-vanz-teal' : 'border-gray-300 bg-white'} ${isRtl ? 'ml-3' : 'mr-3'}`}>
+              {termsAccepted && <Text className="text-white text-xs font-black">✓</Text>}
+            </View>
+            <Text className={`flex-1 text-vanz-navy/70 text-sm ${isRtl ? 'text-right' : ''}`}>
+              {t('auth.termsPrefix')}
+              <Text
+                className="text-vanz-teal font-bold underline"
+                onPress={() => { const b = getApiBaseUrl(); if (b) Linking.openURL(`${b}/${locale}/conditions-utilisation`); }}
+              >
+                {t('auth.termsLink')}
+              </Text>
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={handleRegister}
-            disabled={loading || !email || !password || !name}
+            disabled={loading || !email || !password || !name || !termsAccepted}
             className="w-full h-16 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90"
           >
             <LinearGradient
-              colors={loading || !email || !password || !name ? ['#38B6FF80', '#2196D680'] : ['#38B6FF', '#2196D6']}
+              colors={loading || !email || !password || !name || !termsAccepted ? ['#38B6FF80', '#2196D680'] : ['#38B6FF', '#2196D6']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="w-full h-full items-center justify-center"

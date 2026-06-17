@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { authApiFetch } from '@/lib/api';
 import { datasql } from '@/lib/supabase';
 import { driverTrackingChannel, LOCATION_UPDATE_EVENT } from '@/lib/realtime';
+import { serviceLabel } from '@/lib/serviceLabel';
 import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
@@ -330,7 +331,7 @@ export default function ClientJobDetailsScreen() {
             <View className="bg-white p-5 rounded-card shadow-card mb-6 border border-gray-100">
               <View className={`flex-row justify-between items-center mb-5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <Text className={`text-vanz-navy font-black text-xl flex-1 ${isRtl ? 'text-right' : ''}`}>
-                  {job?.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (job?.service_type || 'Mission')}
+                  {serviceLabel(job?.service_type, t)}
                 </Text>
                 <View className="bg-vanz-teal/10 px-4 py-1.5 rounded-full border border-vanz-teal/20">
                   <Text className="text-vanz-teal font-extrabold text-xs">

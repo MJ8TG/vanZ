@@ -22,11 +22,21 @@ const VEHICLE_OPTIONS: Array<{ key: LoadCapacity; label: string; capacity: strin
   { key: 'camion', label: 'Camion', capacity: 'Max 3.5t', icon: '🚚' },
 ];
 
+const SERVICE_OPTIONS: Array<{ key: ServiceType; icon: string }> = [
+  { key: 'parcel', icon: '📦' },
+  { key: 'furniture', icon: '🛋️' },
+  { key: 'moving', icon: '🏠' },
+  { key: 'express', icon: '⚡' },
+  { key: 'office', icon: '🏢' },
+  { key: 'intercity', icon: '🛣️' },
+];
+
 export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingSheetProps) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['18%', '55%', '90%'], []);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [vehicle, setVehicle] = useState<LoadCapacity>('van_s');
+  const [serviceType, setServiceType] = useState<ServiceType>('parcel');
   const [description, setDescription] = useState('');
   const [selectedDate, setSelectedDate] = useState<'today' | 'tomorrow' | 'after_tomorrow'>('today');
   const [timeSlot, setTimeSlot] = useState<'matin' | 'après-midi' | 'soir'>('matin');
@@ -87,7 +97,7 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
         .from('jobs')
         .insert({
           client_id: session.user.id,
-          service_type: 'parcel' satisfies ServiceType,
+          service_type: serviceType,
           pickup_address: pickup.description,
           pickup_lat: pickup.lat,
           pickup_lng: pickup.lng,
@@ -212,9 +222,33 @@ export default function BookingSheet({ pickup, dropoff, onFocusInput }: BookingS
                 </View>
 
                 <Text className={`text-vanz-navy font-extrabold text-sm mb-3.5 ${isRtl ? 'text-right' : ''}`}>
+                  {t('createJob.serviceTypeLabel')}
+                </Text>
+                <View className={`flex-row flex-wrap gap-2 mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  {SERVICE_OPTIONS.map((s) => {
+                    const sel = serviceType === s.key;
+                    const label = ({
+                      parcel: t('createJob.svcParcel'), furniture: t('createJob.svcFurniture'),
+                      moving: t('createJob.svcMoving'), express: t('createJob.svcExpress'),
+                      office: t('createJob.svcOffice'), intercity: t('createJob.svcIntercity'),
+                    } as Record<ServiceType, string>)[s.key];
+                    return (
+                      <TouchableOpacity
+                        key={s.key}
+                        onPress={() => setServiceType(s.key)}
+                        className={`flex-row items-center px-3 py-2 rounded-full border-2 ${sel ? 'border-vanz-teal bg-vanz-teal/5' : 'border-gray-100 bg-white'} ${isRtl ? 'flex-row-reverse' : ''}`}
+                      >
+                        <Text className="mr-1.5 ml-1.5">{s.icon}</Text>
+                        <Text className={`text-xs font-bold ${sel ? 'text-vanz-teal' : 'text-vanz-navy/70'}`}>{label}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                <Text className={`text-vanz-navy font-extrabold text-sm mb-3.5 ${isRtl ? 'text-right' : ''}`}>
                   {t('createJob.vehicleSize')}
                 </Text>
-                
+
                 {/* Category Grid Selection */}
                 <View className="flex-row flex-wrap justify-between gap-y-3 mb-6">
                   {VEHICLE_OPTIONS.map((option) => {
