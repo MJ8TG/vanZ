@@ -9,10 +9,16 @@ export default function OfflineBanner() {
   const { locale } = useI18n();
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setOffline(state.isConnected === false || state.isInternetReachable === false);
-    });
-    return () => unsubscribe();
+    // Guard the native call so the app still boots on a JS-only reload before
+    // the native module is linked (i.e. before the next rebuild).
+    try {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        setOffline(state.isConnected === false || state.isInternetReachable === false);
+      });
+      return () => unsubscribe();
+    } catch (e) {
+      console.warn('NetInfo unavailable (needs a native rebuild):', e);
+    }
   }, []);
 
   if (!offline) return null;
