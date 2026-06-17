@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Mail, Lock } from 'lucide-react-native';
+import PremiumInput from '@/components/ui/PremiumInput';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -12,8 +15,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const [focusedInput, setFocusedInput] = useState<'email' | 'password' | null>(null);
 
   const isRtl = locale === 'ar';
 
@@ -75,34 +76,24 @@ export default function LoginScreen() {
           </View>
 
           <View className="mb-8 gap-5">
-            <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.emailLabel')}</Text>
-              <TextInput
-                className={`bg-white rounded-2xl border-2 shadow-sm px-5 h-16 text-lg text-vanz-navy ${focusedInput === 'email' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'text-right' : ''}`}
-                placeholder={t('auth.emailPlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-                onFocus={() => setFocusedInput('email')}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
+            <PremiumInput
+              label={t('auth.emailLabel')}
+              placeholder={t('auth.emailPlaceholder')}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              icon={<Mail color="#9CA3AF" size={20} />}
+            />
 
-            <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.passwordLabel')}</Text>
-              <TextInput
-                className={`bg-white rounded-2xl border-2 shadow-sm px-5 h-16 text-lg text-vanz-navy ${focusedInput === 'password' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'text-right' : ''}`}
-                placeholder={t('auth.passwordPlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                onFocus={() => setFocusedInput('password')}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
+            <PremiumInput
+              label={t('auth.passwordLabel')}
+              placeholder={t('auth.passwordPlaceholder')}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              icon={<Lock color="#9CA3AF" size={20} />}
+            />
 
             {error ? (
               <View className={`bg-red-50 p-3 rounded-xl border border-red-100 flex-row items-center mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
@@ -112,24 +103,13 @@ export default function LoginScreen() {
             ) : null}
           </View>
 
-          <TouchableOpacity 
+          <PremiumButton
+            title={t('auth.loginButton')}
+            variant="primary"
+            isLoading={loading}
+            disabled={!email || !password}
             onPress={handleLogin}
-            disabled={loading || !email || !password}
-            className="w-full h-16 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90"
-          >
-            <LinearGradient
-              colors={loading || !email || !password ? ['#38B6FF80', '#2196D680'] : ['#38B6FF', '#2196D6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="w-full h-full items-center justify-center"
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-white text-xl font-extrabold">{t('auth.loginButton')}</Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+          />
 
           <View className={`flex-row justify-between items-center mt-8 px-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <TouchableOpacity onPress={() => router.replace('/auth/register')}>

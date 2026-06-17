@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, Image, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { getApiBaseUrl } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { User, Mail, Phone, Lock } from 'lucide-react-native';
+import PremiumInput from '@/components/ui/PremiumInput';
+import PremiumButton from '@/components/ui/PremiumButton';
+import PremiumCard from '@/components/ui/PremiumCard';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
@@ -22,7 +26,6 @@ export default function RegisterScreen() {
   const [role, setRole] = useState<'client' | 'driver'>('client');
   const [termsAccepted, setTermsAccepted] = useState(false);
   
-  const [focusedInput, setFocusedInput] = useState<'name' | 'email' | 'phone' | 'password' | null>(null);
 
   const isRtl = locale === 'ar';
 
@@ -150,91 +153,75 @@ export default function RegisterScreen() {
           </View>
 
           <View className="mb-8 gap-5">
-            {/* Role Selection — dynamic colors via inline style to avoid
-                NativeWind CSS-variable churn (which remounts and eats taps). */}
-            <View className="bg-gray-100 p-1.5 rounded-2xl flex-row" style={{ flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <TouchableOpacity
-                onPress={() => setRole('client')}
-                activeOpacity={0.8}
-                className="flex-1 py-3 rounded-xl items-center justify-center"
-                style={{ backgroundColor: role === 'client' ? '#ffffff' : 'transparent' }}
-              >
-                <Text className="font-extrabold text-base" style={{ color: role === 'client' ? '#0B1021' : '#9CA3AF' }}>
-                  {t('auth.roleClient')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setRole('driver')}
-                activeOpacity={0.8}
-                className="flex-1 py-3 rounded-xl items-center justify-center"
-                style={{ backgroundColor: role === 'driver' ? '#38B6FF' : 'transparent' }}
-              >
-                <Text className="font-extrabold text-base" style={{ color: role === 'driver' ? '#ffffff' : '#9CA3AF' }}>
-                  {t('auth.roleDriver')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.nameLabel')}</Text>
-              <TextInput
-                className={`bg-white rounded-2xl border-2 shadow-sm px-5 h-16 text-lg text-vanz-navy ${focusedInput === 'name' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'text-right' : ''}`}
-                placeholder={t('auth.namePlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                value={name}
-                onChangeText={setName}
-                onFocus={() => setFocusedInput('name')}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-
-            <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.emailLabel')} *</Text>
-              <TextInput
-                className={`bg-white rounded-2xl border-2 shadow-sm px-5 h-16 text-lg text-vanz-navy ${focusedInput === 'email' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'text-right' : ''}`}
-                placeholder={t('auth.emailPlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-                onFocus={() => setFocusedInput('email')}
-                onBlur={() => setFocusedInput(null)}
-              />
-            </View>
-
-            <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{role === 'driver' ? `${t('auth.phoneLabelDriver')} *` : t('auth.phoneLabel')}</Text>
-              <View className={`flex-row items-center bg-white rounded-2xl border-2 shadow-sm px-4 h-16 ${focusedInput === 'phone' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="bg-vanz-iceblue px-3 py-1.5 rounded-lg border border-gray-100">
-                  <Text className="text-vanz-navy text-sm font-bold">+216</Text>
-                </View>
-                <View className="h-8 w-px bg-gray-100 mx-3" />
-                <TextInput
-                  className={`flex-1 text-lg text-vanz-navy ${isRtl ? 'text-right' : ''}`}
-                  placeholder={t('auth.phonePlaceholder')}
-                  placeholderTextColor="#9CA3AF"
-                  keyboardType="phone-pad"
-                  value={phone}
-                  onChangeText={setPhone}
-                  maxLength={8}
-                  onFocus={() => setFocusedInput('phone')}
-                  onBlur={() => setFocusedInput(null)}
-                />
+            {/* Role Selection — floating segmented control inside a PremiumCard.
+                Dynamic colors via inline style to avoid NativeWind CSS-variable
+                churn (which remounts and eats taps). */}
+            <PremiumCard className="p-1.5">
+              <View className="flex-row" style={{ flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                <TouchableOpacity
+                  onPress={() => setRole('client')}
+                  activeOpacity={0.8}
+                  className="flex-1 py-3 rounded-2xl items-center justify-center"
+                  style={{ backgroundColor: role === 'client' ? '#ffffff' : 'transparent' }}
+                >
+                  <Text className="font-jakarta-bold text-base" style={{ color: role === 'client' ? '#0B1021' : '#9CA3AF' }}>
+                    {t('auth.roleClient')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setRole('driver')}
+                  activeOpacity={0.8}
+                  className="flex-1 py-3 rounded-2xl items-center justify-center"
+                  style={{ backgroundColor: role === 'driver' ? '#38B6FF' : 'transparent' }}
+                >
+                  <Text className="font-jakarta-bold text-base" style={{ color: role === 'driver' ? '#ffffff' : '#9CA3AF' }}>
+                    {t('auth.roleDriver')}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </View>
+            </PremiumCard>
+
+            <PremiumInput
+              label={t('auth.nameLabel')}
+              placeholder={t('auth.namePlaceholder')}
+              value={name}
+              onChangeText={setName}
+              icon={<User color="#9CA3AF" size={20} />}
+            />
+
+            <PremiumInput
+              label={`${t('auth.emailLabel')} *`}
+              placeholder={t('auth.emailPlaceholder')}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              icon={<Mail color="#9CA3AF" size={20} />}
+            />
+
+            <PremiumInput
+              label={role === 'driver' ? `${t('auth.phoneLabelDriver')} *` : t('auth.phoneLabel')}
+              placeholder={t('auth.phonePlaceholder')}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              maxLength={8}
+              icon={
+                <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <Phone color="#9CA3AF" size={18} />
+                  <Text className="text-vanz-navy text-sm font-jakarta-bold mx-1.5">+216</Text>
+                </View>
+              }
+            />
 
             <View>
-              <Text className={`text-vanz-navy font-extrabold mb-2 text-sm ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>{t('auth.passwordRequiredLabel')}</Text>
-              <TextInput
-                className={`bg-white rounded-2xl border-2 shadow-sm px-5 h-16 text-lg text-vanz-navy ${focusedInput === 'password' ? 'border-vanz-teal' : 'border-white'} ${isRtl ? 'text-right' : ''}`}
+              <PremiumInput
+                label={t('auth.passwordRequiredLabel')}
                 placeholder={t('auth.passwordPlaceholder')}
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry
                 value={password}
                 onChangeText={setPassword}
-                onFocus={() => setFocusedInput('password')}
-                onBlur={() => setFocusedInput(null)}
+                secureTextEntry
+                icon={<Lock color="#9CA3AF" size={20} />}
               />
               {password.length > 0 && (() => {
                 const score = (password.length >= 8 ? 1 : 0) + (/\d/.test(password) ? 1 : 0) + (/[^A-Za-z0-9]/.test(password) ? 1 : 0);
@@ -286,24 +273,13 @@ export default function RegisterScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <PremiumButton
+            title={t('auth.registerButton')}
+            variant="primary"
+            isLoading={loading}
+            disabled={!email || !password || !name || !termsAccepted}
             onPress={handleRegister}
-            disabled={loading || !email || !password || !name || !termsAccepted}
-            className="w-full h-16 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90"
-          >
-            <LinearGradient
-              colors={loading || !email || !password || !name || !termsAccepted ? ['#38B6FF80', '#2196D680'] : ['#38B6FF', '#2196D6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="w-full h-full items-center justify-center"
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-white text-xl font-extrabold">{t('auth.registerButton')}</Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+          />
 
           <View className={`flex-row justify-center items-center mt-8 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <Text className="text-vanz-navy/60 font-medium">{t('auth.alreadyHaveAccount')}</Text>
