@@ -14,7 +14,8 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { setMode } = useAuthStore();
+  const { mode: storedMode, setMode } = useAuthStore();
+  const role = storedMode || 'client'; // fallback
   const { t, locale } = useI18n();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,7 +24,6 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [role, setRole] = useState<'client' | 'driver'>('client');
   const [termsAccepted, setTermsAccepted] = useState(false);
   
 
@@ -129,7 +129,11 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-vanz-iceblue"
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Top Gradient Wash */}
         <LinearGradient
           colors={['#E4EDF3', '#F0F6FA', 'transparent']}
@@ -153,33 +157,12 @@ export default function RegisterScreen() {
           </View>
 
           <View className="mb-8 gap-5">
-            {/* Role Selection — floating segmented control inside a PremiumCard.
-                Dynamic colors via inline style to avoid NativeWind CSS-variable
-                churn (which remounts and eats taps). */}
-            <PremiumCard className="p-1.5">
-              <View className="flex-row" style={{ flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                <TouchableOpacity
-                  onPress={() => setRole('client')}
-                  activeOpacity={0.8}
-                  className="flex-1 py-3 rounded-2xl items-center justify-center"
-                  style={{ backgroundColor: role === 'client' ? '#ffffff' : 'transparent' }}
-                >
-                  <Text className="font-jakarta-bold text-base" style={{ color: role === 'client' ? '#0B1021' : '#9CA3AF' }}>
-                    {t('auth.roleClient')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setRole('driver')}
-                  activeOpacity={0.8}
-                  className="flex-1 py-3 rounded-2xl items-center justify-center"
-                  style={{ backgroundColor: role === 'driver' ? '#38B6FF' : 'transparent' }}
-                >
-                  <Text className="font-jakarta-bold text-base" style={{ color: role === 'driver' ? '#ffffff' : '#9CA3AF' }}>
-                    {t('auth.roleDriver')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </PremiumCard>
+            {/* Role Pill showing chosen mode */}
+            <View className="self-center bg-white/50 px-4 py-2 rounded-full border border-vanz-teal/20 mb-2">
+              <Text className="text-vanz-teal font-extrabold text-sm uppercase tracking-widest">
+                {role === 'driver' ? t('auth.roleDriver') : t('auth.roleClient')}
+              </Text>
+            </View>
 
             <PremiumInput
               label={t('auth.nameLabel')}
@@ -254,30 +237,34 @@ export default function RegisterScreen() {
           </View>
 
           {/* Terms acceptance (CGU) */}
-          <TouchableOpacity
-            onPress={() => setTermsAccepted((v) => !v)}
-            activeOpacity={0.7}
-            className={`flex-row items-center mb-5 px-1 ${isRtl ? 'flex-row-reverse' : ''}`}
-          >
-            <View className={`w-6 h-6 rounded-md border-2 items-center justify-center ${termsAccepted ? 'bg-vanz-teal border-vanz-teal' : 'border-gray-300 bg-white'} ${isRtl ? 'ml-3' : 'mr-3'}`}>
-              {termsAccepted && <Text className="text-white text-xs font-black">✓</Text>}
-            </View>
-            <Text className={`flex-1 text-vanz-navy/70 text-sm ${isRtl ? 'text-right' : ''}`}>
-              {t('auth.termsPrefix')}
-              <Text
-                className="text-vanz-teal font-bold underline"
-                onPress={() => { const b = getApiBaseUrl(); if (b) Linking.openURL(`${b}/${locale}/conditions-utilisation`); }}
-              >
+          <View className={`flex-row items-center mb-5 px-1 flex-wrap ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <TouchableOpacity
+              onPress={() => setTermsAccepted((v) => !v)}
+              activeOpacity={0.7}
+              className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
+              <View className={`w-6 h-6 rounded-md border-2 items-center justify-center ${termsAccepted ? 'bg-vanz-teal border-vanz-teal' : 'border-gray-300 bg-white'} ${isRtl ? 'ml-3' : 'mr-3'}`}>
+                {termsAccepted && <Text className="text-white text-xs font-black">✓</Text>}
+              </View>
+              <Text className="text-vanz-navy/70 text-sm">
+                {t('auth.termsPrefix')}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={() => { const b = getApiBaseUrl(); if (b) Linking.openURL(`${b}/${locale}/conditions-utilisation`); }}
+              activeOpacity={0.7}
+            >
+              <Text className="text-vanz-teal font-bold underline text-sm">
                 {t('auth.termsLink')}
               </Text>
-            </Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
 
           <PremiumButton
             title={t('auth.registerButton')}
             variant="primary"
             isLoading={loading}
-            disabled={!email || !password || !name || !termsAccepted}
             onPress={handleRegister}
           />
 

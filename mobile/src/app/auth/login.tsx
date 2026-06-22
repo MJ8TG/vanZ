@@ -34,7 +34,8 @@ export default function LoginScreen() {
       if (error) throw error;
       
       if (data.session) {
-        router.replace('/mode-selector');
+        const { data: prof } = await datasql.from('users').select('role').eq('id', data.user.id).single();
+        router.replace(prof?.role === 'driver' ? '/(driver)' : '/(client)');
       }
     } catch (e: any) {
       setError(e.message || t('auth.invalidLoginError'));
@@ -107,7 +108,6 @@ export default function LoginScreen() {
             title={t('auth.loginButton')}
             variant="primary"
             isLoading={loading}
-            disabled={!email || !password}
             onPress={handleLogin}
           />
 

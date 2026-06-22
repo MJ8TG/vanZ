@@ -40,6 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# scan artifacts & testing
+codesight-rapid-scan-static-sast-results*.json
+build_success_verify.txt
+test-results/
+
 # reference files
 www_anyvan_com.html
 vanz_agent_brief*.html

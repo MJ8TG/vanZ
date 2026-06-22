@@ -15,19 +15,14 @@
     "android": {
       "package": "com.vanz.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#25AAE1",
+        "backgroundColor": "#38B6FF",
         "foregroundImage": "./assets/images/vanz-adaptive-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyA36efUQtxdr1wItr5WLtoB12ytzadVN10"
-        }
-      }
+      ]
     },
     "web": {
       "output": "static",
@@ -51,7 +46,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
-          "color": "#2BBFDF"
+          "color": "#38B6FF"
         }
       ],
       [

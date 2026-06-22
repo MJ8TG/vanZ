@@ -105,11 +105,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isReady || showSplash) return;
-    // Don't dispatch navigation until the root navigator is actually mounted,
-    // otherwise expo-router throws "Couldn't find a navigation context".
     if (!navState?.key) return;
 
-    const inAuthGroup = segments[0] === 'auth' || segments[0] === 'welcome';
+    const inAuthGroup = segments[0] === 'auth' || segments[0] === 'welcome' || segments[0] === 'mode-selector';
 
     if (!session) {
       if (!inAuthGroup) {
@@ -117,14 +115,18 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         router.replace('/welcome');
       }
     } else {
-      if (inAuthGroup || segments[0] === '(client)' || segments[0] === '(driver)' || !segments[0]) {
-        // If logged in but trying to access auth screens or app root
-        if (!mode && (segments[0] as string) !== 'mode-selector') {
+      if (!mode) {
+        // Safety net: session exists but no role is known
+        if (segments[0] !== 'mode-selector' && segments[0] !== 'auth') {
           router.replace('/mode-selector');
-        } else if (mode === 'client' && segments[0] !== '(client)') {
-          router.replace('/(client)');
-        } else if (mode === 'driver' && segments[0] !== '(driver)') {
+        }
+      } else if (mode === 'driver') {
+        if (segments[0] !== '(driver)') {
           router.replace('/(driver)');
+        }
+      } else if (mode === 'client') {
+        if (segments[0] !== '(client)') {
+          router.replace('/(client)');
         }
       }
     }

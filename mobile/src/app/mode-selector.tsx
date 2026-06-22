@@ -6,29 +6,22 @@ import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import PressableCard from '@/components/ui/PressableCard';
+import { useEffect } from 'react';
 
 export default function ModeSelectorScreen() {
   const router = useRouter();
-  const { setMode } = useAuthStore();
+  const { setMode, session, mode: currentMode } = useAuthStore();
   const { t } = useI18n();
 
-  const handleSelectMode = async (mode: 'client' | 'driver') => {
-    // Save to local store
-    setMode(mode);
-    
-    // Save role to database
-    try {
-      const { data: { session } } = await datasql.auth.getSession();
-      if (session?.user?.id) {
-        await datasql.from('users').update({ role: mode }).eq('id', session.user.id);
-      }
-    } catch (e) {
-      console.error('Failed to save role to DB', e);
+  useEffect(() => {
+    if (session) {
+      router.replace(currentMode === 'driver' ? '/(driver)' : '/(client)');
     }
+  }, [session, currentMode, router]);
 
-    // The AuthProvider in _layout.tsx will automatically redirect, but we can also push manually if needed.
-    if (mode === 'client') router.replace('/(client)');
-    else router.replace('/(driver)');
+  const handleSelectMode = (mode: 'client' | 'driver') => {
+    setMode(mode);
+    router.push('/auth/register');
   };
 
   return (

@@ -165,7 +165,7 @@ export default function WelcomeScreen() {
           <PremiumButton
             title={t('welcome.start')}
             variant="primary"
-            onPress={() => router.push('/auth/register')}
+            onPress={() => router.push('/mode-selector')}
           />
 
           <PremiumButton
