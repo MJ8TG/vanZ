@@ -1,11 +1,14 @@
+import { colors } from '@/theme/colors';
 import { View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { datasql } from '@/lib/supabase';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ForceLight } from '@/theme/ThemedRoot';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import PressableCard from '@/components/ui/PressableCard';
+import { Package, Truck } from 'lucide-react-native';
 import { useEffect } from 'react';
 
 export default function ModeSelectorScreen() {
@@ -25,8 +28,9 @@ export default function ModeSelectorScreen() {
   };
 
   return (
+    <ForceLight>
     <LinearGradient
-      colors={['#0B1021', '#131B36', '#1A2444']}
+      colors={[colors.navy, colors.navyLight, colors.navyMid]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       className="flex-1 items-center justify-center p-6"
@@ -57,7 +61,7 @@ export default function ModeSelectorScreen() {
           >
             <View className="flex-row items-center">
               <View className="w-16 h-16 rounded-full bg-vanz-teal/20 items-center justify-center mr-5 border-2 border-vanz-teal/30">
-                <Text className="text-3xl">📦</Text>
+                <Package size={30} color={colors.teal} strokeWidth={2.2} />
               </View>
               <View className="flex-1">
                 <Text className="text-white text-xl font-extrabold mb-1">{t('modeSelector.clientTitle')}</Text>
@@ -70,14 +74,14 @@ export default function ModeSelectorScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(400).springify()}>
-          <PressableCard 
+          <PressableCard
             onPress={() => handleSelectMode('driver')}
             className="w-full bg-white/10 border-2 border-white/20 p-6 shadow-glow-yellow"
             pressScale={0.95}
           >
             <View className="flex-row items-center">
               <View className="w-16 h-16 rounded-full bg-vanz-yellow/20 items-center justify-center mr-5 border-2 border-vanz-yellow/30">
-                <Text className="text-3xl">🚛</Text>
+                <Truck size={30} color={colors.yellow} strokeWidth={2.2} />
               </View>
               <View className="flex-1">
                 <Text className="text-white text-xl font-extrabold mb-1">{t('modeSelector.driverTitle')}</Text>
@@ -88,7 +92,14 @@ export default function ModeSelectorScreen() {
             </View>
           </PressableCard>
         </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(500).springify()}>
+          <Text className="text-white/40 text-center text-xs font-medium px-4 mt-2">
+            {t('modeSelector.oneRoleNote')}
+          </Text>
+        </Animated.View>
       </View>
     </LinearGradient>
+    </ForceLight>
   );
 }

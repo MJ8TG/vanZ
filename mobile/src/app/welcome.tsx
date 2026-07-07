@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TouchableOpacity, useWindowDimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -14,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ForceLight } from '@/theme/ThemedRoot';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Package, Truck, Handshake, type LucideIcon } from 'lucide-react-native';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -104,14 +106,14 @@ export default function WelcomeScreen() {
         
         <Animated.Text 
           entering={FadeIn.delay(300)}
-          className="text-vanz-navy text-3xl font-extrabold mb-4 text-center"
+          className="text-content text-3xl font-extrabold mb-4 text-center"
         >
           {t(item.titleKey)}
         </Animated.Text>
         
         <Animated.Text 
           entering={FadeIn.delay(400)}
-          className="text-gray-500 text-center text-lg font-medium leading-relaxed px-2"
+          className="text-content-secondary text-center text-lg font-medium leading-relaxed px-2"
         >
           {t(item.descKey)}
         </Animated.Text>
@@ -120,10 +122,11 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <ForceLight>
+    <View className="flex-1 bg-surface">
       {/* Header Logo with Gradient */}
       <LinearGradient
-        colors={['#0B1021', '#131B36', 'transparent']}
+        colors={[colors.navy, colors.navyLight, 'transparent']}
         className="pb-16 items-center absolute top-0 w-full z-10"
         style={{ paddingTop: Math.max(insets.top, 16) + 24 }}
       >
@@ -178,10 +181,11 @@ export default function WelcomeScreen() {
             onPress={() => setLocale(locale === 'fr' ? 'ar' : 'fr')}
             className="mt-2 items-center pb-2"
           >
-            <Text className="text-vanz-navy/50 font-bold">{t('welcome.switchLang')}</Text>
+            <Text className="text-content-secondary font-bold">{t('welcome.switchLang')}</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
     </View>
+    </ForceLight>
   );
 }

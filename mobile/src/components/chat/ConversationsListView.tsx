@@ -1,9 +1,11 @@
-import { View, Text, FlatList, RefreshControl } from 'react-native';
+import { colors } from '@/theme/colors';
+import { View, Text, FlatList, RefreshControl, Image } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '@/i18n';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ChatService, type ConversationPreview } from '@/modules/chat/chatService';
 import PressableCard from '@/components/ui/PressableCard';
+import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -55,11 +57,14 @@ export default function ConversationsListView({ onSelect }: Props) {
   if (conversations.length === 0) {
     return (
       <View className="flex-1 items-center justify-center px-10 pb-24">
-        <View className="w-20 h-20 bg-vanz-teal/10 rounded-full items-center justify-center mb-5">
-          <Text className="text-3xl">💬</Text>
-        </View>
-        <Text className="text-vanz-navy font-black text-lg mb-2">{t('chat.emptyTitle')}</Text>
-        <Text className="text-vanz-navy/50 font-medium text-sm text-center leading-relaxed">
+        <Image
+          source={require('../../../assets/images/empty/no-messages.png')}
+          style={{ width: 180, height: 180 }}
+          resizeMode="contain"
+          className="mb-4"
+        />
+        <Text className="text-content font-black text-lg mb-2">{t('chat.emptyTitle')}</Text>
+        <Text className="text-content-secondary font-medium text-sm text-center leading-relaxed">
           {t('chat.emptyDesc')}
         </Text>
       </View>
@@ -88,44 +93,43 @@ export default function ConversationsListView({ onSelect }: Props) {
             setRefreshing(true);
             load();
           }}
-          tintColor="#38B6FF"
+          tintColor={colors.teal}
         />
       }
       renderItem={({ item, index }) => {
         const initial = item.other_party_name[0]?.toUpperCase() || 'V';
         return (
           <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
-            <PressableCard
-              onPress={() => onSelect(item)}
-              className={`p-4 rounded-2xl flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              {/* Avatar */}
-              <View className="w-14 h-14 bg-vanz-teal/10 rounded-full items-center justify-center mr-3 ml-3 border-2 border-vanz-teal/20">
-                <Text className="text-vanz-navy font-black text-xl">{initial}</Text>
-              </View>
+            <PressableCard onPress={() => onSelect(item)} className="p-4 rounded-2xl">
+              <Row className="items-center">
+                {/* Avatar */}
+                <View className="w-14 h-14 bg-vanz-teal/10 rounded-full items-center justify-center mr-3 ml-3 border-2 border-vanz-teal/20">
+                  <Text className="text-content font-black text-xl">{initial}</Text>
+                </View>
 
-              {/* Body */}
-              <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                <View className={`flex-row items-center justify-between w-full ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <Text className="text-vanz-navy font-extrabold text-base" numberOfLines={1}>
-                    {item.other_party_name}
-                  </Text>
-                  <Text className="text-gray-400 font-semibold text-xs">{formatTime(item.last_message_time)}</Text>
+                {/* Body */}
+                <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
+                  <Row className="items-center justify-between w-full">
+                    <Text className="text-content font-extrabold text-base" numberOfLines={1}>
+                      {item.other_party_name}
+                    </Text>
+                    <Text className="text-content-muted font-semibold text-xs">{formatTime(item.last_message_time)}</Text>
+                  </Row>
+                  <Row className="items-center justify-between w-full mt-1">
+                    <Text
+                      className={`text-sm flex-1 ${item.unread_count > 0 ? 'text-content font-bold' : 'text-content-muted font-medium'} ${isRtl ? 'text-right' : ''}`}
+                      numberOfLines={1}
+                    >
+                      {item.last_message || t('chat.noMessagesYet')}
+                    </Text>
+                    {item.unread_count > 0 && (
+                      <View className="bg-vanz-teal min-w-[22px] h-[22px] px-1.5 rounded-full items-center justify-center ml-2 mr-2">
+                        <Text className="text-white font-black text-[11px]">{item.unread_count}</Text>
+                      </View>
+                    )}
+                  </Row>
                 </View>
-                <View className={`flex-row items-center justify-between w-full mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <Text
-                    className={`text-sm flex-1 ${item.unread_count > 0 ? 'text-vanz-navy font-bold' : 'text-gray-400 font-medium'} ${isRtl ? 'text-right' : ''}`}
-                    numberOfLines={1}
-                  >
-                    {item.last_message || t('chat.noMessagesYet')}
-                  </Text>
-                  {item.unread_count > 0 && (
-                    <View className="bg-vanz-teal min-w-[22px] h-[22px] px-1.5 rounded-full items-center justify-center ml-2 mr-2">
-                      <Text className="text-white font-black text-[11px]">{item.unread_count}</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
+              </Row>
             </PressableCard>
           </Animated.View>
         );

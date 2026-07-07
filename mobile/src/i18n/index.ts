@@ -6,14 +6,17 @@ import { I18nManager, Alert } from 'react-native';
 import fr from './fr.json';
 import ar from './ar.json';
 
-type Locale = 'fr' | 'ar';
+export type Locale = 'fr' | 'ar';
 
 const translations: Record<Locale, typeof fr> = { fr, ar };
+
+/** Values for `{{placeholder}}` interpolation in a translation string. */
+export type TVars = Record<string, string | number>;
 
 interface I18nState {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: string, vars?: TVars) => string;
 }
 
 export const useI18n = create<I18nState>()(
@@ -38,22 +41,24 @@ export const useI18n = create<I18nState>()(
           );
         }
       },
-      t: (key: string) => {
-        const locale = get().locale;
+      t: (key: string, vars?: TVars) => {
         const keys = key.split('.');
-        let value: any = translations[locale];
-        for (const k of keys) {
-          value = value?.[k];
-          if (value === undefined) break;
+        const resolve = (loc: Locale): string | undefined => {
+          let value: any = translations[loc];
+          for (const k of keys) {
+            value = value?.[k];
+            if (value === undefined) break;
+          }
+          return typeof value === 'string' ? value : undefined;
+        };
+        // Current locale, then French fallback, then the key itself.
+        let str = resolve(get().locale) ?? resolve('fr') ?? key;
+        if (vars) {
+          str = str.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
+            vars[name] != null ? String(vars[name]) : `{{${name}}}`
+          );
         }
-        if (typeof value === 'string') return value;
-        // Fallback to French
-        let fallback: any = translations['fr'];
-        for (const k of keys) {
-          fallback = fallback?.[k];
-          if (fallback === undefined) break;
-        }
-        return typeof fallback === 'string' ? fallback : key;
+        return str;
       },
     }),
     {

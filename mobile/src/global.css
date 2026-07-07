@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Brand Colors */
+    /* Brand Colors (constant across themes) */
     --color-teal: #38B6FF;
     --color-teal-dark: #2196D6;
     --color-yellow: #F5C800;
@@ -12,7 +12,21 @@
     --color-navy-light: #131B36;
     --color-ice-blue: #F0F6FA;
     --color-green: #22C55E;
-    
+
+    /* Semantic role tokens — light defaults for first paint. The app root
+       overrides these at runtime via vars() (see src/theme/useTheme.ts) so
+       they flip for dark mode. Values are RGB channels for alpha support. */
+    --surface: 240 246 250;
+    --surface-elevated: 255 255 255;
+    --surface-sunken: 228 237 243;
+    --inverted: 11 16 33;
+    --text-primary: 11 16 33;
+    --text-secondary: 91 107 127;
+    --text-muted: 148 163 184;
+    --text-inverted: 255 255 255;
+    --border-default: 236 239 243;
+    --border-strong: 226 231 236;
+
     /* Backgrounds & Text */
     --background: #F0F6FA;
     --foreground: #0B1021;

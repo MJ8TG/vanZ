@@ -27,7 +27,7 @@ export default function PressableCard({
   return (
     <AnimatedTouchable
       style={animatedStyle}
-      className={`bg-white rounded-card shadow-card border border-gray-100 ${className}`}
+      className={`bg-surface-elevated rounded-card shadow-card border border-line ${className}`}
       activeOpacity={0.95}
       onPressIn={() => {
         scale.value = withSpring(pressScale, { damping: 15, stiffness: 300 });

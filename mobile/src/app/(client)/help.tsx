@@ -6,10 +6,10 @@ import HelpView from '@/components/help/HelpView';
 
 export default function ClientHelpScreen() {
   const router = useRouter();
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   return (
-    <View className="flex-1 bg-vanz-iceblue">
-      <GradientHeader title={locale === 'ar' ? 'مركز المساعدة' : "Centre d'aide"} backButton={() => router.back()} tall />
+    <View className="flex-1 bg-surface">
+      <GradientHeader title={t('settings.helpCenter')} backButton={() => router.back()} tall />
       <HelpView />
     </View>
   );

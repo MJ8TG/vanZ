@@ -1,15 +1,18 @@
+import { colors } from '@/theme/colors';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { getApiBaseUrl } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
-import { User, Mail, Phone, Lock } from 'lucide-react-native';
+import { User, Mail, Phone, Lock, Check, AlertTriangle } from 'lucide-react-native';
 import PremiumInput from '@/components/ui/PremiumInput';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PremiumCard from '@/components/ui/PremiumCard';
+import Row from '@/components/ui/Row';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ForceLight } from '@/theme/ThemedRoot';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 export default function RegisterScreen() {
@@ -86,9 +89,9 @@ export default function RegisterScreen() {
 
   if (success) {
     return (
-      <View className="flex-1 bg-vanz-iceblue p-6 justify-center items-center">
+      <View className="flex-1 bg-surface p-6 justify-center items-center">
         <Animated.View entering={FadeInDown.delay(100).springify()} className="items-center w-full">
-          <View className="bg-white p-4 rounded-3xl shadow-elevated mb-10">
+          <View className="bg-surface-elevated p-4 rounded-3xl shadow-elevated mb-10">
             <Image 
               source={require('../../../assets/images/logo.png')}
               accessibilityLabel="VanZ"
@@ -99,11 +102,11 @@ export default function RegisterScreen() {
           <View className="w-24 h-24 bg-vanz-teal/20 rounded-full items-center justify-center mb-6 relative">
             <View className="absolute inset-0 bg-vanz-teal/10 rounded-full" />
             <View className="w-16 h-16 bg-vanz-teal rounded-full items-center justify-center shadow-glow-teal">
-              <Text className="text-white text-3xl font-bold">✓</Text>
+              <Check size={34} color={colors.white} strokeWidth={3} />
             </View>
           </View>
-          <Text className="text-vanz-navy text-3xl font-black mb-4 text-center">{t('auth.registerSuccessTitle')}</Text>
-          <Text className="text-vanz-navy/60 text-center text-lg mb-10 font-medium leading-relaxed px-4">
+          <Text className="text-content text-3xl font-black mb-4 text-center">{t('auth.registerSuccessTitle')}</Text>
+          <Text className="text-content-secondary text-center text-lg mb-10 font-medium leading-relaxed px-4">
             {t('auth.registerSuccessDesc')}
           </Text>
           <TouchableOpacity 
@@ -111,7 +114,7 @@ export default function RegisterScreen() {
             className="w-full h-16 rounded-2xl overflow-hidden shadow-elevated active:opacity-90"
           >
             <LinearGradient
-              colors={['#0B1021', '#1A2444']}
+              colors={[colors.navy, colors.navyMid]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="w-full h-full items-center justify-center"
@@ -125,9 +128,10 @@ export default function RegisterScreen() {
   }
 
   return (
-    <KeyboardAvoidingView 
+    <ForceLight>
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-vanz-iceblue"
+      className="flex-1 bg-surface"
     >
       <ScrollView 
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} 
@@ -136,13 +140,13 @@ export default function RegisterScreen() {
       >
         {/* Top Gradient Wash */}
         <LinearGradient
-          colors={['#E4EDF3', '#F0F6FA', 'transparent']}
+          colors={[colors.iceblueDark, colors.iceblue, 'transparent']}
           className="absolute top-0 w-full h-64 z-0"
         />
 
         <View className="px-6 py-12 relative z-10">
           <View className="items-center mb-8 mt-4">
-            <View className="bg-white p-4 rounded-3xl shadow-elevated mb-6">
+            <View className="bg-surface-elevated p-4 rounded-3xl shadow-elevated mb-6">
               <Image 
                 source={require('../../../assets/images/logo.png')}
               accessibilityLabel="VanZ"
@@ -150,8 +154,8 @@ export default function RegisterScreen() {
                 resizeMode="contain" 
               />
             </View>
-            <Text className="text-vanz-navy text-3xl font-black mb-2">{t('auth.registerTitle')}</Text>
-            <Text className="text-vanz-navy/60 text-base font-medium text-center">
+            <Text className="text-content text-3xl font-black mb-2">{t('auth.registerTitle')}</Text>
+            <Text className="text-content-secondary text-base font-medium text-center">
               {t('auth.registerSubtitle')}
             </Text>
           </View>
@@ -169,7 +173,7 @@ export default function RegisterScreen() {
               placeholder={t('auth.namePlaceholder')}
               value={name}
               onChangeText={setName}
-              icon={<User color="#9CA3AF" size={20} />}
+              icon={<User color={colors.placeholder} size={20} />}
             />
 
             <PremiumInput
@@ -179,7 +183,7 @@ export default function RegisterScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              icon={<Mail color="#9CA3AF" size={20} />}
+              icon={<Mail color={colors.placeholder} size={20} />}
             />
 
             <PremiumInput
@@ -190,10 +194,10 @@ export default function RegisterScreen() {
               keyboardType="phone-pad"
               maxLength={8}
               icon={
-                <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <Phone color="#9CA3AF" size={18} />
-                  <Text className="text-vanz-navy text-sm font-jakarta-bold mx-1.5">+216</Text>
-                </View>
+                <Row className="items-center">
+                  <Phone color={colors.placeholder} size={18} />
+                  <Text className="text-content text-sm font-jakarta-bold mx-1.5">+216</Text>
+                </Row>
               }
             />
 
@@ -204,49 +208,49 @@ export default function RegisterScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                icon={<Lock color="#9CA3AF" size={20} />}
+                icon={<Lock color={colors.placeholder} size={20} />}
               />
               {password.length > 0 && (() => {
                 const score = (password.length >= 8 ? 1 : 0) + (/\d/.test(password) ? 1 : 0) + (/[^A-Za-z0-9]/.test(password) ? 1 : 0);
                 const meta = [
                   { fr: 'Faible', ar: 'ضعيف', c: '#EF4444' },
                   { fr: 'Moyen', ar: 'متوسط', c: '#F59E0B' },
-                  { fr: 'Bon', ar: 'جيد', c: '#22C55E' },
-                  { fr: 'Fort', ar: 'قوي', c: '#16A34A' },
+                  { fr: 'Bon', ar: 'جيد', c: colors.green },
+                  { fr: 'Fort', ar: 'قوي', c: colors.greenDark },
                 ][score];
                 const filled = Math.max(1, score);
                 return (
-                  <View className={`flex-row items-center mt-2 px-1 gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                    <View className={`flex-1 flex-row gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <Row className="items-center mt-2 px-1 gap-2">
+                    <Row className="flex-1 gap-1">
                       {[0, 1, 2].map((i) => (
                         <View key={i} className="flex-1 h-1.5 rounded-full" style={{ backgroundColor: i < filled ? meta.c : '#E5E7EB' }} />
                       ))}
-                    </View>
+                    </Row>
                     <Text className="text-xs font-bold" style={{ color: meta.c }}>{isRtl ? meta.ar : meta.fr}</Text>
-                  </View>
+                  </Row>
                 );
               })()}
             </View>
 
             {error ? (
               <Animated.View entering={FadeIn} className={`bg-red-50 p-3 rounded-xl border border-red-100 flex-row items-center mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-red-500 mr-2 ml-2">⚠️</Text>
-                <Text className={`text-red-500 text-sm font-bold flex-1 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
+                <AlertTriangle size={16} color="#EF4444" strokeWidth={2.4} />
+                <Text className={`text-red-500 text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
               </Animated.View>
             ) : null}
           </View>
 
           {/* Terms acceptance (CGU) */}
-          <View className={`flex-row items-center mb-5 px-1 flex-wrap ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <Row className="items-center mb-5 px-1 flex-wrap">
             <TouchableOpacity
               onPress={() => setTermsAccepted((v) => !v)}
               activeOpacity={0.7}
               className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}
             >
-              <View className={`w-6 h-6 rounded-md border-2 items-center justify-center ${termsAccepted ? 'bg-vanz-teal border-vanz-teal' : 'border-gray-300 bg-white'} ${isRtl ? 'ml-3' : 'mr-3'}`}>
-                {termsAccepted && <Text className="text-white text-xs font-black">✓</Text>}
+              <View className={`w-6 h-6 rounded-md border-2 items-center justify-center ${termsAccepted ? 'bg-vanz-teal border-vanz-teal' : 'border-gray-300 bg-surface-elevated'} ${isRtl ? 'ml-3' : 'mr-3'}`}>
+                {termsAccepted && <Check size={14} color={colors.white} strokeWidth={3} />}
               </View>
-              <Text className="text-vanz-navy/70 text-sm">
+              <Text className="text-content-secondary text-sm">
                 {t('auth.termsPrefix')}
               </Text>
             </TouchableOpacity>
@@ -259,7 +263,7 @@ export default function RegisterScreen() {
                 {t('auth.termsLink')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </Row>
 
           <PremiumButton
             title={t('auth.registerButton')}
@@ -268,14 +272,15 @@ export default function RegisterScreen() {
             onPress={handleRegister}
           />
 
-          <View className={`flex-row justify-center items-center mt-8 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <Text className="text-vanz-navy/60 font-medium">{t('auth.alreadyHaveAccount')}</Text>
+          <Row className="justify-center items-center mt-8 mb-4">
+            <Text className="text-content-secondary font-medium">{t('auth.alreadyHaveAccount')}</Text>
             <TouchableOpacity onPress={() => router.replace('/auth/login')}>
               <Text className="text-vanz-teal font-extrabold ml-1 mr-1">{t('auth.loginButton')}</Text>
             </TouchableOpacity>
-          </View>
+          </Row>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ForceLight>
   );
 }

@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -6,8 +7,10 @@ import { authApiFetch } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
+import Row from '@/components/ui/Row';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Rocket } from 'lucide-react-native';
 
 export default function BidScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -76,10 +79,8 @@ export default function BidScreen() {
 
       if (driverError || driverData?.status !== 'approved') {
         Alert.alert(
-          locale === 'ar' ? 'حساب غير مفعل' : 'Compte non approuvé',
-          locale === 'ar'
-            ? 'يجب أن يتم تفعيل حسابك أولاً لتتمكن من تقديم عرض.'
-            : 'Votre compte doit être approuvé pour pouvoir soumettre une offre.'
+          t('bidScreen.notApprovedTitle'),
+          t('bidScreen.notApprovedBody')
         );
         setLoading(false);
         return;
@@ -103,7 +104,7 @@ export default function BidScreen() {
       }
 
       Alert.alert(
-        locale === 'ar' ? 'نجاح' : 'Succès',
+        t('bidScreen.successTitle'),
         t('driver.offerSent'),
         [{ text: t('common.ok'), onPress: () => router.back() }]
       );
@@ -116,7 +117,7 @@ export default function BidScreen() {
 
   if (jobLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-vanz-iceblue">
+      <View className="flex-1 items-center justify-center bg-surface">
         <ActivityIndicator size="large" color="#FFC800" />
       </View>
     );
@@ -125,41 +126,41 @@ export default function BidScreen() {
   const isRtl = locale === 'ar';
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-vanz-iceblue">
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-surface">
       <GradientHeader title={t('driver.bidTitle')} backButton={() => router.back()} tall />
 
       <ScrollView className="flex-1 px-5 pt-6" contentContainerStyle={{ paddingBottom: 100 }}>
         {job && (
           <Animated.View entering={FadeInDown.delay(100).springify()}>
-            <View className="bg-white p-5 rounded-card shadow-card border border-gray-100 mb-6">
-              <Text className={`text-vanz-navy font-black text-xl mb-4 ${isRtl ? 'text-right' : ''}`}>
-                {job.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (job.service_type || 'Mission')}
+            <View className="bg-surface-elevated p-5 rounded-card shadow-card border border-line mb-6">
+              <Text className={`text-content font-black text-xl mb-4 ${isRtl ? 'text-right' : ''}`}>
+                {job.service_type === 'parcel' ? t('common.parcel') : (job.service_type || 'Mission')}
               </Text>
               
-              <View className="bg-gray-50/80 p-4 rounded-2xl border border-gray-100 mb-5 relative">
-                <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-gray-200 ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
+              <View className="bg-surface-sunken/80 p-4 rounded-2xl border border-line mb-5 relative">
+                <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-line-strong ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
                 
-                <View className={`flex-row items-start mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <Row className="items-start mb-4">
                   <View className="w-7 h-7 rounded-full bg-vanz-teal/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                     <View className="w-2.5 h-2.5 rounded-full bg-vanz-teal" />
                   </View>
                   <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                    <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.pickup_address}</Text>
+                    <Text className={`text-content font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.pickup_address}</Text>
                   </View>
-                </View>
+                </Row>
 
-                <View className={`flex-row items-start ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <Row className="items-start">
                   <View className="w-7 h-7 rounded-xl bg-vanz-yellow/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                     <View className="w-2.5 h-2.5 rounded-sm bg-vanz-yellow" />
                   </View>
                   <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                    <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.dropoff_address}</Text>
+                    <Text className={`text-content font-bold text-sm ${isRtl ? 'text-right' : ''}`}>{job.dropoff_address}</Text>
                   </View>
-                </View>
+                </Row>
               </View>
 
               <View className="bg-vanz-teal/5 p-4 rounded-xl border border-vanz-teal/10 flex-row justify-between items-center">
-                <Text className="text-vanz-navy font-bold">{locale === 'ar' ? 'أقل عرض حالي:' : 'Offre la plus basse :'}</Text>
+                <Text className="text-content font-bold">{t('bidScreen.lowestBid')}</Text>
                 {lowestBid ? (
                   <Text className="text-vanz-teal font-black text-lg">{lowestBid} {t('common.currency')}</Text>
                 ) : (
@@ -171,20 +172,20 @@ export default function BidScreen() {
         )}
 
         <Animated.View entering={FadeInDown.delay(200).springify()}>
-          <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
+          <Text className={`text-content font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
             {t('driver.yourPrice')}
           </Text>
-          <View className={`flex-row items-center mb-6 gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <TouchableOpacity 
+          <Row className="items-center mb-6 gap-3">
+            <TouchableOpacity
               onPress={() => adjustBid(-5)}
-              className="w-16 h-16 bg-white rounded-2xl items-center justify-center border border-gray-100 shadow-sm active:bg-gray-50"
+              className="w-16 h-16 bg-surface-elevated rounded-2xl items-center justify-center border border-line shadow-sm active:bg-surface-sunken"
             >
-              <Text className="text-vanz-navy text-2xl font-medium">-</Text>
+              <Text className="text-content text-2xl font-medium">-</Text>
             </TouchableOpacity>
             
             <View className="flex-1 relative">
               <TextInput
-                className="bg-white border-2 border-vanz-teal text-vanz-navy font-black text-3xl text-center h-16 rounded-2xl shadow-glow-teal"
+                className="bg-surface-elevated border-2 border-vanz-teal text-content font-black text-3xl text-center h-16 rounded-2xl shadow-glow-teal"
                 placeholder="0"
                 placeholderTextColor="#CBD5E1"
                 keyboardType="numeric"
@@ -196,21 +197,21 @@ export default function BidScreen() {
 
             <TouchableOpacity 
               onPress={() => adjustBid(5)}
-              className="w-16 h-16 bg-white rounded-2xl items-center justify-center border border-gray-100 shadow-sm active:bg-gray-50"
+              className="w-16 h-16 bg-surface-elevated rounded-2xl items-center justify-center border border-line shadow-sm active:bg-surface-sunken"
             >
-              <Text className="text-vanz-navy text-2xl font-medium">+</Text>
+              <Text className="text-content text-2xl font-medium">+</Text>
             </TouchableOpacity>
-          </View>
+          </Row>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(300).springify()}>
-          <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
+          <Text className={`text-content font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
             {t('driver.messageClient')}
           </Text>
           <TextInput
-            className={`bg-white p-4.5 rounded-2xl border border-gray-100 text-vanz-navy h-32 mb-6 text-sm font-semibold shadow-sm ${isRtl ? 'text-right' : ''}`}
+            className={`bg-surface-elevated p-4.5 rounded-2xl border border-line text-content h-32 mb-6 text-sm font-semibold shadow-sm ${isRtl ? 'text-right' : ''}`}
             placeholder={t('driver.messagePlaceholder')}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.placeholder}
             multiline
             textAlignVertical="top"
             value={notes}
@@ -227,7 +228,7 @@ export default function BidScreen() {
           className="w-full h-16 rounded-2xl overflow-hidden shadow-elevated active:opacity-90"
         >
           <LinearGradient
-            colors={loading || !price ? ['#1A244480', '#0B102180'] : ['#1A2444', '#0B1021']}
+            colors={loading || !price ? ['#1A244480', '#0B102180'] : [colors.navyMid, colors.navy]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             className="w-full h-full items-center justify-center flex-row"
@@ -236,8 +237,8 @@ export default function BidScreen() {
               <ActivityIndicator color="#fff" />
             ) : (
               <>
-                <Text className="text-white text-xl font-extrabold">{t('driver.sendOffer')}</Text>
-                <Text className="text-white text-xl ml-2">🚀</Text>
+                <Text className="text-white text-xl font-extrabold mr-2">{t('driver.sendOffer')}</Text>
+                <Rocket size={20} color={colors.white} strokeWidth={2.2} />
               </>
             )}
           </LinearGradient>

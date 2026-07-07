@@ -6,7 +6,7 @@ import { useI18n } from '@/i18n';
 /** Top banner shown whenever the device loses connectivity. */
 export default function OfflineBanner() {
   const [offline, setOffline] = useState(false);
-  const { locale } = useI18n();
+  const { t } = useI18n();
 
   useEffect(() => {
     // Guard the native call so the app still boots on a JS-only reload before
@@ -31,7 +31,7 @@ export default function OfflineBanner() {
       style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, paddingTop: topPad, backgroundColor: '#EF4444' }}
     >
       <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '700', paddingVertical: 6, fontSize: 13 }}>
-        {locale === 'ar' ? 'لا يوجد اتصال بالإنترنت' : 'Pas de connexion internet'}
+        {t('common.offline')}
       </Text>
     </View>
   );

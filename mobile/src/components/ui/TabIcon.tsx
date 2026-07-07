@@ -1,38 +1,45 @@
+import { colors } from '@/theme/colors';
 import React from 'react';
-import { Text } from 'react-native';
-import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import { View, Text } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 
 interface TabIconProps {
-  icon: string;
+  Icon: LucideIcon;
   label: string;
   focused: boolean;
-  color: string;
+  /** Active accent (client = teal, driver = yellow). */
+  activeColor?: string;
+  /** Inactive icon/label color. */
+  inactiveColor?: string;
+  /** Tailwind class for the active pill behind the icon. */
+  pillClass?: string;
 }
 
 /**
- * Tab icon with the Stitch bottom-nav active pill:
- * focused tab gets a tinted pill behind the icon.
+ * Bottom-nav item — clean lucide icon that turns the brand accent when active,
+ * with a subtle tinted pill behind the active icon. Matches the prototype's
+ * BottomNav (no emoji, no chunky circle).
  */
-export default function TabIcon({ icon, label, focused, color }: TabIconProps) {
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: withSpring(focused ? 1.1 : 1, { damping: 12, stiffness: 150 }) }],
-  }));
-
-  const pillStyle = useAnimatedStyle(() => ({
-    backgroundColor: withTiming(focused ? `${color}26` : 'transparent', { duration: 200 }), // ~15% alpha
-  }));
-
+export default function TabIcon({
+  Icon,
+  label,
+  focused,
+  activeColor = colors.teal,
+  inactiveColor = colors.slate,
+  pillClass = 'bg-vanz-teal/10',
+}: TabIconProps) {
+  const color = focused ? activeColor : inactiveColor;
   return (
-    <Animated.View style={animatedStyle} className="items-center justify-center pt-1">
-      <Animated.View style={pillStyle} className="px-4 py-1 rounded-full items-center justify-center mb-0.5">
-        <Text style={{ color }} className="text-xl">{icon}</Text>
-      </Animated.View>
+    <View className="items-center justify-center" style={{ width: 66 }}>
+      <View className={`px-3.5 py-1 rounded-full ${focused ? pillClass : ''}`}>
+        <Icon size={22} color={color} strokeWidth={focused ? 2.6 : 2} />
+      </View>
       <Text
-        style={{ color }}
-        className={`text-2xs ${focused ? 'font-bold' : 'font-medium'}`}
+        numberOfLines={1}
+        style={{ color, fontSize: 10.5, fontWeight: focused ? '800' : '500', marginTop: 3 }}
       >
         {label}
       </Text>
-    </Animated.View>
+    </View>
   );
 }

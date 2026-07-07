@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
@@ -6,9 +6,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import { serviceLabel } from '@/lib/serviceLabel';
 import type { MobileJob } from '@/types/domain';
+import { colors } from '@/theme/colors';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
+import { MapPin, Flag } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useMissions } from '@/modules/booking/hooks/useMissions';
 import { useRealtimeSync } from '@/modules/booking/hooks/useRealtimeSync';
@@ -34,13 +37,13 @@ export default function ClientMissionsScreen() {
   const getStatusBadge = (status: string) => {
 
     const badges: Record<string, { bg: string; text: string; label: string }> = {
-      open: { bg: 'bg-vanz-teal/10', text: 'text-vanz-teal', label: locale === 'ar' ? 'مفتوح' : 'Ouverte' },
-      payment_pending: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: locale === 'ar' ? 'الدفع' : 'Paiement' },
-      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: locale === 'ar' ? 'تم التعيين' : 'Attribuée' },
-      in_progress: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: locale === 'ar' ? 'قيد التنفيذ' : 'En cours' },
-      completed: { bg: 'bg-green-50', text: 'text-green-600', label: locale === 'ar' ? 'مكتملة' : 'Terminée' },
-      cancelled: { bg: 'bg-gray-100', text: 'text-gray-400', label: locale === 'ar' ? 'ملغاة' : 'Annulée' },
-      expired: { bg: 'bg-red-50', text: 'text-red-500', label: locale === 'ar' ? 'منتهية' : 'Expirée' },
+      open: { bg: 'bg-vanz-teal/10', text: 'text-vanz-teal', label: t('jobDetails.statusOpen') },
+      payment_pending: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('jobDetails.stepPayment') },
+      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: t('jobDetails.statusMatched') },
+      in_progress: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('jobDetails.statusInProgress') },
+      completed: { bg: 'bg-green-50', text: 'text-green-600', label: t('jobDetails.statusCompleted') },
+      cancelled: { bg: 'bg-surface-sunken', text: 'text-content-muted', label: t('jobDetails.statusCancelled') },
+      expired: { bg: 'bg-red-50', text: 'text-red-500', label: t('jobDetails.statusExpired') },
     };
     return badges[status] || badges.open;
   };
@@ -64,31 +67,31 @@ export default function ClientMissionsScreen() {
           className={`mb-4 overflow-hidden border-l-4 ${tab === 'active' ? 'border-l-vanz-teal' : 'border-l-gray-300'}`}
         >
           <View className="p-5">
-            <View className={`flex-row justify-between items-start mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-              <Text className={`text-vanz-navy font-black text-lg flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
+            <Row className="justify-between items-start mb-4">
+              <Text className={`text-content font-black text-lg flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
                 {title}
               </Text>
               <View className={`${badge.bg} px-3 py-1 rounded-full ml-2 mr-2 border border-${badge.text.split('-')[1]}/10`}>
                 <Text className={`${badge.text} font-bold text-[10px] uppercase tracking-wider`}>{badge.label}</Text>
               </View>
-            </View>
+            </Row>
 
             <View className="space-y-3 mb-5">
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-sm mr-3 ml-3">📍</Text>
-                <Text className={`text-vanz-navy/70 text-xs font-semibold flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
+              <Row className="items-center">
+                <View className="mr-3 ml-3"><MapPin size={14} color={colors.green} strokeWidth={2.4} /></View>
+                <Text className={`text-content-secondary text-xs font-semibold flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
                   {item.pickup_address || 'Départ non spécifié'}
                 </Text>
-              </View>
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-sm mr-3 ml-3">🎯</Text>
-                <Text className={`text-vanz-navy/70 text-xs font-semibold flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
+              </Row>
+              <Row className="items-center">
+                <View className="mr-3 ml-3"><Flag size={14} color={colors.yellowDark} strokeWidth={2.4} /></View>
+                <Text className={`text-content-secondary text-xs font-semibold flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
                   {item.dropoff_address || 'Arrivée non spécifiée'}
                 </Text>
-              </View>
+              </Row>
             </View>
 
-            <View className={`flex-row justify-between items-center pt-4 border-t border-gray-50 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <Row className="justify-between items-center pt-4 border-t border-line">
               <Text className="text-vanz-teal font-black text-base">
                 {item.accepted_bid_amount 
                   ? `${item.accepted_bid_amount} ${t('common.currency')}` 
@@ -97,14 +100,14 @@ export default function ClientMissionsScreen() {
                     : t('client.noOffers')}
               </Text>
               
-              <View className="bg-vanz-iceblue px-3 py-1.5 rounded-lg">
-                <Text className="text-vanz-navy/60 font-bold text-xs">
-                  {new Date(item.created_at || new Date().toISOString()).toLocaleDateString(locale === 'ar' ? 'ar-TN' : 'fr-FR', {
+              <View className="bg-surface px-3 py-1.5 rounded-lg">
+                <Text className="text-content-secondary font-bold text-xs">
+                  {new Date(item.created_at || new Date().toISOString()).toLocaleDateString(isRtl ? 'ar-TN' : 'fr-FR', {
                     day: 'numeric', month: 'short'
                   })}
                 </Text>
               </View>
-            </View>
+            </Row>
           </View>
         </PressableCard>
       </Animated.View>
@@ -114,13 +117,13 @@ export default function ClientMissionsScreen() {
   const isRtl = locale === 'ar';
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader title={t('client.missions')} tall>
         {/* Segmented Control inside Header */}
-        <View className={`flex-row bg-white/10 p-1.5 rounded-2xl mt-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-          <TouchableOpacity 
+        <Row className="bg-white/10 p-1.5 rounded-2xl mt-4">
+          <TouchableOpacity
             onPress={() => setTab('active')}
-            className={`flex-1 py-3 items-center rounded-xl ${tab === 'active' ? 'bg-white shadow-card' : ''}`}
+            className={`flex-1 py-3 items-center rounded-xl ${tab === 'active' ? 'bg-surface-elevated shadow-card' : ''}`}
           >
             <Text className={`font-extrabold text-sm ${tab === 'active' ? 'text-vanz-teal' : 'text-white/60'}`}>
               {t('client.active')}
@@ -128,13 +131,13 @@ export default function ClientMissionsScreen() {
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setTab('history')}
-            className={`flex-1 py-3 items-center rounded-xl ${tab === 'history' ? 'bg-white shadow-card' : ''}`}
+            className={`flex-1 py-3 items-center rounded-xl ${tab === 'history' ? 'bg-surface-elevated shadow-card' : ''}`}
           >
             <Text className={`font-extrabold text-sm ${tab === 'history' ? 'text-vanz-teal' : 'text-white/60'}`}>
               {t('client.history')}
             </Text>
           </TouchableOpacity>
-        </View>
+        </Row>
       </GradientHeader>
 
       <View className="flex-1 px-5 pt-5 pb-24">
@@ -152,13 +155,16 @@ export default function ClientMissionsScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
             ListEmptyComponent={() => (
-              <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-20 mt-10">
-                <View className="w-32 h-32 bg-white rounded-full items-center justify-center shadow-card mb-6">
-                  <Text className="text-6xl">📭</Text>
-                </View>
-                <Text className="text-vanz-navy/40 text-center text-sm font-semibold leading-relaxed px-8">
-                  {tab === 'active' 
-                    ? t('client.noActive') 
+              <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-16 mt-8">
+                <Image
+                  source={require('../../../assets/images/empty/no-missions.png')}
+                  style={{ width: 200, height: 200 }}
+                  resizeMode="contain"
+                  className="mb-5"
+                />
+                <Text className="text-content-secondary text-center text-sm font-semibold leading-relaxed px-8">
+                  {tab === 'active'
+                    ? t('client.noActive')
                     : t('client.emptyHistory')}
                 </Text>
               </Animated.View>

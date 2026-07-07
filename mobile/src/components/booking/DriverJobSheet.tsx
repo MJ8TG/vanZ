@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -8,6 +9,8 @@ import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import Row from '@/components/ui/Row';
+import { Clock, Calendar, Rocket } from 'lucide-react-native';
 
 interface DriverJobSheetProps {
   job: MobileJob;
@@ -42,7 +45,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
     const numericAmount = parseFloat(bidAmount);
     
     if (isNaN(numericAmount) || numericAmount <= 0) {
-      Alert.alert(t('common.error'), locale === 'ar' ? 'الرجاء إدخال مبلغ صحيح' : 'Veuillez entrer un montant valide');
+      Alert.alert(t('common.error'), t('jobSheet.invalidAmount'));
       return;
     }
 
@@ -65,8 +68,8 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
       if (!res.ok) {
         if (res.status === 409 && payload?.error?.includes('Offre déjà envoyée')) {
           Alert.alert(
-            locale === 'ar' ? 'تم تقديم العرض مسبقاً' : 'Offre déjà soumise',
-            locale === 'ar' ? 'لقد قدمت عرضاً لهذه المهمة بالفعل.' : 'Vous avez déjà fait une offre pour cette mission.'
+            t('jobSheet.alreadyBidTitle'),
+            t('jobSheet.alreadyBidBody')
           );
         } else {
           throw new Error(payload?.error || "Impossible d'envoyer l'offre.");
@@ -74,8 +77,8 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         Alert.alert(
-          locale === 'ar' ? 'تم الإرسال!' : 'Offre envoyée !',
-          locale === 'ar' ? 'تم إرسال عرضك للعميل.' : 'Votre offre a été envoyée au client.'
+          t('jobSheet.sentTitle'),
+          t('jobSheet.sentBody')
         );
         onBidSuccess();
       }
@@ -100,54 +103,60 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
     >
       <BottomSheetView className="flex-1 px-6 pb-6 pt-2">
         <Animated.View entering={FadeIn.duration(400)} className="flex-1">
-          <View className={`flex-row justify-between items-center mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <Row className="justify-between items-center mb-6">
             <View>
-              <Text className={`text-vanz-navy font-black text-2xl ${isRtl ? 'text-right' : ''}`}>
-                {job.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (job.service_type || 'Mission')}
+              <Text className={`text-content font-black text-2xl ${isRtl ? 'text-right' : ''}`}>
+                {job.service_type === 'parcel' ? t('common.parcel') : (job.service_type || 'Mission')}
               </Text>
-              <View className={`flex-row items-center mt-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-gray-400 font-bold text-xs mr-2 ml-2">🕒 {job.time_slot}</Text>
+              <Row className="items-center mt-1.5">
+                <Row className="items-center mr-2 ml-2">
+                  <Clock size={12} color={colors.slate} strokeWidth={2.4} />
+                  <Text className="text-content-muted font-bold text-xs ml-1">{job.time_slot}</Text>
+                </Row>
                 <View className="w-1 h-1 bg-gray-300 rounded-full" />
-                <Text className="text-gray-400 font-bold text-xs ml-2 mr-2">📅 {new Date(job.scheduled_at || new Date().toISOString()).toLocaleDateString()}</Text>
-              </View>
+                <Row className="items-center ml-2 mr-2">
+                  <Calendar size={12} color={colors.slate} strokeWidth={2.4} />
+                  <Text className="text-content-muted font-bold text-xs ml-1">{new Date(job.scheduled_at || new Date().toISOString()).toLocaleDateString()}</Text>
+                </Row>
+              </Row>
             </View>
-            <View className="bg-vanz-navy/5 px-3 py-1.5 rounded-lg border border-vanz-navy/10">
-              <Text className="text-vanz-navy font-black text-xs uppercase">{job.load_capacity?.replace('van_', 'Van ')}</Text>
+            <View className="bg-inverted/5 px-3 py-1.5 rounded-lg border border-vanz-navy/10">
+              <Text className="text-content font-black text-xs uppercase">{job.load_capacity?.replace('van_', 'Van ')}</Text>
             </View>
-          </View>
+          </Row>
 
           {/* Route Card */}
-          <View className="bg-gray-50/80 p-4 rounded-card border border-gray-100 mb-6 relative">
+          <View className="bg-surface-sunken/80 p-4 rounded-card border border-line mb-6 relative">
             {/* Dotted connector line */}
-            <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-gray-200 ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
+            <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-line-strong ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
             
-            <View className={`flex-row items-start mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <Row className="items-start mb-4">
               <View className="w-7 h-7 rounded-full bg-vanz-teal/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                 <View className="w-2.5 h-2.5 rounded-full bg-vanz-teal" />
               </View>
               <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                <Text className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-1">
-                  {locale === 'ar' ? 'نقطة الانطلاق' : 'Départ'}
+                <Text className="text-content-muted font-bold text-xs uppercase tracking-wider mb-1">
+                  {t('jobSheet.departure')}
                 </Text>
-                <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
+                <Text className={`text-content font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
                   {job.pickup_address}
                 </Text>
               </View>
-            </View>
+            </Row>
 
-            <View className={`flex-row items-start ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <Row className="items-start">
               <View className="w-7 h-7 rounded-xl bg-vanz-yellow/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                 <View className="w-2.5 h-2.5 rounded-sm bg-vanz-yellow" />
               </View>
               <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                <Text className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-1">
-                  {locale === 'ar' ? 'نقطة الوصول' : 'Arrivée'}
+                <Text className="text-content-muted font-bold text-xs uppercase tracking-wider mb-1">
+                  {t('jobSheet.arrival')}
                 </Text>
-                <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
+                <Text className={`text-content font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
                   {job.dropoff_address}
                 </Text>
               </View>
-            </View>
+            </Row>
           </View>
 
           {job.description ? (
@@ -159,21 +168,21 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
           ) : null}
 
           {/* Bidding Section */}
-          <Text className={`text-vanz-navy font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
-            {(locale === 'ar' ? 'اقتراح سعر' : 'Proposer un prix') + ` (${t('common.currency')})`}
+          <Text className={`text-content font-extrabold text-sm mb-3 ${isRtl ? 'text-right' : ''}`}>
+            {t('jobSheet.proposePrice') + ` (${t('common.currency')})`}
           </Text>
           
-          <View className={`flex-row items-center mb-5 gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <TouchableOpacity 
+          <Row className="items-center mb-5 gap-3">
+            <TouchableOpacity
               onPress={() => adjustBid(-5)}
-              className="w-14 h-14 bg-gray-50 rounded-2xl items-center justify-center border border-gray-200 active:bg-gray-100"
+              className="w-14 h-14 bg-surface-sunken rounded-2xl items-center justify-center border border-line-strong active:bg-surface-sunken"
             >
-              <Text className="text-vanz-navy text-2xl font-medium">-</Text>
+              <Text className="text-content text-2xl font-medium">-</Text>
             </TouchableOpacity>
             
             <View className="flex-1 relative">
               <TextInput
-                className="bg-white border-2 border-vanz-teal text-vanz-navy font-black text-2xl text-center h-14 rounded-2xl shadow-glow-teal"
+                className="bg-surface-elevated border-2 border-vanz-teal text-content font-black text-2xl text-center h-14 rounded-2xl shadow-glow-teal"
                 keyboardType="numeric"
                 value={bidAmount}
                 onChangeText={setBidAmount}
@@ -185,16 +194,16 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
 
             <TouchableOpacity 
               onPress={() => adjustBid(5)}
-              className="w-14 h-14 bg-gray-50 rounded-2xl items-center justify-center border border-gray-200 active:bg-gray-100"
+              className="w-14 h-14 bg-surface-sunken rounded-2xl items-center justify-center border border-line-strong active:bg-surface-sunken"
             >
-              <Text className="text-vanz-navy text-2xl font-medium">+</Text>
+              <Text className="text-content text-2xl font-medium">+</Text>
             </TouchableOpacity>
-          </View>
+          </Row>
 
           <TextInput
-            className={`bg-white border-2 border-gray-100 rounded-2xl p-4 text-vanz-navy text-sm shadow-sm mb-6 ${isRtl ? 'text-right' : ''}`}
-            placeholder={locale === 'ar' ? 'ملاحظة للعميل (اختياري)...' : 'Un mot pour le client (optionnel)...'}
-            placeholderTextColor="#9CA3AF"
+            className={`bg-surface-elevated border-2 border-line rounded-2xl p-4 text-content text-sm shadow-sm mb-6 ${isRtl ? 'text-right' : ''}`}
+            placeholder={t('jobSheet.notePlaceholder')}
+            placeholderTextColor={colors.placeholder}
             value={note}
             onChangeText={setNote}
           />
@@ -205,7 +214,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
             className="w-full h-16 rounded-2xl overflow-hidden shadow-elevated active:opacity-90 mt-auto"
           >
             <LinearGradient
-              colors={isSubmitting || !bidAmount ? ['#1A244480', '#0B102180'] : ['#1A2444', '#0B1021']}
+              colors={isSubmitting || !bidAmount ? ['#1A244480', '#0B102180'] : [colors.navyMid, colors.navy]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="w-full h-full items-center justify-center flex-row"
@@ -214,8 +223,8 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
                 <Text className="text-white text-xl font-extrabold opacity-70">{t('common.loading')}</Text>
               ) : (
                 <>
-                  <Text className="text-white text-xl font-extrabold">{locale === 'ar' ? 'إرسال العرض' : 'Envoyer l\'offre'}</Text>
-                  <Text className="text-white text-xl ml-2">🚀</Text>
+                  <Text className="text-white text-xl font-extrabold mr-2">{t('driver.sendOffer')}</Text>
+                  <Rocket size={20} color={colors.white} strokeWidth={2.2} />
                 </>
               )}
             </LinearGradient>

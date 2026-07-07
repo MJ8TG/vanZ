@@ -9,7 +9,7 @@ export default function DriverMessagesScreen() {
   const { t } = useI18n();
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader title={t('chat.messages')} tall />
       <ConversationsListView onSelect={(conv) => router.push(`/(driver)/chat/${conv.id}`)} />
     </View>

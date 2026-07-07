@@ -1,3 +1,5 @@
+import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { datasql } from '@/lib/supabase';
@@ -7,8 +9,36 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import PressableCard from '@/components/ui/PressableCard';
+import Row from '@/components/ui/Row';
+import { useDirection } from '@/hooks/useDirection';
+import {
+  Wallet, Bell, MapPin, Gift, Lock, Globe, Truck, LogOut, ChevronRight, ChevronLeft,
+  type LucideIcon,
+} from 'lucide-react-native';
+
+function ProfileRow({ Icon, label, onPress, delay, isRtl }: {
+  Icon: LucideIcon; label: string; onPress: () => void; delay: number; isRtl: boolean;
+}) {
+  const Chevron = isRtl ? ChevronLeft : ChevronRight;
+  return (
+    <Animated.View entering={FadeInDown.delay(delay).springify()}>
+      <PressableCard onPress={onPress} className="p-4 rounded-2xl">
+        <Row className="items-center justify-between">
+          <Row className="items-center">
+            <View className="w-10 h-10 bg-surface-sunken rounded-xl items-center justify-center mx-4">
+              <Icon size={18} color={colors.muted} strokeWidth={2.4} />
+            </View>
+            <Text className="text-content text-base font-extrabold">{label}</Text>
+          </Row>
+          <Chevron size={18} color={colors.slate} strokeWidth={2.4} />
+        </Row>
+      </PressableCard>
+    </Animated.View>
+  );
+}
 
 export default function ClientProfileScreen() {
+  const c = useThemeColors();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { session, logout } = useAuthStore();
@@ -17,9 +47,9 @@ export default function ClientProfileScreen() {
   const handleLogout = () => {
     Alert.alert(
       t('client.logout'), 
-      locale === 'ar' ? 'هل أنت متأكد أنك تريد تسجيل الخروج؟' : 'Êtes-vous sûr de vouloir vous déconnecter ?', 
+      t('profile.logoutConfirm'), 
       [
-        { text: locale === 'ar' ? 'إلغاء' : 'Annuler', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('client.logout'),
           style: 'destructive',
@@ -34,16 +64,16 @@ export default function ClientProfileScreen() {
   };
 
   const userPhone = session?.user?.phone || '+216 XX XXX XXX';
-  const userName = session?.user?.user_metadata?.full_name || (locale === 'ar' ? 'عميل' : 'Client');
+  const userName = session?.user?.user_metadata?.full_name || t('profile.fallbackClient');
   const initial = userName[0]?.toUpperCase() || 'C';
 
   const isRtl = locale === 'ar';
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       {/* Profile Header */}
       <LinearGradient
-        colors={['#0B1021', '#131B36', '#1A2444']}
+        colors={[colors.navy, colors.navyLight, colors.navyMid]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         className="pb-12 px-6 items-center rounded-b-[40px] shadow-glow-teal relative z-10"
@@ -66,129 +96,59 @@ export default function ClientProfileScreen() {
       {/* Profile Options List */}
       <ScrollView className="flex-1 px-5 pt-8" contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         <View className="gap-4">
-          <Animated.View entering={FadeInDown.delay(140).springify()}>
-            <PressableCard
-              onPress={() => router.push('/(client)/wallet' as Href)}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">💰</Text>
-                </View>
-                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'محفظتي' : 'Portefeuille'}</Text>
-              </View>
-              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
-            </PressableCard>
-          </Animated.View>
+          <ProfileRow Icon={Wallet} label={t('profile.wallet')} onPress={() => router.push('/(client)/wallet' as Href)} delay={140} isRtl={isRtl} />
+          <ProfileRow Icon={Bell} label={t('profile.notifications')} onPress={() => router.push('/(client)/notifications' as Href)} delay={150} isRtl={isRtl} />
+          <ProfileRow Icon={MapPin} label={t('profile.myAddresses')} onPress={() => router.push('/(client)/addresses' as Href)} delay={180} isRtl={isRtl} />
+          <ProfileRow Icon={Gift} label={t('profile.referral')} onPress={() => router.push('/(client)/referral' as Href)} delay={190} isRtl={isRtl} />
+          <ProfileRow Icon={Lock} label={t('client.accountSettings')} onPress={() => router.push('/(client)/settings' as Href)} delay={200} isRtl={isRtl} />
 
-          <Animated.View entering={FadeInDown.delay(150).springify()}>
-            <PressableCard
-              onPress={() => router.push('/(client)/notifications' as Href)}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">🔔</Text>
-                </View>
-                <Text className="text-vanz-navy text-base font-extrabold">
-                  {locale === 'ar' ? 'الإشعارات' : 'Notifications'}
-                </Text>
-              </View>
-              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
-            </PressableCard>
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(180).springify()}>
-            <PressableCard
-              onPress={() => router.push('/(client)/addresses' as Href)}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">📍</Text>
-                </View>
-                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'عناويني' : 'Mes adresses'}</Text>
-              </View>
-              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
-            </PressableCard>
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(190).springify()}>
-            <PressableCard
-              onPress={() => router.push('/(client)/referral' as Href)}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">🎁</Text>
-                </View>
-                <Text className="text-vanz-navy text-base font-extrabold">{locale === 'ar' ? 'الإحالة' : 'Parrainage'}</Text>
-              </View>
-              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
-            </PressableCard>
-          </Animated.View>
-
-          <Animated.View entering={FadeInDown.delay(200).springify()}>
-            <PressableCard
-              onPress={() => router.push('/(client)/settings' as Href)}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">🔐</Text>
-                </View>
-                <Text className="text-vanz-navy text-base font-extrabold">{t('client.accountSettings')}</Text>
-              </View>
-              <Text className="text-gray-300 font-bold text-lg">{isRtl ? '←' : '→'}</Text>
-            </PressableCard>
-          </Animated.View>
-          
           <Animated.View entering={FadeInDown.delay(300).springify()}>
-            <PressableCard 
+            <PressableCard
               onPress={() => setLocale(locale === 'fr' ? 'ar' : 'fr')}
-              className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+              className="p-4 rounded-2xl"
             >
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <View className="w-10 h-10 bg-gray-50 rounded-xl items-center justify-center mr-4 ml-4">
-                  <Text className="text-lg">🌐</Text>
+              <Row className="items-center justify-between">
+                <Row className="items-center">
+                  <View className="w-10 h-10 bg-surface-sunken rounded-xl items-center justify-center mx-4">
+                    <Globe size={18} color={colors.muted} strokeWidth={2.4} />
+                  </View>
+                  <Text className="text-content text-base font-extrabold">{t('client.language')}</Text>
+                </Row>
+                <View className="bg-vanz-teal/10 px-3 py-1 rounded-lg">
+                  <Text className="text-vanz-teal font-black text-xs">
+                    {locale === 'fr' ? 'Français' : 'العربية'}
+                  </Text>
                 </View>
-                <Text className="text-vanz-navy text-base font-extrabold">{t('client.language')}</Text>
-              </View>
-              <View className="bg-vanz-teal/10 px-3 py-1 rounded-lg">
-                <Text className="text-vanz-teal font-black text-xs">
-                  {locale === 'fr' ? 'Français' : 'العربية'}
-                </Text>
-              </View>
+              </Row>
             </PressableCard>
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(400).springify()}>
-            <PressableCard 
-              onPress={() => {
-                useAuthStore.getState().setMode('driver');
-                router.replace('/(driver)');
-              }}
+            <PressableCard
+              onPress={() => router.push('/(client)/become-driver' as Href)}
               className="mt-4 p-[2px] rounded-2xl overflow-hidden"
             >
               <LinearGradient
-                colors={['#F5C800', '#D4AD00']}
+                colors={[colors.yellow, colors.yellowDark]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 className="absolute inset-0"
               />
-              <View className={`bg-white p-4 rounded-[14px] flex-row items-center justify-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-xl mr-3 ml-3">🔄</Text>
-                <Text className="text-vanz-navy font-black text-base">
-                  {t('client.switchDriver')}
+              <Row className="bg-surface-elevated p-4 rounded-[14px] items-center justify-center">
+                <Truck size={20} color={c.textPrimary} strokeWidth={2.4} />
+                <Text className="text-content font-black text-base mx-3">
+                  {t('client.becomeDriver')}
                 </Text>
-              </View>
+              </Row>
             </PressableCard>
           </Animated.View>
 
           <Animated.View entering={FadeInDown.delay(500).springify()}>
-            <TouchableOpacity onPress={handleLogout} className="mt-8 p-4 items-center flex-row justify-center bg-red-50 rounded-2xl border border-red-100 active:bg-red-100">
-              <Text className="text-red-500 text-lg mr-2">🚪</Text>
-              <Text className="text-red-500 font-extrabold text-base">{t('client.logout')}</Text>
+            <TouchableOpacity onPress={handleLogout}>
+              <Row className="mt-8 p-4 items-center justify-center bg-red-50 rounded-2xl border border-red-100 active:bg-red-100">
+                <LogOut size={18} color="#EF4444" strokeWidth={2.4} />
+                <Text className="text-red-500 font-extrabold text-base mx-2">{t('client.logout')}</Text>
+              </Row>
             </TouchableOpacity>
           </Animated.View>
         </View>

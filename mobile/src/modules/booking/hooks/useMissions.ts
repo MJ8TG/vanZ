@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { qk } from '@/lib/queryKeys';
 import { BookingService } from '../services/bookingService';
 
 export function useMissions(userId: string | undefined, tab: 'active' | 'history') {
@@ -7,7 +8,7 @@ export function useMissions(userId: string | undefined, tab: 'active' | 'history
   const statuses = tab === 'active' ? activeStatuses : historyStatuses;
 
   return useQuery({
-    queryKey: ['missions', userId, tab],
+    queryKey: qk.missions(userId, tab),
     queryFn: () => BookingService.fetchClientMissions(userId!, statuses),
     enabled: !!userId,
   });

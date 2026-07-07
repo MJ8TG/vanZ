@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { qk } from '@/lib/queryKeys';
 import { DriverService } from '../services/driverService';
 
 export function useTrips(driverId: string | undefined, tab: 'active' | 'history') {
@@ -7,7 +8,7 @@ export function useTrips(driverId: string | undefined, tab: 'active' | 'history'
   const statuses = tab === 'active' ? activeStatuses : historyStatuses;
 
   return useQuery({
-    queryKey: ['trips', driverId, tab],
+    queryKey: qk.trips(driverId, tab),
     queryFn: () => DriverService.fetchDriverTrips(driverId!, statuses),
     enabled: !!driverId,
   });

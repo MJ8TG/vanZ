@@ -9,9 +9,9 @@ export default function ClientNotificationsScreen() {
   const { t, locale } = useI18n();
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader
-        title={locale === 'ar' ? 'الإشعارات' : 'Notifications'}
+        title={t('profile.notifications')}
         backButton={() => router.back()}
         tall
       />

@@ -1,35 +1,25 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, Alert, RefreshControl, Platform } from 'react-native';
-import { useState, useEffect, useCallback } from 'react';
-import { datasql } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import Row from '@/components/ui/Row';
+import { useDriverWallet } from '@/modules/wallet/hooks/useDriverWallet';
+import { WalletService, type DriverWalletTx } from '@/modules/wallet/services/walletService';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-
-type Transaction = {
-  id: string;
-  amount: number;
-  type: 'earning' | 'refund' | 'penalty' | 'withdrawal';
-  created_at: string;
-};
-
-type Withdrawal = {
-  id: string;
-  amount: number;
-  status: string;
-  created_at: string;
-};
+import { TrendingUp, Undo2, AlertTriangle, Banknote, CreditCard, Clock, Inbox, type LucideIcon } from 'lucide-react-native';
 
 export default function WalletScreen() {
   const { session } = useAuthStore();
   const { t, locale } = useI18n();
-  const [balance, setBalance] = useState(0);
-  const [pendingDebt, setPendingDebt] = useState(0);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [pendingWithdrawals, setPendingWithdrawals] = useState<Withdrawal[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const { data, isRefetching, refetch } = useDriverWallet(session?.user?.id);
+  const balance = data?.balance ?? 0;
+  const pendingDebt = data?.pendingDebt ?? 0;
+  const transactions = data?.transactions ?? [];
+  const pendingWithdrawals = data?.pendingWithdrawals ?? [];
   const [requesting, setRequesting] = useState(false);
 
   const balanceScale = useSharedValue(0.5);
@@ -38,46 +28,9 @@ export default function WalletScreen() {
     transform: [{ scale: balanceScale.value }],
   }));
 
-  const fetchWallet = useCallback(async () => {
-    if (!session?.user?.id) return;
-    try {
-      const userId = session.user.id;
-
-      const [{ data: profile }, { data: txs }, { data: withdrawals }] = await Promise.all([
-        datasql
-          .from('users')
-          .select('credit_balance, pending_commission_debt')
-          .eq('id', userId)
-          .single(),
-        datasql
-          .from('wallet_transactions')
-          .select('id, amount, type, created_at')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(50),
-        datasql
-          .from('withdrawals')
-          .select('id, amount, status, created_at')
-          .eq('driver_id', userId)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false }),
-      ]);
-
-      setBalance(Number(profile?.credit_balance || 0));
-      setPendingDebt(Number(profile?.pending_commission_debt || 0));
-      setTransactions((txs || []) as Transaction[]);
-      setPendingWithdrawals((withdrawals || []) as Withdrawal[]);
-    } catch (e) {
-      console.error('Failed to fetch wallet:', e);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [session?.user?.id]);
-
   useEffect(() => {
-    fetchWallet();
     balanceScale.value = withSpring(1, { damping: 12, stiffness: 100 });
-  }, [fetchWallet]);
+  }, []);
 
   const availableBalance = Math.max(0, balance - pendingDebt);
   const hasPendingWithdrawal = pendingWithdrawals.length > 0;
@@ -122,15 +75,9 @@ export default function WalletScreen() {
 
     setRequesting(true);
     try {
-      const { error } = await datasql.from('withdrawals').insert({
-        driver_id: session.user.id,
-        amount,
-        status: 'pending',
-      });
-      if (error) throw error;
-
+      await WalletService.requestWithdrawal(session.user.id, amount);
       Alert.alert('✓', t('wallet.withdrawSuccess'));
-      fetchWallet();
+      refetch();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       Alert.alert(t('common.error'), message);
@@ -141,15 +88,15 @@ export default function WalletScreen() {
 
   const isRtl = locale === 'ar';
 
-  const txMeta: Record<Transaction['type'], { label: string; icon: string; positive: boolean }> = {
-    earning: { label: t('wallet.earning'), icon: '📈', positive: true },
-    refund: { label: t('wallet.refund'), icon: '↩️', positive: true },
-    penalty: { label: t('wallet.penalty'), icon: '⚠️', positive: false },
-    withdrawal: { label: t('wallet.withdrawal'), icon: '💸', positive: false },
+  const txMeta: Record<DriverWalletTx['type'], { label: string; Icon: LucideIcon; positive: boolean }> = {
+    earning: { label: t('wallet.earning'), Icon: TrendingUp, positive: true },
+    refund: { label: t('wallet.refund'), Icon: Undo2, positive: true },
+    penalty: { label: t('wallet.penalty'), Icon: AlertTriangle, positive: false },
+    withdrawal: { label: t('wallet.withdrawal'), Icon: Banknote, positive: false },
   };
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader title={t('driver.wallet')} tall />
 
       <ScrollView
@@ -157,12 +104,9 @@ export default function WalletScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              fetchWallet();
-            }}
-            tintColor="#38B6FF"
+            refreshing={isRefetching}
+            onRefresh={() => refetch()}
+            tintColor={colors.teal}
           />
         }
       >
@@ -170,13 +114,13 @@ export default function WalletScreen() {
         <Animated.View entering={FadeInDown.delay(100).springify()}>
           <View className="rounded-[28px] overflow-hidden shadow-elevated mb-6">
             <LinearGradient
-              colors={['#0B1021', '#131B36', '#1A2444']}
+              colors={[colors.navy, colors.navyLight, colors.navyMid]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               className="p-7"
             >
               {/* Watermark icon like the Stitch design */}
-              <Text className="absolute right-4 top-4 text-7xl opacity-10">💳</Text>
+              <View className="absolute right-4 top-4 opacity-10"><CreditCard size={84} color={colors.white} strokeWidth={1.5} /></View>
 
               <Text className="text-vanz-teal font-bold text-xs uppercase tracking-[2px] mb-3">
                 {t('wallet.available')}
@@ -208,7 +152,7 @@ export default function WalletScreen() {
               >
                 <Text
                   className={`font-black text-base tracking-wide uppercase ${
-                    availableBalance > 0 && !hasPendingWithdrawal ? 'text-vanz-navy' : 'text-white'
+                    availableBalance > 0 && !hasPendingWithdrawal ? 'text-content' : 'text-white'
                   }`}
                 >
                   {hasPendingWithdrawal ? t('wallet.withdrawPending') : t('driver.withdraw')}
@@ -221,20 +165,20 @@ export default function WalletScreen() {
         {/* Pending withdrawals */}
         {pendingWithdrawals.map((w) => (
           <Animated.View key={w.id} entering={FadeInDown.delay(200).springify()}>
-            <View className={`bg-vanz-yellow/10 border border-vanz-yellow/30 p-4 rounded-2xl mb-6 flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-              <View className={`flex-row items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-xl mr-3 ml-3">⏳</Text>
-                <Text className="text-vanz-navy font-extrabold text-sm">{t('wallet.withdrawPending')}</Text>
-              </View>
-              <Text className="text-vanz-navy font-black text-base">
+            <Row className="bg-vanz-yellow/10 border border-vanz-yellow/30 p-4 rounded-2xl mb-6 items-center justify-between">
+              <Row className="items-center">
+                <View className="mr-3 ml-3"><Clock size={20} color={colors.yellowDark} strokeWidth={2.4} /></View>
+                <Text className="text-content font-extrabold text-sm">{t('wallet.withdrawPending')}</Text>
+              </Row>
+              <Text className="text-content font-black text-base">
                 {Number(w.amount).toFixed(2)} {t('common.currency')}
               </Text>
-            </View>
+            </Row>
           </Animated.View>
         ))}
 
         {/* Transactions List */}
-        <Animated.Text entering={FadeInDown.delay(300)} className={`text-vanz-navy font-black text-xl mb-4 ${isRtl ? 'text-right' : ''}`}>
+        <Animated.Text entering={FadeInDown.delay(300)} className={`text-content font-black text-xl mb-4 ${isRtl ? 'text-right' : ''}`}>
           {t('driver.transactions')}
         </Animated.Text>
 
@@ -242,30 +186,33 @@ export default function WalletScreen() {
           {transactions.map((tx, index) => {
             const meta = txMeta[tx.type] || txMeta.earning;
             const positive = meta.positive && Number(tx.amount) >= 0;
+            const MIcon = meta.Icon;
             return (
               <Animated.View key={tx.id} entering={FadeInDown.delay(300 + index * 50).springify()}>
-                <PressableCard className={`p-4 rounded-2xl flex-row items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <View className={`flex-row items-center flex-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <PressableCard className="p-4 rounded-2xl">
+                  <Row className="items-center justify-between">
+                  <Row className="items-center flex-1">
                     <View className={`w-12 h-12 rounded-xl items-center justify-center mr-4 ml-4 ${positive ? 'bg-vanz-green/10' : 'bg-red-50'}`}>
-                      <Text className="text-xl">{meta.icon}</Text>
+                      <MIcon size={20} color={positive ? colors.green : '#EF4444'} strokeWidth={2.2} />
                     </View>
                     <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
-                      <Text className={`text-vanz-navy font-bold text-base ${isRtl ? 'text-right' : ''}`}>
+                      <Text className={`text-content font-bold text-base ${isRtl ? 'text-right' : ''}`}>
                         {meta.label}
                       </Text>
-                      <Text className={`text-gray-400 font-semibold text-xs mt-0.5 ${isRtl ? 'text-right' : ''}`}>
+                      <Text className={`text-content-muted font-semibold text-xs mt-0.5 ${isRtl ? 'text-right' : ''}`}>
                         {new Date(tx.created_at).toLocaleDateString(isRtl ? 'ar-TN' : 'fr-FR', {
                           day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
                         })}
                       </Text>
                     </View>
-                  </View>
+                  </Row>
                   <View className="items-end">
                     <Text className={`font-black text-lg ${positive ? 'text-vanz-green' : 'text-red-500'}`}>
                       {positive ? '+' : '-'}{Math.abs(Number(tx.amount)).toFixed(2)}
                     </Text>
-                    <Text className="text-gray-400 font-bold text-xs uppercase">{t('common.currency')}</Text>
+                    <Text className="text-content-muted font-bold text-xs uppercase">{t('common.currency')}</Text>
                   </View>
+                  </Row>
                 </PressableCard>
               </Animated.View>
             );
@@ -273,8 +220,8 @@ export default function WalletScreen() {
 
           {transactions.length === 0 && (
             <View className="items-center justify-center py-12">
-              <Text className="text-4xl mb-4">📭</Text>
-              <Text className="text-vanz-navy/50 font-medium text-center">{t('driver.noTransactions')}</Text>
+              <View className="mb-4"><Inbox size={40} color={colors.slate} strokeWidth={1.8} /></View>
+              <Text className="text-content-secondary font-medium text-center">{t('driver.noTransactions')}</Text>
             </View>
           )}
         </View>

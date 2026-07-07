@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
@@ -9,6 +10,9 @@ import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import Row from '@/components/ui/Row';
+import { Play, CheckCircle, Route } from 'lucide-react-native';
+import SosButton from '@/components/ui/SosButton';
 import DriverStatsHeader from '@/components/driver/DriverStatsHeader';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -65,33 +69,29 @@ export default function DriverTripsScreen() {
 
   const handleStartTrip = (jobId: string) => {
     Alert.alert(
-      locale === 'ar' ? 'بدء الرحلة' : 'Démarrer le trajet',
-      locale === 'ar' ? 'هل أنت متأكد من بدء هذه الرحلة؟' : 'Êtes-vous sûr de vouloir démarrer ce trajet ?',
+      t('trips.startTitle'),
+      t('trips.startBody'),
       [
-        { text: locale === 'ar' ? 'إلغاء' : 'Annuler', style: 'cancel' },
-        { text: locale === 'ar' ? 'بدء' : 'Démarrer', onPress: () => updateJobStatus(jobId, 'in_progress') }
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('trips.start'), onPress: () => updateJobStatus(jobId, 'in_progress') }
       ]
     );
   };
 
   const handleCompleteTrip = (jobId: string) => {
     Alert.alert(
-      locale === 'ar' ? 'إنهاء الرحلة' : 'Terminer le trajet',
-      locale === 'ar' 
-        ? 'لإنهاء الرحلة، يرجى التقاط صورة لإثبات التسليم.' 
-        : 'Pour terminer le trajet, veuillez prendre une photo de preuve de livraison.',
+      t('trips.completeTitle'),
+      t('trips.completeBody'),
       [
-        { text: locale === 'ar' ? 'إلغاء' : 'Annuler', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: locale === 'ar' ? 'التقاط صورة' : 'Prendre photo',
+          text: t('trips.takePhoto'),
           onPress: async () => {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             if (status !== 'granted') {
               Alert.alert(
-                locale === 'ar' ? 'الصلاحية مطلوبة' : 'Permission requise',
-                locale === 'ar' 
-                  ? 'يرجى السماح بالوصول إلى الكاميرا لالتقاط إثبات التسليم.' 
-                  : 'Veuillez autoriser l\'accès à la caméra pour capturer la preuve.'
+                t('driverForm.permTitle'),
+                t('trips.permCameraProof')
               );
               return;
             }
@@ -140,8 +140,8 @@ export default function DriverTripsScreen() {
               }
 
               Alert.alert(
-                locale === 'ar' ? 'أحسنت!' : 'Bravo !',
-                locale === 'ar' ? 'تم إنهاء الرحلة بنجاح.' : 'Course terminée avec succès.'
+                t('trips.doneTitle'),
+                t('trips.doneBody')
               );
               refetch();
             } catch (e: any) {
@@ -158,12 +158,12 @@ export default function DriverTripsScreen() {
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { bg: string; text: string; label: string }> = {
-      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: locale === 'ar' ? 'معين' : 'Attribuée' },
-      in_progress: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: locale === 'ar' ? 'قيد التنفيذ' : 'En cours' },
-      completed: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: locale === 'ar' ? 'مكتملة' : 'Terminée' },
-      cancelled: { bg: 'bg-gray-100', text: 'text-gray-400', label: locale === 'ar' ? 'ملغاة' : 'Annulée' },
+      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: t('trips.statusMatched') },
+      in_progress: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('trips.statusInProgress') },
+      completed: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('trips.statusCompleted') },
+      cancelled: { bg: 'bg-surface-sunken', text: 'text-content-muted', label: t('trips.statusCancelled') },
     };
-    return badges[status] || { bg: 'bg-gray-100', text: 'text-gray-500', label: status };
+    return badges[status] || { bg: 'bg-surface-sunken', text: 'text-content-secondary', label: status };
   };
 
   const getProgressPercentage = (status: string) => {
@@ -177,7 +177,7 @@ export default function DriverTripsScreen() {
 
   const renderTrip = ({ item, index }: { item: MobileJob, index: number }) => {
     const badge = getStatusBadge(item.status);
-    const title = item.service_type === 'parcel' ? (locale === 'ar' ? 'شحنة' : 'Colis') : (item.service_type || 'Mission');
+    const title = item.service_type === 'parcel' ? t('common.parcel') : (item.service_type || 'Mission');
     const progress = getProgressPercentage(item.status);
 
     return (
@@ -185,7 +185,7 @@ export default function DriverTripsScreen() {
         <PressableCard className="mb-5 overflow-hidden">
           {/* Progress Bar Top */}
           {tab === 'active' && (
-            <View className="w-full h-1.5 bg-gray-100">
+            <View className="w-full h-1.5 bg-surface-sunken">
               <View 
                 className={`h-full ${item.status === 'in_progress' ? 'bg-vanz-yellow shadow-glow-yellow' : 'bg-vanz-teal shadow-glow-teal'}`} 
                 style={{ width: `${progress}%` }} 
@@ -194,55 +194,55 @@ export default function DriverTripsScreen() {
           )}
 
           <View className="p-5">
-            <View className={`flex-row justify-between items-start mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-              <Text className={`text-vanz-navy font-black text-lg flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
+            <Row className="justify-between items-start mb-4">
+              <Text className={`text-content font-black text-lg flex-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
                 {title}
               </Text>
               <View className={`${badge.bg} px-3 py-1 rounded-full ml-2 mr-2 border border-${badge.text.split('-')[1]}/10`}>
                 <Text className={`${badge.text} font-bold text-[10px] uppercase tracking-wider`}>{badge.label}</Text>
               </View>
-            </View>
+            </Row>
 
-            <View className="bg-gray-50/80 p-4 rounded-2xl border border-gray-100 mb-5 relative">
-              <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-gray-200 ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
-              
-              <View className={`flex-row items-start mb-3.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <View className="bg-surface-sunken/80 p-4 rounded-2xl border border-line mb-5 relative">
+              <View className={`absolute top-8 bottom-8 w-px border-l-2 border-dashed border-line-strong ${isRtl ? 'right-[29px]' : 'left-[29px]'}`} />
+
+              <Row className="items-start mb-3.5">
                 <View className="w-7 h-7 rounded-full bg-vanz-teal/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                   <View className="w-2.5 h-2.5 rounded-full bg-vanz-teal" />
                 </View>
-                <Text className={`text-vanz-navy font-bold text-sm flex-1 mt-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={2}>
+                <Text className={`text-content font-bold text-sm flex-1 mt-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={2}>
                   {item.pickup_address}
                 </Text>
-              </View>
-              
-              <View className={`flex-row items-start ${isRtl ? 'flex-row-reverse' : ''}`}>
+              </Row>
+
+              <Row className="items-start">
                 <View className="w-7 h-7 rounded-xl bg-vanz-yellow/20 items-center justify-center mr-3 ml-3 relative z-10 border-2 border-white">
                   <View className="w-2.5 h-2.5 rounded-sm bg-vanz-yellow" />
                 </View>
-                <Text className={`text-vanz-navy font-bold text-sm flex-1 mt-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={2}>
+                <Text className={`text-content font-bold text-sm flex-1 mt-1 ${isRtl ? 'text-right' : ''}`} numberOfLines={2}>
                   {item.dropoff_address}
                 </Text>
-              </View>
+              </Row>
             </View>
 
-            <View className={`flex-row justify-between items-center mb-5 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <Row className="justify-between items-center mb-5">
               <View>
-                <Text className={`text-gray-400 font-bold text-xs uppercase tracking-wider mb-1 ${isRtl ? 'text-right' : ''}`}>
-                  {locale === 'ar' ? 'السعر' : 'Tarif'}
+                <Text className={`text-content-muted font-bold text-xs uppercase tracking-wider mb-1 ${isRtl ? 'text-right' : ''}`}>
+                  {t('trips.price')}
                 </Text>
-                <Text className="text-vanz-navy font-black text-xl">
+                <Text className="text-content font-black text-xl">
                   {item.accepted_bid_amount} {t('common.currency')}
                 </Text>
               </View>
               <View>
-                <Text className={`text-gray-400 font-bold text-xs uppercase tracking-wider mb-1 ${isRtl ? 'text-right' : ''}`}>
-                  {locale === 'ar' ? 'التاريخ' : 'Date'}
+                <Text className={`text-content-muted font-bold text-xs uppercase tracking-wider mb-1 ${isRtl ? 'text-right' : ''}`}>
+                  {t('trips.date')}
                 </Text>
-                <Text className={`text-vanz-navy font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
+                <Text className={`text-content font-bold text-sm ${isRtl ? 'text-right' : ''}`}>
                   {new Date(item.scheduled_at || new Date().toISOString()).toLocaleDateString()}
                 </Text>
               </View>
-            </View>
+            </Row>
 
             {item.status === 'matched' && (
               <TouchableOpacity 
@@ -250,36 +250,39 @@ export default function DriverTripsScreen() {
                 className="w-full h-14 rounded-xl overflow-hidden shadow-glow-yellow active:opacity-90"
               >
                 <LinearGradient
-                  colors={['#F5C800', '#D4AD00']}
+                  colors={[colors.yellow, colors.yellowDark]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   className="w-full h-full items-center justify-center flex-row"
                 >
-                  <Text className="text-white text-base mr-2 ml-2">▶️</Text>
-                  <Text className="text-white font-black uppercase tracking-wide">
-                    {locale === 'ar' ? 'بدء الرحلة' : 'Démarrer le trajet'}
+                  <Play size={18} color={colors.white} fill={colors.white} strokeWidth={2} />
+                  <Text className="text-white font-black uppercase tracking-wide ml-2">
+                    {t('trips.startTitle')}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
             )}
 
             {item.status === 'in_progress' && (
-              <TouchableOpacity 
-                onPress={() => handleCompleteTrip(item.id)}
-                className="w-full h-14 rounded-xl overflow-hidden shadow-glow-green active:opacity-90"
-              >
-                <LinearGradient
-                  colors={['#22C55E', '#16A34A']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className="w-full h-full items-center justify-center flex-row"
+              <Row className="items-center gap-2">
+                <SosButton jobId={item.id} variant="floating" className="h-14 px-4" />
+                <TouchableOpacity
+                  onPress={() => handleCompleteTrip(item.id)}
+                  className="flex-1 h-14 rounded-xl overflow-hidden shadow-glow-green active:opacity-90"
                 >
-                  <Text className="text-white text-base mr-2 ml-2">✅</Text>
-                  <Text className="text-white font-black uppercase tracking-wide">
-                    {locale === 'ar' ? 'إنهاء الرحلة' : 'Terminer le trajet'}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                  <LinearGradient
+                    colors={[colors.green, colors.greenDark]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    className="w-full h-full items-center justify-center flex-row"
+                  >
+                    <CheckCircle size={18} color={colors.white} strokeWidth={2.4} />
+                    <Text className="text-white font-black uppercase tracking-wide ml-2">
+                      {t('trips.completeTitle')}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Row>
             )}
           </View>
         </PressableCard>
@@ -288,34 +291,34 @@ export default function DriverTripsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       {uploading && (
         <View className="absolute inset-0 bg-black/60 justify-center items-center z-50">
-          <ActivityIndicator size="large" color="#38B6FF" />
+          <ActivityIndicator size="large" color={colors.teal} />
           <Text className="text-white font-bold mt-4">Téléversement de la preuve...</Text>
         </View>
       )}
       <GradientHeader title={t('driver.trips')} tall>
 
         {/* Segmented Control */}
-        <View className={`flex-row bg-white/10 p-1.5 rounded-2xl mt-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-          <TouchableOpacity 
+        <Row className="bg-white/10 p-1.5 rounded-2xl mt-4">
+          <TouchableOpacity
             onPress={() => setTab('active')}
-            className={`flex-1 py-3 items-center rounded-xl ${tab === 'active' ? 'bg-vanz-navy/50 border border-white/10 shadow-sm' : ''}`}
+            className={`flex-1 py-3 items-center rounded-xl ${tab === 'active' ? 'bg-inverted/50 border border-white/10 shadow-sm' : ''}`}
           >
             <Text className={`font-extrabold text-sm ${tab === 'active' ? 'text-vanz-yellow' : 'text-white/60'}`}>
-              {locale === 'ar' ? 'النشطة' : 'En cours'}
+              {t('trips.tabActive')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity 
             onPress={() => setTab('history')}
-            className={`flex-1 py-3 items-center rounded-xl ${tab === 'history' ? 'bg-vanz-navy/50 border border-white/10 shadow-sm' : ''}`}
+            className={`flex-1 py-3 items-center rounded-xl ${tab === 'history' ? 'bg-inverted/50 border border-white/10 shadow-sm' : ''}`}
           >
             <Text className={`font-extrabold text-sm ${tab === 'history' ? 'text-vanz-yellow' : 'text-white/60'}`}>
-              {locale === 'ar' ? 'السجل' : 'Historique'}
+              {t('trips.tabHistory')}
             </Text>
           </TouchableOpacity>
-        </View>
+        </Row>
       </GradientHeader>
 
       <View className="flex-1 px-5 pt-5 pb-24">
@@ -335,13 +338,13 @@ export default function DriverTripsScreen() {
             ListHeaderComponent={tab === 'active' ? <DriverStatsHeader /> : null}
             ListEmptyComponent={() => (
               <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-20 mt-10">
-                <View className="w-32 h-32 bg-white rounded-full items-center justify-center shadow-card mb-6">
-                  <Text className="text-6xl">🛣️</Text>
+                <View className="w-32 h-32 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-6">
+                  <Route size={52} color={colors.slate} strokeWidth={1.6} />
                 </View>
-                <Text className="text-vanz-navy/40 text-center text-sm font-semibold leading-relaxed px-8">
+                <Text className="text-content-muted text-center text-sm font-semibold leading-relaxed px-8">
                   {tab === 'active' 
-                    ? (locale === 'ar' ? 'ليس لديك رحلات نشطة حالياً.' : 'Vous n\'avez aucun trajet en cours.') 
-                    : (locale === 'ar' ? 'سجل رحلاتك فارغ.' : 'Votre historique est vide.')}
+                    ? t('trips.emptyActive')
+                    : t('trips.emptyHistory')}
                 </Text>
               </Animated.View>
             )}

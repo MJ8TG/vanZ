@@ -6,10 +6,10 @@ import SettingsView from '@/components/settings/SettingsView';
 
 export default function ClientSettingsScreen() {
   const router = useRouter();
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   return (
-    <View className="flex-1 bg-vanz-iceblue">
-      <GradientHeader title={locale === 'ar' ? 'الإعدادات' : 'Paramètres'} backButton={() => router.back()} tall />
+    <View className="flex-1 bg-surface">
+      <GradientHeader title={t('settings.title')} backButton={() => router.back()} tall />
       <SettingsView helpHref="/(client)/help" />
     </View>
   );

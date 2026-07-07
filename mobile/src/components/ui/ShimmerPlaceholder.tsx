@@ -55,7 +55,7 @@ export default function ShimmerPlaceholder({
 /** Pre-built shimmer card for job/trip lists */
 export function ShimmerCard() {
   return (
-    <View className="bg-white p-5 rounded-card mb-4 border border-gray-100">
+    <View className="bg-surface-elevated p-5 rounded-card mb-4 border border-line">
       <View className="flex-row justify-between items-center mb-3.5">
         <ShimmerPlaceholder width={120} height={18} borderRadius={8} />
         <ShimmerPlaceholder width={70} height={24} borderRadius={12} />

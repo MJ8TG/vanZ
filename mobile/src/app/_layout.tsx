@@ -1,8 +1,12 @@
+import { colors } from '@/theme/colors';
 import '../global.css';
 
 import { useEffect, useState } from 'react';
-import { Stack, useRouter, useSegments, useRootNavigationState, type Href } from 'expo-router';
+import { Stack, useRouter, useSegments, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
+import { ThemedRoot } from '@/theme/ThemedRoot';
+import { useTheme } from '@/theme/useTheme';
 import * as Notifications from 'expo-notifications';
 import { Platform, View, Image, Text } from 'react-native';
 import { datasql } from '@/lib/supabase';
@@ -29,12 +33,22 @@ Notifications.setNotificationHandler({
   } as Notifications.NotificationBehavior),
 });
 
+/** Reads the user's role from the DB once, for the launch + auth-change handlers. */
+async function fetchUserRole(userId: string): Promise<'client' | 'driver' | null> {
+  try {
+    const { data, error } = await datasql.from('users').select('role').eq('id', userId).single();
+    if (!error && data?.role) return data.role as 'client' | 'driver';
+  } catch (e) {
+    console.error('Failed to fetch user role:', e);
+  }
+  return null;
+}
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const { session, setSession, mode, setMode } = useAuthStore();
   const { t } = useI18n();
   const segments = useSegments();
   const router = useRouter();
-  const navState = useRootNavigationState();
   const [isReady, setIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
 
@@ -52,19 +66,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsReady(true);
 
       if (session?.user) {
-        try {
-          const { data, error } = await datasql
-            .from('users')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-
-          if (!error && data?.role) {
-            setMode(data.role as 'client' | 'driver');
-          }
-        } catch (e) {
-          console.error('Failed to fetch user role on launch:', e);
-        }
+        const role = await fetchUserRole(session.user.id);
+        if (role) setMode(role);
       }
       setTimeout(() => setShowSplash(false), 500);
     }).catch((e) => {
@@ -77,19 +80,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = datasql.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        try {
-          const { data, error } = await datasql
-            .from('users')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-
-          if (!error && data?.role) {
-            setMode(data.role as 'client' | 'driver');
-          }
-        } catch (e) {
-          console.error('onAuthStateChange role fetch error:', e);
-        }
+        const role = await fetchUserRole(session.user.id);
+        if (role) setMode(role);
         // Register this device for push notifications (fire-and-forget).
         registerPushToken(session.user.id);
       } else {
@@ -105,32 +97,29 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isReady || showSplash) return;
-    if (!navState?.key) return;
 
-    const inAuthGroup = segments[0] === 'auth' || segments[0] === 'welcome' || segments[0] === 'mode-selector';
+    const seg0 = segments[0] as string | undefined;
+    const inPublic = seg0 === 'welcome' || seg0 === 'auth' || seg0 === 'mode-selector';
 
     if (!session) {
-      if (!inAuthGroup) {
-        // Redirect to welcome if not logged in and not in auth screens
-        router.replace('/welcome');
-      }
-    } else {
-      if (!mode) {
-        // Safety net: session exists but no role is known
-        if (segments[0] !== 'mode-selector' && segments[0] !== 'auth') {
-          router.replace('/mode-selector');
-        }
-      } else if (mode === 'driver') {
-        if (segments[0] !== '(driver)') {
-          router.replace('/(driver)');
-        }
-      } else if (mode === 'client') {
-        if (segments[0] !== '(client)') {
-          router.replace('/(client)');
-        }
-      }
+      if (!inPublic) router.replace('/welcome');
+      return;
     }
-  }, [session, mode, segments, isReady, showSplash, navState?.key]);
+
+    if (!mode) {
+      if (seg0 !== 'mode-selector') router.replace('/mode-selector');
+      return;
+    }
+
+    const targetGroup = mode === 'driver' ? '(driver)' : '(client)';
+    if (inPublic || (seg0 !== '(client)' && seg0 !== '(driver)' && !seg0)) {
+      router.replace(`/${targetGroup}` as any);
+      return;
+    }
+
+    if (mode === 'client' && seg0 === '(driver)') router.replace('/(client)');
+    if (mode === 'driver' && seg0 === '(client)') router.replace('/(driver)');
+  }, [session, mode, segments, isReady, showSplash]);
 
   // Deep-link: route the user to the relevant screen when they tap a push.
   useEffect(() => {
@@ -168,7 +157,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: '#0B1021',
+            backgroundColor: colors.navy,
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 99999,
@@ -183,7 +172,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
               alignItems: 'center',
               borderColor: 'rgba(255, 255, 255, 0.2)',
               borderWidth: 1,
-              shadowColor: '#38B6FF',
+              shadowColor: colors.teal,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.25,
               shadowRadius: 24,
@@ -222,6 +211,12 @@ export default function RootLayout() {
     'Plus Jakarta Sans ExtraBold': PlusJakartaSans_800ExtraBold,
   });
 
+  // Instantiate the theme store so its persisted preference rehydrates and is
+  // applied to NativeWind's color scheme (see useTheme.onRehydrateStorage).
+  // Must stay above the early font-loading return so hook order is stable.
+  const themeMode = useTheme((s) => s.mode);
+  const { colorScheme } = useColorScheme();
+
   useEffect(() => {
     async function requestPermissions() {
       if (Platform.OS !== 'web') {
@@ -237,26 +232,28 @@ export default function RootLayout() {
   // Hold on a navy screen (matching the splash) until fonts are ready, so text
   // doesn't flash in a fallback font. Don't block forever if loading errors.
   if (!fontsLoaded && !fontError) {
-    return <View style={{ flex: 1, backgroundColor: '#0B1021' }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.navy }} />;
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryProvider>
-        <AuthProvider>
-          <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="welcome" />
-            <Stack.Screen name="mode-selector" />
-            {/* Client & Driver Mode Stacks */}
-            <Stack.Screen name="(client)" />
-            <Stack.Screen name="(driver)" />
-            <Stack.Screen name="auth" />
-          </Stack>
-        </AuthProvider>
-        <OfflineBanner />
-      </QueryProvider>
+      <ThemedRoot>
+        <QueryProvider>
+          <AuthProvider>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} key={`${themeMode}-${colorScheme}`} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="welcome" />
+              <Stack.Screen name="mode-selector" />
+              {/* Client & Driver Mode Stacks */}
+              <Stack.Screen name="(client)" />
+              <Stack.Screen name="(driver)" />
+              <Stack.Screen name="auth" />
+            </Stack>
+          </AuthProvider>
+          <OfflineBanner />
+        </QueryProvider>
+      </ThemedRoot>
     </GestureHandlerRootView>
   );
 }

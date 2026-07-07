@@ -1,12 +1,15 @@
+import { colors } from '@/theme/colors';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { datasql } from '@/lib/supabase';
 import { useI18n } from '@/i18n';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock } from 'lucide-react-native';
+import { ForceLight } from '@/theme/ThemedRoot';
+import { Mail, Lock, AlertTriangle } from 'lucide-react-native';
 import PremiumInput from '@/components/ui/PremiumInput';
 import PremiumButton from '@/components/ui/PremiumButton';
+import Row from '@/components/ui/Row';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -45,9 +48,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <ForceLight>
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-vanz-iceblue"
+      className="flex-1 bg-surface"
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
@@ -56,13 +60,13 @@ export default function LoginScreen() {
       >
         {/* Top Gradient Wash */}
         <LinearGradient
-          colors={['#E4EDF3', '#F0F6FA', 'transparent']}
+          colors={[colors.iceblueDark, colors.iceblue, 'transparent']}
           className="absolute top-0 w-full h-64 z-0"
         />
 
         <View className="px-6 py-8 relative z-10">
           <View className="items-center mb-10">
-            <View className="bg-white p-4 rounded-3xl shadow-elevated mb-6">
+            <View className="bg-surface-elevated p-4 rounded-3xl shadow-elevated mb-6">
               <Image 
                 source={require('../../../assets/images/logo.png')}
                 accessibilityLabel="VanZ"
@@ -70,8 +74,8 @@ export default function LoginScreen() {
                 resizeMode="contain" 
               />
             </View>
-            <Text className="text-vanz-navy text-3xl font-black mb-2">{t('auth.loginTitle')}</Text>
-            <Text className="text-vanz-navy/60 text-base font-medium text-center">
+            <Text className="text-content text-3xl font-black mb-2">{t('auth.loginTitle')}</Text>
+            <Text className="text-content-secondary text-base font-medium text-center">
               {t('auth.loginSubtitle')}
             </Text>
           </View>
@@ -84,7 +88,7 @@ export default function LoginScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              icon={<Mail color="#9CA3AF" size={20} />}
+              icon={<Mail color={colors.placeholder} size={20} />}
             />
 
             <PremiumInput
@@ -93,14 +97,14 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              icon={<Lock color="#9CA3AF" size={20} />}
+              icon={<Lock color={colors.placeholder} size={20} />}
             />
 
             {error ? (
-              <View className={`bg-red-50 p-3 rounded-xl border border-red-100 flex-row items-center mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <Text className="text-red-500 mr-2 ml-2">⚠️</Text>
-                <Text className={`text-red-500 text-sm font-bold flex-1 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
-              </View>
+              <Row className="bg-red-50 p-3 rounded-xl border border-red-100 items-center mt-1">
+                <AlertTriangle size={16} color="#EF4444" strokeWidth={2.4} />
+                <Text className={`text-red-500 text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
+              </Row>
             ) : null}
           </View>
 
@@ -111,17 +115,18 @@ export default function LoginScreen() {
             onPress={handleLogin}
           />
 
-          <View className={`flex-row justify-between items-center mt-8 px-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <Row className="justify-between items-center mt-8 px-2">
             <TouchableOpacity onPress={() => router.replace('/auth/register')}>
-              <Text className="text-vanz-navy/70 font-bold">{t('auth.createAccount')}</Text>
+              <Text className="text-content-secondary font-bold">{t('auth.createAccount')}</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity onPress={() => router.push('/auth/reset-password')}>
               <Text className="text-vanz-teal font-bold">{t('auth.forgotPassword')}</Text>
             </TouchableOpacity>
-          </View>
+          </Row>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ForceLight>
   );
 }

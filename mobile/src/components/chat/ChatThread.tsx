@@ -1,3 +1,5 @@
+import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import {
   View,
   Text,
@@ -21,6 +23,8 @@ import {
   type ConversationPhase,
 } from '@/modules/chat/chatService';
 import GradientHeader from '@/components/ui/GradientHeader';
+import Row from '@/components/ui/Row';
+import { Lock, Send, MessageCircle } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
 type Props = {
@@ -33,6 +37,7 @@ export default function ChatThread({ conversationId, userType }: Props) {
   const insets = useSafeAreaInsets();
   const { t, locale } = useI18n();
   const { session } = useAuthStore();
+  const c = useThemeColors();
   const userId = session?.user?.id;
 
   const listRef = useRef<FlatList<ChatMessage>>(null);
@@ -118,8 +123,8 @@ export default function ChatThread({ conversationId, userType }: Props) {
     if (item.type === 'system' || item.sender_type === 'system') {
       return (
         <View className="items-center my-2 px-8">
-          <View className="bg-vanz-navy/5 px-4 py-2 rounded-full">
-            <Text className="text-vanz-navy/60 text-xs font-bold text-center">{item.content}</Text>
+          <View className="bg-inverted/5 px-4 py-2 rounded-full">
+            <Text className="text-content-secondary text-xs font-bold text-center">{item.content}</Text>
           </View>
         </View>
       );
@@ -135,13 +140,13 @@ export default function ChatThread({ conversationId, userType }: Props) {
           className={`max-w-[80%] px-4 py-3 ${
             isMine
               ? 'bg-vanz-teal rounded-t-2xl rounded-bl-2xl rounded-br-md'
-              : 'bg-white border border-gray-100 rounded-t-2xl rounded-br-2xl rounded-bl-md shadow-card'
+              : 'bg-surface-elevated border border-line rounded-t-2xl rounded-br-2xl rounded-bl-md shadow-card'
           }`}
         >
-          <Text className={`text-[15px] font-medium leading-snug ${isMine ? 'text-white' : 'text-vanz-navy'}`}>
+          <Text className={`text-[15px] font-medium leading-snug ${isMine ? 'text-white' : 'text-content'}`}>
             {item.content}
           </Text>
-          <Text className={`text-[10px] mt-1 font-semibold ${isMine ? 'text-white/70' : 'text-gray-300'} ${isMine ? 'text-right' : ''}`}>
+          <Text className={`text-[10px] mt-1 font-semibold ${isMine ? 'text-white/70' : 'text-content-muted'} ${isMine ? 'text-right' : ''}`}>
             {new Date(item.created_at).toLocaleTimeString(isRtl ? 'ar-TN' : 'fr-FR', {
               hour: '2-digit',
               minute: '2-digit',
@@ -153,21 +158,24 @@ export default function ChatThread({ conversationId, userType }: Props) {
   };
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader title={t('chat.title')} backButton={() => router.back()} />
 
       {/* Pre-acceptance safety banner — mirrors the web anti-abuse rule */}
       {phase === 'pre_bid' && (
         <View className="bg-vanz-yellow/15 border-b border-vanz-yellow/30 px-5 py-2.5">
-          <Text className={`text-vanz-navy/70 text-xs font-bold ${isRtl ? 'text-right' : ''}`}>
-            🔒 {t('chat.preBidNotice')}
-          </Text>
+          <Row className="items-center gap-2">
+            <Lock size={13} color={c.textPrimary} strokeWidth={2.4} />
+            <Text className="text-content-secondary text-xs font-bold flex-1">
+              {t('chat.preBidNotice')}
+            </Text>
+          </Row>
         </View>
       )}
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#38B6FF" size="large" />
+          <ActivityIndicator color={colors.teal} size="large" />
         </View>
       ) : (
         <FlatList
@@ -179,8 +187,10 @@ export default function ChatThread({ conversationId, userType }: Props) {
           onContentSizeChange={scrollToEnd}
           ListEmptyComponent={
             <View className="items-center justify-center pt-24 px-10">
-              <Text className="text-3xl mb-3">👋</Text>
-              <Text className="text-vanz-navy/40 font-semibold text-sm text-center">
+              <View className="mb-3">
+                <MessageCircle size={40} color={colors.slate} strokeWidth={1.8} />
+              </View>
+              <Text className="text-content-muted font-semibold text-sm text-center">
                 {t('chat.startConversation')}
               </Text>
             </View>
@@ -190,17 +200,17 @@ export default function ChatThread({ conversationId, userType }: Props) {
 
       {/* Composer */}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={0}>
-        <View
-          className={`flex-row items-end px-4 pt-3 bg-white border-t border-gray-100 ${isRtl ? 'flex-row-reverse' : ''}`}
+        <Row
+          className="items-end px-4 pt-3 bg-surface-elevated border-t border-line"
           style={{ paddingBottom: Math.max(insets.bottom, 12) + 4 }}
         >
           <TextInput
             value={input}
             onChangeText={setInput}
             placeholder={t('chat.inputPlaceholder')}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.placeholder}
             multiline
-            className={`flex-1 bg-vanz-iceblue rounded-2xl px-4 py-3 text-[15px] font-medium text-vanz-navy max-h-28 ${isRtl ? 'text-right' : ''}`}
+            className={`flex-1 bg-surface rounded-2xl px-4 py-3 text-[15px] font-medium text-content max-h-28 ${isRtl ? 'text-right' : ''}`}
           />
           <TouchableOpacity
             onPress={handleSend}
@@ -210,12 +220,12 @@ export default function ChatThread({ conversationId, userType }: Props) {
             }`}
           >
             {sending ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={colors.white} size="small" />
             ) : (
-              <Text className="text-white text-lg font-black">{isRtl ? '←' : '→'}</Text>
+              <Send size={18} color={colors.white} strokeWidth={2.4} />
             )}
           </TouchableOpacity>
-        </View>
+        </Row>
       </KeyboardAvoidingView>
     </View>
   );

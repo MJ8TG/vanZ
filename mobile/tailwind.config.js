@@ -1,3 +1,5 @@
+const { tailwindVanz } = require("./src/theme/tokens.cjs");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
@@ -12,22 +14,25 @@ module.exports = {
         'jakarta-extrabold': ['"Plus Jakarta Sans ExtraBold"'],
       },
       colors: {
-        vanz: {
-          teal: '#38B6FF',
-          'teal-dark': '#2196D6',
-          'teal-glow': '#38B6FF33',
-          yellow: '#F5C800',
-          'yellow-dark': '#D4AD00',
-          'yellow-glow': '#F5C80033',
-          navy: '#0B1021',
-          'navy-light': '#131B36',
-          'navy-mid': '#1A2444',
-          iceblue: '#F0F6FA',
-          'iceblue-dark': '#E4EDF3',
-          green: '#22C55E',
-          'green-dark': '#16A34A',
-          'card-glass': 'rgba(255,255,255,0.92)',
-        }
+        vanz: tailwindVanz,
+        // Semantic role tokens — flip with the theme. Backed by CSS vars set at
+        // the app root via vars(). Brand accents stay under `vanz-*`.
+        surface: {
+          DEFAULT: 'rgb(var(--surface) / <alpha-value>)',
+          elevated: 'rgb(var(--surface-elevated) / <alpha-value>)',
+          sunken: 'rgb(var(--surface-sunken) / <alpha-value>)',
+        },
+        content: {
+          DEFAULT: 'rgb(var(--text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          inverted: 'rgb(var(--text-inverted) / <alpha-value>)',
+        },
+        line: {
+          DEFAULT: 'rgb(var(--border-default) / <alpha-value>)',
+          strong: 'rgb(var(--border-strong) / <alpha-value>)',
+        },
+        inverted: 'rgb(var(--inverted) / <alpha-value>)',
       },
       borderRadius: {
         'card': '24px',

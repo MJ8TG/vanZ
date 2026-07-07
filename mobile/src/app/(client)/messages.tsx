@@ -9,7 +9,7 @@ export default function ClientMessagesScreen() {
   const { t } = useI18n();
 
   return (
-    <View className="flex-1 bg-vanz-iceblue">
+    <View className="flex-1 bg-surface">
       <GradientHeader title={t('chat.messages')} tall />
       <ConversationsListView onSelect={(conv) => router.push(`/(client)/chat/${conv.id}`)} />
     </View>

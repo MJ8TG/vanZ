@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { ReactNode } from 'react';
 import { TouchableOpacity, Text, View, ActivityIndicator, StyleProp, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,12 +32,12 @@ export default function PremiumButton({
   };
 
   const textColor =
-    variant === 'primary' ? 'text-white' : variant === 'outline' ? 'text-vanz-teal' : 'text-vanz-navy';
+    variant === 'primary' ? 'text-white' : variant === 'outline' ? 'text-vanz-teal' : 'text-content';
 
   const content = (
     <View className="flex-row items-center justify-center gap-2">
       {isLoading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#fff' : '#0B1021'} />
+        <ActivityIndicator color={variant === 'primary' ? '#fff' : colors.navy} />
       ) : (
         <>
           {icon}
@@ -56,7 +57,7 @@ export default function PremiumButton({
         className={`w-full h-16 rounded-2xl overflow-hidden ${inactive ? '' : 'shadow-glow-teal'}`}
       >
         <LinearGradient
-          colors={inactive ? ['#38B6FF80', '#2196D680'] : ['#38B6FF', '#2196D6']}
+          colors={inactive ? ['#38B6FF80', '#2196D680'] : [colors.teal, colors.tealDark]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           className="w-full h-full items-center justify-center"
@@ -74,7 +75,7 @@ export default function PremiumButton({
       disabled={inactive}
       style={style}
       className={`w-full h-16 rounded-2xl items-center justify-center ${
-        variant === 'outline' ? 'border-2 border-vanz-teal bg-transparent' : 'bg-white shadow-card'
+        variant === 'outline' ? 'border-2 border-vanz-teal bg-transparent' : 'bg-surface-elevated shadow-card'
       } ${inactive ? 'opacity-60' : ''}`}
     >
       {content}

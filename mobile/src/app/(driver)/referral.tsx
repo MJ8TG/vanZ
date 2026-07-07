@@ -6,10 +6,10 @@ import ReferralView from '@/components/referral/ReferralView';
 
 export default function DriverReferralScreen() {
   const router = useRouter();
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   return (
-    <View className="flex-1 bg-vanz-iceblue">
-      <GradientHeader title={locale === 'ar' ? 'الإحالة' : 'Parrainage'} backButton={() => router.back()} tall />
+    <View className="flex-1 bg-surface">
+      <GradientHeader title={t('profile.referral')} backButton={() => router.back()} tall />
       <ReferralView />
     </View>
   );
