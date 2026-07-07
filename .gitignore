@@ -67,3 +67,19 @@ Gemini_Generated_Image_*.png
 image*.png
 .DS_Store
 node_modules/
+
+# graphify tooling & outputs (generated / vendored)
+/graphify/
+/graphify-out/
+.graphifyignore
+
+# local agent config & screenshots
+/.claude/
+.mcp.json
+.shots/
+
+# bulky design-tool exports (kept on disk, not tracked)
+/stitch_design/
+/stitch_vanz_logistics_marketplace_appv/
+/stitch_vanz_mobile_design_system/
+/stitch_vanz_mobile_design_system.zip
