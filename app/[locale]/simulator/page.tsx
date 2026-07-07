@@ -540,6 +540,8 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formPickup} 
                             onChange={(e) => setFormPickup(e.target.value)} 
                             className="bg-transparent text-sm w-full outline-none"
+                            title={t.pickup}
+                            placeholder={t.pickup}
                           />
                         </div>
                       </div>
@@ -552,6 +554,8 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formDropoff} 
                             onChange={(e) => setFormDropoff(e.target.value)} 
                             className="bg-transparent text-sm w-full outline-none"
+                            title={t.dropoff}
+                            placeholder={t.dropoff}
                           />
                         </div>
                       </div>
@@ -563,6 +567,7 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formServiceType}
                             onChange={(e) => setFormServiceType(e.target.value)}
                             className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs w-full text-white outline-none"
+                            title={t.serviceType}
                           >
                             <option value="van_standard">{t.vanStandard}</option>
                             <option value="van_large">{t.vanLarge}</option>
@@ -708,6 +713,8 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formPickup} 
                             onChange={(e) => setFormPickup(e.target.value)} 
                             className="bg-transparent text-sm w-full outline-none"
+                            title={t.pickup}
+                            placeholder={t.pickup}
                           />
                         </div>
                       </div>
@@ -720,6 +727,8 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formDropoff} 
                             onChange={(e) => setFormDropoff(e.target.value)} 
                             className="bg-transparent text-sm w-full outline-none"
+                            title={t.dropoff}
+                            placeholder={t.dropoff}
                           />
                         </div>
                       </div>
@@ -731,6 +740,7 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formServiceType}
                             onChange={(e) => setFormServiceType(e.target.value)}
                             className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs w-full text-white outline-none"
+                            title={t.serviceType}
                           >
                             <option value="van_standard">{t.vanStandard}</option>
                             <option value="van_large">{t.vanLarge}</option>
@@ -1036,6 +1046,8 @@ export default function SimulatorPage({ params }: { params: Promise<{ locale: st
                             value={formBidAmount}
                             onChange={(e) => setFormBidAmount(Number(e.target.value))}
                             className="bg-transparent text-sm w-full outline-none font-bold text-white"
+                            title={t.bidAmount}
+                            placeholder={t.bidAmount}
                           />
                           <span className="text-xs text-slate-400 font-bold">TND</span>
                         </div>

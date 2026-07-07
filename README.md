@@ -2,6 +2,9 @@
 
 [![Collaboration Guide](https://img.shields.io/badge/Collaboration-Guide-blue)](./COLLABORATION.md)
 
+## ⚠️ Important Architecture Rules
+- **Admin Identity Source of Truth:** Admin identity is strictly tracked in `public.admin_users`. Do not write `'admin'` into `users.role`. The `role` column is reserved exclusively for client/driver routing.
+
 This is a [Next.js](https://nextjs.org) project...
 
 ## Getting Started

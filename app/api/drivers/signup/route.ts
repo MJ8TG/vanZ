@@ -75,7 +75,9 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, status: 'approved' });
+    // The DB upsert sets drivers.status = 'pending' (admin approves later); keep
+    // the response consistent so nothing downstream treats the driver as approved.
+    return NextResponse.json({ success: true, status: 'pending' });
   } catch (err: any) {
     console.error('[API_DRIVER_SIGNUP]', err);
     return NextResponse.json({ error: err.message || "Erreur lors de l'inscription." }, { status: 500 });
