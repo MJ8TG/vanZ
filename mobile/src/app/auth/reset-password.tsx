@@ -123,9 +123,9 @@ export default function ResetPasswordScreen() {
             </View>
 
             {error ? (
-              <Animated.View entering={FadeIn} className={`bg-red-50 p-3 rounded-xl border border-red-100 flex-row items-center mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <Animated.View entering={FadeIn} className={`bg-danger/10 p-3 rounded-xl border border-danger/30 flex-row items-center mt-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <AlertTriangle size={16} color="#EF4444" strokeWidth={2.4} />
-                <Text className={`text-red-500 text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
+                <Text className={`text-danger text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
               </Animated.View>
             ) : null}
           </View>

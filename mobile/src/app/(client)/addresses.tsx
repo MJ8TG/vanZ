@@ -162,7 +162,7 @@ export default function SavedAddressesScreen() {
                         <Pin size={16} color={colors.teal} strokeWidth={2.4} />
                       </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={() => handleDelete(item)} className="w-9 h-9 rounded-full bg-red-50 items-center justify-center active:bg-red-100">
+                    <TouchableOpacity onPress={() => handleDelete(item)} className="w-9 h-9 rounded-full bg-danger/10 items-center justify-center active:bg-danger/15">
                       <Trash2 size={16} color="#EF4444" strokeWidth={2.4} />
                     </TouchableOpacity>
                   </View>
@@ -197,7 +197,7 @@ export default function SavedAddressesScreen() {
       {/* Add address sheet */}
       {adding && (
         <>
-          <TouchableOpacity activeOpacity={1} onPress={() => setAdding(false)} className="absolute inset-0 bg-inverted/40" />
+          <TouchableOpacity activeOpacity={1} onPress={() => setAdding(false)} className="absolute inset-0 bg-black/50" />
           <Animated.View entering={SlideInDown.springify().damping(15)} exiting={SlideOutDown} className="absolute bottom-0 w-full bg-surface-elevated rounded-t-[32px] p-6 pb-10 shadow-elevated">
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
               <View className="w-12 h-1.5 bg-gray-200 rounded-full self-center mb-6" />

@@ -224,7 +224,7 @@ export default function DriverMarketplaceScreen() {
     return (
       <View className="flex-1 bg-surface justify-center items-center p-6">
         <Animated.View entering={FadeInDown.springify()} className="items-center">
-          <View className={`w-32 h-32 rounded-full items-center justify-center mb-6 ${isRejected ? 'bg-red-100' : 'bg-vanz-yellow/20'}`}>
+          <View className={`w-32 h-32 rounded-full items-center justify-center mb-6 ${isRejected ? 'bg-danger/15' : 'bg-vanz-yellow/20'}`}>
             {isRejected
               ? <AlertTriangle size={52} color="#EF4444" strokeWidth={1.8} />
               : <ClipboardList size={52} color={colors.yellowDark} strokeWidth={1.8} />}

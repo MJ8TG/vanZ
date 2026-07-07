@@ -23,7 +23,7 @@ export default function DriverVehicleScreen() {
   const statusMeta = {
     approved: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('vehicleScreen.statusApproved'), Icon: CheckCircle as LucideIcon, iconColor: colors.green },
     pending: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('vehicleScreen.statusPending'), Icon: Clock as LucideIcon, iconColor: colors.yellowDark },
-    rejected: { bg: 'bg-red-50', text: 'text-red-500', label: t('vehicleScreen.statusRejected'), Icon: AlertTriangle as LucideIcon, iconColor: '#EF4444' },
+    rejected: { bg: 'bg-danger/10', text: 'text-danger', label: t('vehicleScreen.statusRejected'), Icon: AlertTriangle as LucideIcon, iconColor: '#EF4444' },
   } as const;
 
   const vehicleTypeLabel = (id: string | null) => {

@@ -101,9 +101,9 @@ export default function LoginScreen() {
             />
 
             {error ? (
-              <Row className="bg-red-50 p-3 rounded-xl border border-red-100 items-center mt-1">
+              <Row className="bg-danger/10 p-3 rounded-xl border border-danger/30 items-center mt-1">
                 <AlertTriangle size={16} color="#EF4444" strokeWidth={2.4} />
-                <Text className={`text-red-500 text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
+                <Text className={`text-danger text-sm font-bold flex-1 mx-2 ${isRtl ? 'text-right' : ''}`}>{error}</Text>
               </Row>
             ) : null}
           </View>

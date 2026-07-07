@@ -33,6 +33,11 @@ module.exports = {
           strong: 'rgb(var(--border-strong) / <alpha-value>)',
         },
         inverted: 'rgb(var(--inverted) / <alpha-value>)',
+        // Status roles — flip with the theme. Use with opacity for tints:
+        // `bg-danger/10 border-danger/30 text-danger`.
+        danger: 'rgb(var(--danger) / <alpha-value>)',
+        success: 'rgb(var(--success) / <alpha-value>)',
+        warning: 'rgb(var(--warning) / <alpha-value>)',
       },
       borderRadius: {
         'card': '24px',

@@ -192,7 +192,7 @@ export default function WalletScreen() {
                 <PressableCard className="p-4 rounded-2xl">
                   <Row className="items-center justify-between">
                   <Row className="items-center flex-1">
-                    <View className={`w-12 h-12 rounded-xl items-center justify-center mr-4 ml-4 ${positive ? 'bg-vanz-green/10' : 'bg-red-50'}`}>
+                    <View className={`w-12 h-12 rounded-xl items-center justify-center mr-4 ml-4 ${positive ? 'bg-vanz-green/10' : 'bg-danger/10'}`}>
                       <MIcon size={20} color={positive ? colors.green : '#EF4444'} strokeWidth={2.2} />
                     </View>
                     <View className={`flex-1 ${isRtl ? 'items-end' : ''}`}>
@@ -207,7 +207,7 @@ export default function WalletScreen() {
                     </View>
                   </Row>
                   <View className="items-end">
-                    <Text className={`font-black text-lg ${positive ? 'text-vanz-green' : 'text-red-500'}`}>
+                    <Text className={`font-black text-lg ${positive ? 'text-vanz-green' : 'text-danger'}`}>
                       {positive ? '+' : '-'}{Math.abs(Number(tx.amount)).toFixed(2)}
                     </Text>
                     <Text className="text-content-muted font-bold text-xs uppercase">{t('common.currency')}</Text>

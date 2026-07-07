@@ -17,7 +17,7 @@ export default function PremiumInput({ label, error, icon, secureTextEntry, ...r
   const isRtl = locale === 'ar';
 
   const borderColor = error ? 'border-red-400' : focused ? 'border-vanz-teal' : 'border-line';
-  const bg = error ? 'bg-red-50/40' : focused ? 'bg-vanz-teal/5' : 'bg-surface-elevated';
+  const bg = error ? 'bg-danger/5' : focused ? 'bg-vanz-teal/5' : 'bg-surface-elevated';
 
   return (
     <View>
@@ -36,7 +36,7 @@ export default function PremiumInput({ label, error, icon, secureTextEntry, ...r
         />
       </Row>
       {error ? (
-        <Animated.Text entering={FadeIn} className={`text-red-500 text-xs font-jakarta-bold mt-1.5 ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>
+        <Animated.Text entering={FadeIn} className={`text-danger text-xs font-jakarta-bold mt-1.5 ${isRtl ? 'text-right mr-1' : 'ml-1'}`}>
           {error}
         </Animated.Text>
       ) : null}

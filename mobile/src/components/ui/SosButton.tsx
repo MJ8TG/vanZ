@@ -69,14 +69,14 @@ export default function SosButton({ jobId, variant = 'floating', className = '' 
         disabled={sending}
         accessibilityRole="button"
         accessibilityLabel={t('sos.button')}
-        className={`h-12 rounded-2xl bg-red-50 border border-red-200 flex-row items-center justify-center gap-2 active:bg-red-100 ${className}`}
+        className={`h-12 rounded-2xl bg-danger/10 border border-danger/40 flex-row items-center justify-center gap-2 active:bg-danger/15 ${className}`}
       >
         {sending ? (
           <ActivityIndicator size="small" color="#E5484D" />
         ) : (
           <>
             <ShieldAlert size={18} color="#E5484D" strokeWidth={2.4} />
-            <Text className="text-red-600 font-black text-sm uppercase tracking-wide">{t('sos.button')}</Text>
+            <Text className="text-danger font-black text-sm uppercase tracking-wide">{t('sos.button')}</Text>
           </>
         )}
       </TouchableOpacity>
@@ -89,14 +89,14 @@ export default function SosButton({ jobId, variant = 'floating', className = '' 
       disabled={sending}
       accessibilityRole="button"
       accessibilityLabel={t('sos.button')}
-      className={`flex-row items-center gap-1.5 px-3 py-2 rounded-2xl bg-red-500/15 border border-red-500/50 active:bg-red-500/25 ${className}`}
+      className={`flex-row items-center gap-1.5 px-3 py-2 rounded-2xl bg-danger/15 border border-danger/50 active:bg-danger/25 ${className}`}
     >
       {sending ? (
         <ActivityIndicator size="small" color="#E5484D" />
       ) : (
         <>
           <ShieldAlert size={15} color="#E5484D" strokeWidth={2.4} />
-          <Text className="text-red-600 font-black text-xs">{t('sos.button')}</Text>
+          <Text className="text-danger font-black text-xs">{t('sos.button')}</Text>
         </>
       )}
     </TouchableOpacity>

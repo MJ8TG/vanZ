@@ -145,9 +145,9 @@ export default function ClientProfileScreen() {
 
           <Animated.View entering={FadeInDown.delay(500).springify()}>
             <TouchableOpacity onPress={handleLogout}>
-              <Row className="mt-8 p-4 items-center justify-center bg-red-50 rounded-2xl border border-red-100 active:bg-red-100">
+              <Row className="mt-8 p-4 items-center justify-center bg-danger/10 rounded-2xl border border-danger/30 active:bg-danger/15">
                 <LogOut size={18} color="#EF4444" strokeWidth={2.4} />
-                <Text className="text-red-500 font-extrabold text-base mx-2">{t('client.logout')}</Text>
+                <Text className="text-danger font-extrabold text-base mx-2">{t('client.logout')}</Text>
               </Row>
             </TouchableOpacity>
           </Animated.View>

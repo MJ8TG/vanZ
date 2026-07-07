@@ -41,9 +41,9 @@ export default function ClientMissionsScreen() {
       payment_pending: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('jobDetails.stepPayment') },
       matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: t('jobDetails.statusMatched') },
       in_progress: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('jobDetails.statusInProgress') },
-      completed: { bg: 'bg-green-50', text: 'text-green-600', label: t('jobDetails.statusCompleted') },
+      completed: { bg: 'bg-success/10', text: 'text-success', label: t('jobDetails.statusCompleted') },
       cancelled: { bg: 'bg-surface-sunken', text: 'text-content-muted', label: t('jobDetails.statusCancelled') },
-      expired: { bg: 'bg-red-50', text: 'text-red-500', label: t('jobDetails.statusExpired') },
+      expired: { bg: 'bg-danger/10', text: 'text-danger', label: t('jobDetails.statusExpired') },
     };
     return badges[status] || badges.open;
   };

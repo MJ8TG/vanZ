@@ -61,7 +61,7 @@ export default function BecomeDriverScreen() {
     rejected: {
       Icon: AlertTriangle,
       iconColor: '#EF4444',
-      tint: 'bg-red-100',
+      tint: 'bg-danger/15',
       title: t('becomeDriver.rejectedTitle'),
       body: rejectionReason || t('becomeDriver.rejectedBody'),
     },

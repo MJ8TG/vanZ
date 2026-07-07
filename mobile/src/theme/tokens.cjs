@@ -75,20 +75,30 @@ const semantic = {
     'text-inverted': '255 255 255',    // white (on inverted fill)
     'border-default': '236 239 243',   // hairline
     'border-strong': '226 231 236',
+    // Semantic status roles — used as `text-danger` / `bg-danger/10` /
+    // `border-danger/30` etc. so one saturated color yields text + tint + border.
+    danger: '239 68 68',               // red-500
+    success: '34 197 94',              // green-500 (brand green)
+    warning: '245 158 11',             // amber-500
   },
   dark: {
     surface: '11 16 33',               // page bg — navy
     'surface-elevated': '19 27 54',    // cards — navy-light
     'surface-sunken': '23 32 54',      // inset — subtle raise
-    // Inverted stays navy brand in BOTH modes: navy pills/avatars/buttons read
-    // on the navy-light cards and keep their white/yellow accent text correct.
-    inverted: '11 16 33',              // navy (same as light) — a brand fill
+    // Inverted is a navy brand fill (pills/avatars/buttons). In dark it must sit
+    // ABOVE the page (11 16 33) and cards (19 27 54) or it vanishes, so use a
+    // lifted mid-navy — still dark enough for white/yellow accent text to read.
+    inverted: '34 46 74',              // lifted mid-navy for visibility on dark
     'text-primary': '240 246 250',     // near-white
     'text-secondary': '154 176 196',   // mist
     'text-muted': '110 127 146',
     'text-inverted': '255 255 255',    // white (on the navy inverted fill)
     'border-default': '36 48 76',
     'border-strong': '46 59 89',
+    // Lighter/brighter status hues so they read on the dark surfaces.
+    danger: '248 113 113',             // red-400
+    success: '74 222 128',             // green-400
+    warning: '251 191 36',             // amber-400
   },
 };
 
@@ -117,6 +127,9 @@ function semanticHex(mode) {
     textInverted: tripletToHex(src['text-inverted']),
     border: tripletToHex(src['border-default']),
     borderStrong: tripletToHex(src['border-strong']),
+    danger: tripletToHex(src.danger),
+    success: tripletToHex(src.success),
+    warning: tripletToHex(src.warning),
   };
 }
 

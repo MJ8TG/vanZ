@@ -203,7 +203,7 @@ export default function ClientHomeScreen() {
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 60 + Math.max(insets.bottom, 12) + 96 }}
+        contentContainerStyle={{ paddingBottom: 60 + Math.max(insets.bottom, 12) + 128 }}
         showsVerticalScrollIndicator={false}
       >
         {/* ROUTE CARD */}

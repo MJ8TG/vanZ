@@ -110,7 +110,7 @@ export default function DriverEarningsScreen() {
                 </Row>
                 <Row className="justify-between pt-2 border-t border-line">
                   <Text className="text-content-secondary font-semibold text-xs">{t('earnings.gross')}: {gross.toFixed(2)}</Text>
-                  <Text className="text-red-400 font-semibold text-xs">- {t('earnings.commission')} {commission.toFixed(2)}</Text>
+                  <Text className="text-danger font-semibold text-xs">- {t('earnings.commission')} {commission.toFixed(2)}</Text>
                 </Row>
                 <Text className={`text-content-muted font-bold text-[11px] mt-2 ${isRtl ? 'text-right' : ''}`}>
                   {new Date(item.created_at || new Date().toISOString()).toLocaleDateString(isRtl ? 'ar-TN' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}

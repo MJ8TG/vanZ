@@ -444,7 +444,7 @@ export default function DriverApplicationForm({ onDone }: { onDone: () => void }
       {/* Image source action sheet */}
       {activeDoc && (
         <>
-          <TouchableOpacity activeOpacity={1} onPress={() => setActiveDoc(null)} className="absolute inset-0 bg-inverted/40" />
+          <TouchableOpacity activeOpacity={1} onPress={() => setActiveDoc(null)} className="absolute inset-0 bg-black/50" />
           <Animated.View entering={SlideInDown.springify().damping(15)} exiting={SlideOutDown} className="absolute bottom-0 w-full bg-surface-elevated rounded-t-[32px] p-6 pb-12 shadow-elevated">
             <View className="w-12 h-1.5 bg-gray-200 rounded-full self-center mb-6" />
             <Text className="text-content text-xl font-black mb-6 text-center">{t('driverForm.chooseSource')}</Text>

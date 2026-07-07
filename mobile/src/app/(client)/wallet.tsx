@@ -110,7 +110,7 @@ export default function ClientWalletScreen() {
                     {item.note || new Date(item.created_at).toLocaleDateString(isRtl ? 'ar-TN' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </Text>
                 </View>
-                <Text className={`font-black text-base ${meta.positive ? 'text-vanz-green' : 'text-red-500'}`}>
+                <Text className={`font-black text-base ${meta.positive ? 'text-vanz-green' : 'text-danger'}`}>
                   {meta.positive ? '+' : '-'}{Math.abs(Number(item.amount)).toFixed(2)} {t('common.currency')}
                 </Text>
               </Row>
