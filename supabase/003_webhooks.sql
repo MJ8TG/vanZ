@@ -128,3 +128,27 @@ SELECT cron.schedule(
     );
   $$
 );
+
+-- 6. Webhook: New Job Alert (Trigger on INSERT of job with status='open')
+CREATE OR REPLACE FUNCTION public.notify_new_job_alert()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status = 'open' THEN
+    PERFORM net.http_post(
+      url := 'https://hyjagsvunuobarsxrllx.supabase.co/functions/v1/new-job-alert',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'X-Edge-Secret', current_setting('app.settings.edge_webhook_secret', true)
+      ),
+      body := jsonb_build_object('type', 'INSERT', 'table', 'jobs', 'record', row_to_json(NEW))
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_new_job_alert ON public.jobs;
+CREATE TRIGGER trg_new_job_alert
+AFTER INSERT ON public.jobs
+FOR EACH ROW EXECUTE FUNCTION public.notify_new_job_alert();
+
