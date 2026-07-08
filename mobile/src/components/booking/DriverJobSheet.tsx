@@ -1,4 +1,5 @@
 import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -23,6 +24,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
   const snapPoints = useMemo(() => ['50%', '80%'], []);
   const { session } = useAuthStore();
   const { t, locale } = useI18n();
+  const c = useThemeColors();
 
   const [bidAmount, setBidAmount] = useState<string>('');
   const [note, setNote] = useState('');
@@ -98,8 +100,8 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
       enablePanDownToClose
       onClose={onClose}
       keyboardBehavior="interactive"
-      backgroundStyle={{ backgroundColor: '#ffffff', borderRadius: 32 }}
-      handleIndicatorStyle={{ backgroundColor: '#e2e8f0', width: 48, height: 6 }}
+      backgroundStyle={{ backgroundColor: c.surfaceElevated, borderRadius: 32 }}
+      handleIndicatorStyle={{ backgroundColor: c.borderStrong, width: 48, height: 6 }}
     >
       <BottomSheetView className="flex-1 px-6 pb-6 pt-2">
         <Animated.View entering={FadeIn.duration(400)} className="flex-1">
