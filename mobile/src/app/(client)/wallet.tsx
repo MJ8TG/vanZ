@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
+import EmptyState from '@/components/ui/EmptyState';
 import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import { useClientWallet } from '@/modules/wallet/hooks/useClientWallet';
@@ -117,16 +118,7 @@ export default function ClientWalletScreen() {
             </Animated.View>
           );
         }}
-        ListEmptyComponent={() => (
-          <Animated.View entering={FadeInDown} className="items-center justify-center py-16">
-            <View className="w-24 h-24 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-5">
-              <Receipt size={40} color={colors.slate} strokeWidth={1.8} />
-            </View>
-            <Text className="text-content-muted text-center text-sm font-semibold px-10">
-              {t('clientWallet.empty')}
-            </Text>
-          </Animated.View>
-        )}
+        ListEmptyComponent={() => <EmptyState Icon={Receipt} title={t('clientWallet.empty')} />}
       />
     </View>
   );
