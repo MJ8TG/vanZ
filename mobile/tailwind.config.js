@@ -38,6 +38,7 @@ module.exports = {
         danger: 'rgb(var(--danger) / <alpha-value>)',
         success: 'rgb(var(--success) / <alpha-value>)',
         warning: 'rgb(var(--warning) / <alpha-value>)',
+        info: 'rgb(var(--info) / <alpha-value>)',
       },
       borderRadius: {
         'card': '24px',

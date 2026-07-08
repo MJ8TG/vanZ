@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
+import { useThemeColors } from '@/theme/useThemeColors';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,6 +24,7 @@ export default function ShimmerPlaceholder({
   className = '',
 }: ShimmerPlaceholderProps) {
   const shimmerValue = useSharedValue(0);
+  const c = useThemeColors();
 
   useEffect(() => {
     shimmerValue.value = withRepeat(
@@ -43,7 +45,10 @@ export default function ShimmerPlaceholder({
           width: typeof width === 'number' ? width : undefined,
           height,
           borderRadius,
-          backgroundColor: '#E2E8F0',
+          // Theme-aware: reads as a subtle placeholder on both the white cards
+          // (light) and the navy-light cards (dark) — a fixed light gray glares
+          // against dark surfaces.
+          backgroundColor: c.borderStrong,
         },
         animatedStyle,
       ]}

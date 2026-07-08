@@ -158,7 +158,7 @@ export default function DriverTripsScreen() {
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { bg: string; text: string; label: string }> = {
-      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: t('trips.statusMatched') },
+      matched: { bg: 'bg-info/10', text: 'text-info', label: t('trips.statusMatched') },
       in_progress: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('trips.statusInProgress') },
       completed: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('trips.statusCompleted') },
       cancelled: { bg: 'bg-surface-sunken', text: 'text-content-muted', label: t('trips.statusCancelled') },

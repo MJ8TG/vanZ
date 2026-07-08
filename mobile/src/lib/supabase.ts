@@ -6,6 +6,26 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+/**
+ * Hard ceiling on any REST/auth request.
+ *
+ * Without this a request on a flaky connection can hang indefinitely: it never
+ * rejects, so react-query stays `isPending && isFetching` and the screen shows
+ * its loading skeleton forever with no way out. Aborting turns that into a
+ * normal error the UI can render (and retry).
+ */
+const REQUEST_TIMEOUT_MS = 15_000;
+
+const fetchWithTimeout: typeof fetch = async (input, init) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(input as RequestInfo, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 let client: SupabaseClient;
 try {
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -46,6 +66,7 @@ try {
       persistSession: true,
       detectSessionInUrl: false,
     },
+    global: { fetch: fetchWithTimeout },
   });
 } catch (e) {
   console.error('Fatal: Failed to initialize Supabase client:', e);

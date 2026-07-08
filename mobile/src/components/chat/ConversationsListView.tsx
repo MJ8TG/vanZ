@@ -7,6 +7,7 @@ import { ChatService, type ConversationPreview } from '@/modules/chat/chatServic
 import PressableCard from '@/components/ui/PressableCard';
 import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
+import EmptyState from '@/components/ui/EmptyState';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 type Props = {
@@ -56,18 +57,11 @@ export default function ConversationsListView({ onSelect }: Props) {
 
   if (conversations.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center px-10 pb-24">
-        <Image
-          source={require('../../../assets/images/empty/no-messages.png')}
-          style={{ width: 180, height: 180 }}
-          resizeMode="contain"
-          className="mb-4"
-        />
-        <Text className="text-content font-black text-lg mb-2">{t('chat.emptyTitle')}</Text>
-        <Text className="text-content-secondary font-medium text-sm text-center leading-relaxed">
-          {t('chat.emptyDesc')}
-        </Text>
-      </View>
+      <EmptyState
+        image={require('../../../assets/images/empty/no-messages.png')}
+        title={t('chat.emptyTitle')}
+        description={t('chat.emptyDesc')}
+      />
     );
   }
 

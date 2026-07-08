@@ -80,6 +80,7 @@ const semantic = {
     danger: '239 68 68',               // red-500
     success: '34 197 94',              // green-500 (brand green)
     warning: '245 158 11',             // amber-500
+    info: '59 130 246',                // blue-500
   },
   dark: {
     surface: '11 16 33',               // page bg — navy
@@ -99,6 +100,7 @@ const semantic = {
     danger: '248 113 113',             // red-400
     success: '74 222 128',             // green-400
     warning: '251 191 36',             // amber-400
+    info: '96 165 250',                // blue-400
   },
 };
 
@@ -130,6 +132,7 @@ function semanticHex(mode) {
     danger: tripletToHex(src.danger),
     success: tripletToHex(src.success),
     warning: tripletToHex(src.warning),
+    info: tripletToHex(src.info),
   };
 }
 

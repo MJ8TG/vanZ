@@ -11,7 +11,8 @@ import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
 import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
-import { MapPin, Flag } from 'lucide-react-native';
+import EmptyState from '@/components/ui/EmptyState';
+import { MapPin, Flag, CloudOff } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useMissions } from '@/modules/booking/hooks/useMissions';
 import { useRealtimeSync } from '@/modules/booking/hooks/useRealtimeSync';
@@ -24,7 +25,7 @@ export default function ClientMissionsScreen() {
   const { t, locale } = useI18n();
   const [tab, setTab] = useState<'active' | 'history'>('active');
 
-  const { data: jobs = [], isLoading, refetch } = useMissions(session?.user?.id, tab);
+  const { data: jobs = [], isLoading, isError, refetch } = useMissions(session?.user?.id, tab);
 
   // Enable automatic query cache invalidation on realtime changes
   useRealtimeSync(session?.user?.id);
@@ -39,7 +40,7 @@ export default function ClientMissionsScreen() {
     const badges: Record<string, { bg: string; text: string; label: string }> = {
       open: { bg: 'bg-vanz-teal/10', text: 'text-vanz-teal', label: t('jobDetails.statusOpen') },
       payment_pending: { bg: 'bg-vanz-yellow/10', text: 'text-vanz-yellow-dark', label: t('jobDetails.stepPayment') },
-      matched: { bg: 'bg-blue-50', text: 'text-blue-600', label: t('jobDetails.statusMatched') },
+      matched: { bg: 'bg-info/10', text: 'text-info', label: t('jobDetails.statusMatched') },
       in_progress: { bg: 'bg-vanz-green/10', text: 'text-vanz-green', label: t('jobDetails.statusInProgress') },
       completed: { bg: 'bg-success/10', text: 'text-success', label: t('jobDetails.statusCompleted') },
       cancelled: { bg: 'bg-surface-sunken', text: 'text-content-muted', label: t('jobDetails.statusCancelled') },
@@ -147,6 +148,14 @@ export default function ClientMissionsScreen() {
             <ShimmerCard />
             <ShimmerCard />
           </View>
+        ) : isError ? (
+          // A failed fetch is not an empty list — say so, and offer a way out.
+          <EmptyState
+            Icon={CloudOff}
+            title={t('common.loadFailedTitle')}
+            description={t('common.loadFailedDesc')}
+            action={{ label: t('common.retry'), onPress: () => refetch() }}
+          />
         ) : (
           <FlatList
             data={jobs}
@@ -155,19 +164,18 @@ export default function ClientMissionsScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
             ListEmptyComponent={() => (
-              <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-16 mt-8">
-                <Image
-                  source={require('../../../assets/images/empty/no-missions.png')}
-                  style={{ width: 200, height: 200 }}
-                  resizeMode="contain"
-                  className="mb-5"
-                />
-                <Text className="text-content-secondary text-center text-sm font-semibold leading-relaxed px-8">
-                  {tab === 'active'
-                    ? t('client.noActive')
-                    : t('client.emptyHistory')}
-                </Text>
-              </Animated.View>
+              <EmptyState
+                image={require('../../../assets/images/empty/no-missions.png')}
+                title={tab === 'active' ? t('client.noActiveTitle') : t('client.emptyHistoryTitle')}
+                description={tab === 'active' ? t('client.noActive') : t('client.emptyHistory')}
+                // An empty active list is a dead end — offer the one action that
+                // resolves it. History has nothing to act on.
+                action={
+                  tab === 'active'
+                    ? { label: t('client.publishJob'), onPress: () => router.push('/(client)') }
+                    : undefined
+                }
+              />
             )}
           />
         )}

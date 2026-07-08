@@ -6,6 +6,7 @@ import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
 import Row from '@/components/ui/Row';
+import EmptyState from '@/components/ui/EmptyState';
 import { useDriverWallet } from '@/modules/wallet/hooks/useDriverWallet';
 import { WalletService, type DriverWalletTx } from '@/modules/wallet/services/walletService';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -219,10 +220,7 @@ export default function WalletScreen() {
           })}
 
           {transactions.length === 0 && (
-            <View className="items-center justify-center py-12">
-              <View className="mb-4"><Inbox size={40} color={colors.slate} strokeWidth={1.8} /></View>
-              <Text className="text-content-secondary font-medium text-center">{t('driver.noTransactions')}</Text>
-            </View>
+            <EmptyState compact Icon={Inbox} accent="yellow" title={t('driver.noTransactions')} />
           )}
         </View>
       </ScrollView>
