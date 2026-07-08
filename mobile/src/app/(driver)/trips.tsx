@@ -10,6 +10,7 @@ import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import EmptyState from '@/components/ui/EmptyState';
 import Row from '@/components/ui/Row';
 import { Play, CheckCircle, Route } from 'lucide-react-native';
 import SosButton from '@/components/ui/SosButton';
@@ -337,16 +338,11 @@ export default function DriverTripsScreen() {
             contentContainerStyle={{ paddingBottom: 100 }}
             ListHeaderComponent={tab === 'active' ? <DriverStatsHeader /> : null}
             ListEmptyComponent={() => (
-              <Animated.View entering={FadeInDown} className="flex-1 items-center justify-center py-20 mt-10">
-                <View className="w-32 h-32 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-6">
-                  <Route size={52} color={colors.slate} strokeWidth={1.6} />
-                </View>
-                <Text className="text-content-muted text-center text-sm font-semibold leading-relaxed px-8">
-                  {tab === 'active' 
-                    ? t('trips.emptyActive')
-                    : t('trips.emptyHistory')}
-                </Text>
-              </Animated.View>
+              <EmptyState
+                Icon={Route}
+                accent="yellow"
+                title={tab === 'active' ? t('trips.emptyActive') : t('trips.emptyHistory')}
+              />
             )}
           />
         )}

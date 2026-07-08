@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import VanzLogo from '@/components/ui/VanzLogo';
 import Row from '@/components/ui/Row';
+import EmptyState from '@/components/ui/EmptyState';
 import * as Haptics from 'expo-haptics';
 import {
   Bell,
@@ -27,6 +28,7 @@ import {
   Clock,
   AlertTriangle,
   ClipboardList,
+  Radio,
 } from 'lucide-react-native';
 
 type DriverJob = MobileJob & {
@@ -396,8 +398,8 @@ export default function DriverMarketplaceScreen() {
               </Text>
             </Animated.View>
           ) : jobs.length === 0 ? (
-            <Animated.View entering={FadeInDown.delay(220).springify()} className="bg-surface-elevated border border-line rounded-card p-6 items-center shadow-sm">
-              <Text className="text-content-secondary font-semibold text-sm text-center">{t('driver.emptyFeed')}</Text>
+            <Animated.View entering={FadeInDown.delay(220).springify()} className="bg-surface-elevated border border-line rounded-card py-4 shadow-sm">
+              <EmptyState compact accent="yellow" Icon={Radio} title={t('driver.emptyFeed')} />
             </Animated.View>
           ) : (
             <View className="gap-3">

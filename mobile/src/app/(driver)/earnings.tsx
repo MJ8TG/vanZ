@@ -7,6 +7,7 @@ import { useI18n } from '@/i18n';
 import type { MobileJob } from '@/types/domain';
 import { DriverService } from '@/modules/driver/services/driverService';
 import GradientHeader from '@/components/ui/GradientHeader';
+import EmptyState from '@/components/ui/EmptyState';
 import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -119,16 +120,7 @@ export default function DriverEarningsScreen() {
             </Animated.View>
           );
         }}
-        ListEmptyComponent={() => (
-          <Animated.View entering={FadeInDown} className="items-center justify-center py-16">
-            <View className="w-24 h-24 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-5">
-              <Banknote size={40} color={colors.slate} strokeWidth={1.8} />
-            </View>
-            <Text className="text-content-muted text-center text-sm font-semibold px-10">
-              {t('earnings.empty')}
-            </Text>
-          </Animated.View>
-        )}
+        ListEmptyComponent={() => <EmptyState Icon={Banknote} accent="yellow" title={t('earnings.empty')} />}
       />
     </View>
   );

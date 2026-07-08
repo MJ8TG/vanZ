@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
 import GradientHeader from '@/components/ui/GradientHeader';
 import PressableCard from '@/components/ui/PressableCard';
+import EmptyState from '@/components/ui/EmptyState';
 import Row from '@/components/ui/Row';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -171,16 +172,7 @@ export default function SavedAddressesScreen() {
             </Animated.View>
             );
           }}
-          ListEmptyComponent={() => (
-            <Animated.View entering={FadeInDown} className="items-center justify-center py-24">
-              <View className="w-28 h-28 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-6">
-                <MapPin size={44} color={colors.slate} strokeWidth={1.8} />
-              </View>
-              <Text className="text-content-muted text-center text-sm font-semibold px-10">
-                {t('addresses.empty')}
-              </Text>
-            </Animated.View>
-          )}
+          ListEmptyComponent={() => <EmptyState Icon={MapPin} title={t('addresses.empty')} />}
         />
       )}
 

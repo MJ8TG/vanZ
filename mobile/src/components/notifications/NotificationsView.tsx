@@ -7,6 +7,7 @@ import { useI18n, type Locale } from '@/i18n';
 import { NotificationService, type AppNotification } from '@/modules/notifications/notificationService';
 import { ShimmerCard } from '@/components/ui/ShimmerPlaceholder';
 import PressableCard from '@/components/ui/PressableCard';
+import EmptyState from '@/components/ui/EmptyState';
 import Row from '@/components/ui/Row';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import {
@@ -183,16 +184,7 @@ export default function NotificationsView({ resolveHref }: Props) {
             </Animated.View>
           );
         }}
-        ListEmptyComponent={() => (
-          <Animated.View entering={FadeInDown} className="items-center justify-center py-24">
-            <View className="w-28 h-28 bg-surface-elevated rounded-full items-center justify-center shadow-card mb-6">
-              <BellOff size={44} color={colors.slate} strokeWidth={1.8} />
-            </View>
-            <Text className="text-content-muted text-center text-sm font-semibold px-10">
-              {t('notifications.empty')}
-            </Text>
-          </Animated.View>
-        )}
+        ListEmptyComponent={() => <EmptyState Icon={BellOff} title={t('notifications.empty')} />}
       />
     </View>
   );

@@ -1,4 +1,5 @@
 import { colors } from '@/theme/colors';
+import { useThemeColors } from '@/theme/useThemeColors';
 import { type RefObject } from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -43,6 +44,7 @@ export default function AddressSearchSheet({
   const { t, locale } = useI18n();
   const { isRtl } = useDirection();
   const insets = useSafeAreaInsets();
+  const c = useThemeColors();
 
   return (
     <Modal visible={activeInput !== null} animationType="slide">
@@ -104,17 +106,20 @@ export default function AddressSearchSheet({
                 <Text className="text-content-muted text-sm text-center mt-1">{t('addressSheet.tryStreet')}</Text>
               </View>
             )}
+            // These are inline styles (not className) so they can't flip via the
+            // theme vars — feed them the mode-aware hexes. Previously hardcoded
+            // white, which made row labels (text-content, white in dark) invisible.
             styles={{
-              container: { flex: 1, backgroundColor: colors.iceblue },
+              container: { flex: 1, backgroundColor: c.surface },
               textInputContainer: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 },
               textInput: {
-                backgroundColor: '#ffffff', borderRadius: 16, height: 56, fontSize: 16, paddingHorizontal: 16,
-                borderWidth: 1, borderColor: '#e5e7eb', color: colors.navy, textAlign: isRtl ? 'right' : 'left',
+                backgroundColor: c.surfaceElevated, borderRadius: 16, height: 56, fontSize: 16, paddingHorizontal: 16,
+                borderWidth: 1, borderColor: c.border, color: c.textPrimary, textAlign: isRtl ? 'right' : 'left',
               },
               listView: { paddingHorizontal: 20, backgroundColor: 'transparent' },
-              row: { width: ROW_WIDTH, backgroundColor: '#ffffff', padding: 14, borderRadius: 16, marginBottom: 8, borderWidth: 1, borderColor: '#eef2f6' },
+              row: { width: ROW_WIDTH, backgroundColor: c.surfaceElevated, padding: 14, borderRadius: 16, marginBottom: 8, borderWidth: 1, borderColor: c.border },
               separator: { height: 0 },
-              description: { fontSize: 15, color: colors.navy, fontWeight: '600' },
+              description: { fontSize: 15, color: c.textPrimary, fontWeight: '600' },
             }}
           />
         )}
@@ -141,7 +146,7 @@ export default function AddressSearchSheet({
               className="absolute bottom-0 left-0 right-0 bg-surface-elevated rounded-t-3xl px-6 pt-4 shadow-elevated"
               style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
             >
-              <View className="w-12 h-1.5 bg-gray-200 rounded-full self-center mb-4" />
+              <View className="w-12 h-1.5 bg-line-strong rounded-full self-center mb-4" />
               {pickup && (
                 <Row className="items-center gap-3 mb-2.5">
                   <View className="w-3 h-3 rounded-full bg-vanz-green" />
