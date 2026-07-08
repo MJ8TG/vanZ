@@ -5,6 +5,7 @@ import { datasql } from '@/lib/supabase';
 import { getApiBaseUrl } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useI18n } from '@/i18n';
+import * as Haptics from 'expo-haptics';
 import { useTheme, type ThemeMode } from '@/theme/useTheme';
 import { useThemeColors } from '@/theme/useThemeColors';
 import PressableCard from '@/components/ui/PressableCard';
@@ -120,7 +121,10 @@ export default function SettingsView({ helpHref }: Props) {
               return (
                 <TouchableOpacity
                   key={key}
-                  onPress={() => setMode(key)}
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    setMode(key);
+                  }}
                   activeOpacity={0.85}
                   className={`flex-1 py-3 rounded-xl items-center border ${active ? 'bg-vanz-teal/10 border-vanz-teal' : 'bg-surface-sunken border-line'}`}
                 >

@@ -1,5 +1,6 @@
 import { View, Text, Image, TouchableOpacity, type ImageSourcePropType } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { colors } from '@/theme/colors';
 import { useThemeColors } from '@/theme/useThemeColors';
 import type { LucideIcon } from 'lucide-react-native';
@@ -70,7 +71,10 @@ export default function EmptyState({
 
       {action ? (
         <TouchableOpacity
-          onPress={action.onPress}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            action.onPress();
+          }}
           activeOpacity={0.85}
           className={`mt-5 px-6 h-12 rounded-2xl ${accentBg} items-center justify-center active:opacity-90`}
           style={{

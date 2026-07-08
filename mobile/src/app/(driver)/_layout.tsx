@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TabIcon from '@/components/ui/TabIcon';
 import { Radio, Truck, MessageCircle, Wallet, User } from 'lucide-react-native';
 import { useI18n } from '@/i18n';
+import * as Haptics from 'expo-haptics';
 
 const driverTab = { activeColor: colors.yellow, inactiveColor: '#9AAEC4', pillClass: 'bg-vanz-yellow/15' };
 
@@ -16,6 +17,7 @@ export default function DriverTabLayout() {
 
   return (
     <Tabs
+      screenListeners={{ tabPress: () => Haptics.selectionAsync() }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.yellow, // vanz-yellow for driver mode

@@ -8,6 +8,7 @@ import { Home, Package, MessageCircle, User } from 'lucide-react-native';
 import { useI18n } from '@/i18n';
 import { useThemeColors } from '@/theme/useThemeColors';
 import { useColorScheme } from 'nativewind';
+import * as Haptics from 'expo-haptics';
 
 export default function ClientTabLayout() {
   const { t } = useI18n();
@@ -18,6 +19,7 @@ export default function ClientTabLayout() {
 
   return (
     <Tabs
+      screenListeners={{ tabPress: () => Haptics.selectionAsync() }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.teal, // vanz-teal
