@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useI18n } from '@/i18n';
 import { useDirection } from '@/hooks/useDirection';
 import Row from '@/components/ui/Row';
-import { ArrowLeft, ArrowRight, Search, MapPin, Star } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, Search, MapPin, Star, ChevronLeft, ChevronRight, Crosshair } from 'lucide-react-native';
 import type { PlaceSelection } from '@/types/domain';
 
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -125,7 +125,7 @@ export default function AddressSearchSheet({
         )}
 
         {activeInput === 'mapPreview' && (
-          <View className="flex-1 relative bg-surface">
+          <View className="flex-1 relative bg-surface-sunken">
             <MapView ref={mapRef} className="w-full h-full" provider={PROVIDER_GOOGLE} showsUserLocation>
               {pickup && (
                 <Marker coordinate={{ latitude: pickup.lat, longitude: pickup.lng }}>
@@ -142,25 +142,91 @@ export default function AddressSearchSheet({
                 </Marker>
               )}
             </MapView>
-            <View
-              className="absolute bottom-0 left-0 right-0 bg-surface-elevated rounded-t-3xl px-6 pt-4 shadow-elevated"
-              style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
+
+            {/* Recenter on the selected points */}
+            <TouchableOpacity
+              onPress={() => {
+                const coords = [pickup, dropoff]
+                  .filter((p): p is PlaceSelection => !!p)
+                  .map((p) => ({ latitude: p.lat, longitude: p.lng }));
+                if (coords.length === 1) {
+                  mapRef.current?.animateToRegion({ ...coords[0], latitudeDelta: 0.03, longitudeDelta: 0.03 });
+                } else if (coords.length > 1) {
+                  mapRef.current?.fitToCoordinates(coords, {
+                    edgePadding: { top: 100, right: 80, bottom: 280, left: 80 },
+                    animated: true,
+                  });
+                }
+              }}
+              className="absolute w-11 h-11 rounded-full bg-surface-elevated border border-line items-center justify-center shadow-card active:bg-surface-sunken"
+              style={{ top: 16, ...(isRtl ? { left: 16 } : { right: 16 }) }}
+              accessibilityLabel={t('addressSheet.mapTitle')}
             >
-              <View className="w-12 h-1.5 bg-line-strong rounded-full self-center mb-4" />
-              {pickup && (
-                <Row className="items-center gap-3 mb-2.5">
-                  <View className="w-3 h-3 rounded-full bg-vanz-green" />
-                  <Text numberOfLines={1} className={`flex-1 text-content font-semibold text-sm ${isRtl ? 'text-right' : ''}`}>{pickup.description}</Text>
+              <Crosshair size={20} color={c.textPrimary} strokeWidth={2.2} />
+            </TouchableOpacity>
+
+            <View
+              className="absolute bottom-0 left-0 right-0 bg-surface-elevated rounded-t-[28px] px-5 pt-4 shadow-elevated border-t border-line"
+              // Inside an Android Modal (edge-to-edge) the safe-area inset can
+              // report 0, which used to leave the confirm button clipped under
+              // the gesture bar — guarantee real clearance instead.
+              style={{ paddingBottom: Math.max(insets.bottom, 28) + 20 }}
+            >
+              <View className="w-12 h-1.5 bg-line-strong rounded-full self-center mb-5" />
+
+              {/* Route card: timeline rail + labeled stops */}
+              <View className="bg-surface rounded-2xl border border-line px-4 py-4 mb-4">
+                <Row className={`items-stretch ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <View className="items-center w-5">
+                    {pickup && (
+                      <View className="w-3.5 h-3.5 rounded-full bg-vanz-green border-2 border-vanz-green/30 mt-1" />
+                    )}
+                    {pickup && dropoff && <View className="flex-1 w-0.5 bg-line-strong my-1 rounded-full" />}
+                    {dropoff && (
+                      <View className="w-3.5 h-3.5 rounded-[4px] bg-vanz-yellow border-2 border-vanz-yellow/30 mb-1" />
+                    )}
+                  </View>
+                  <View className={`flex-1 ${isRtl ? 'mr-3' : 'ml-3'}`}>
+                    {pickup && (
+                      <View className={dropoff ? 'mb-4' : ''}>
+                        <Text className={`text-content-muted font-bold text-[10px] uppercase tracking-[0.08em] ${isRtl ? 'text-right' : ''}`}>
+                          {t('home.departure')}
+                        </Text>
+                        <Text numberOfLines={1} className={`text-content font-extrabold text-[15px] mt-0.5 ${isRtl ? 'text-right' : ''}`}>
+                          {pickup.description}
+                        </Text>
+                      </View>
+                    )}
+                    {dropoff && (
+                      <View>
+                        <Text className={`text-content-muted font-bold text-[10px] uppercase tracking-[0.08em] ${isRtl ? 'text-right' : ''}`}>
+                          {t('home.arrival')}
+                        </Text>
+                        <Text numberOfLines={1} className={`text-content font-extrabold text-[15px] mt-0.5 ${isRtl ? 'text-right' : ''}`}>
+                          {dropoff.description}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 </Row>
-              )}
-              {dropoff && (
-                <Row className="items-center gap-3 mb-4">
-                  <View className="w-3 h-3 rounded-sm bg-vanz-yellow" />
-                  <Text numberOfLines={1} className={`flex-1 text-content font-semibold text-sm ${isRtl ? 'text-right' : ''}`}>{dropoff.description}</Text>
-                </Row>
-              )}
-              <TouchableOpacity onPress={onClose} className="w-full h-14 bg-inverted rounded-2xl items-center justify-center shadow-elevated active:opacity-90">
-                <Text className="text-white font-black text-lg">{t('addressSheet.confirm')}</Text>
+              </View>
+
+              <TouchableOpacity onPress={onClose} className="w-full h-14 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90">
+                <LinearGradient
+                  colors={[colors.teal, colors.tealDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  // Explicit style: className flex props don't reliably reach
+                  // expo-linear-gradient, which left the label pinned to a side.
+                  style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Row className="items-center gap-2">
+                    <Text className="text-white font-black text-lg">{t('addressSheet.confirm')}</Text>
+                    {isRtl
+                      ? <ChevronLeft size={20} color={colors.white} strokeWidth={2.6} />
+                      : <ChevronRight size={20} color={colors.white} strokeWidth={2.6} />}
+                  </Row>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
