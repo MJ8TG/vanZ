@@ -1,6 +1,6 @@
 import { colors } from '@/theme/colors';
 import { useThemeColors } from '@/theme/useThemeColors';
-import { type RefObject } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useI18n } from '@/i18n';
 import { useDirection } from '@/hooks/useDirection';
 import Row from '@/components/ui/Row';
-import { ArrowLeft, ArrowRight, Search, MapPin, Star, ChevronLeft, ChevronRight, Crosshair } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, Search, MapPin, Star, ChevronLeft, ChevronRight, Crosshair, WifiOff } from 'lucide-react-native';
 import type { PlaceSelection } from '@/types/domain';
 
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -45,9 +45,19 @@ export default function AddressSearchSheet({
   const { isRtl } = useDirection();
   const insets = useSafeAreaInsets();
   const c = useThemeColors();
+  // Places API failures (quota, billing, network) were swallowed silently and
+  // the search just showed nothing — surface them so the user knows to use
+  // the saved-address quick-picks instead.
+  const [searchFailed, setSearchFailed] = useState(false);
+
+  useEffect(() => {
+    setSearchFailed(false);
+  }, [activeInput]);
 
   return (
-    <Modal visible={activeInput !== null} animationType="slide">
+    // onRequestClose: without it the Android hardware back button is a no-op
+    // inside a RN Modal and users are stuck on this sheet.
+    <Modal visible={activeInput !== null} animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 bg-surface">
         <LinearGradient
           colors={[colors.navy, colors.navyLight]}
@@ -66,11 +76,25 @@ export default function AddressSearchSheet({
           </Row>
         </LinearGradient>
 
+        {(activeInput === 'pickup' || activeInput === 'dropoff') && searchFailed && (
+          <View className={`mx-5 mt-4 px-4 py-3 rounded-2xl bg-warning/10 border border-warning/30 flex-row items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <WifiOff size={16} color={c.warning} strokeWidth={2.2} />
+            <Text className={`flex-1 text-warning font-bold text-xs leading-relaxed ${isRtl ? 'text-right' : ''}`}>
+              {t('addressSheet.searchUnavailable')}
+            </Text>
+          </View>
+        )}
+
         {(activeInput === 'pickup' || activeInput === 'dropoff') && (
           <GooglePlacesAutocomplete
             placeholder={t('createJob.searchPlaceholder')}
             fetchDetails
             onPress={onPlaceSelect}
+            onFail={(e) => {
+              console.warn('Places autocomplete failed:', e);
+              setSearchFailed(true);
+            }}
+            onTimeout={() => setSearchFailed(true)}
             minLength={2}
             debounce={250}
             enablePoweredByContainer={false}
@@ -117,8 +141,11 @@ export default function AddressSearchSheet({
                 borderWidth: 1, borderColor: c.border, color: c.textPrimary, textAlign: isRtl ? 'right' : 'left',
               },
               listView: { paddingHorizontal: 20, backgroundColor: 'transparent' },
-              row: { width: ROW_WIDTH, backgroundColor: c.surfaceElevated, padding: 14, borderRadius: 16, marginBottom: 8, borderWidth: 1, borderColor: c.border },
-              separator: { height: 0 },
+              // Spacing must live in `separator`, not a row margin: the lib's
+              // touch regions don't account for row margins, so every row after
+              // the first became untappable (visuals drifted below hit areas).
+              row: { width: ROW_WIDTH, backgroundColor: c.surfaceElevated, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: c.border },
+              separator: { height: 8, backgroundColor: 'transparent' },
               description: { fontSize: 15, color: c.textPrimary, fontWeight: '600' },
             }}
           />

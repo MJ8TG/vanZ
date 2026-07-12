@@ -601,7 +601,8 @@
     "mapTitle": "Carte",
     "noResults": "Aucun résultat",
     "tryStreet": "Essayez un nom de rue ou de ville",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "searchUnavailable": "Recherche indisponible pour le moment. Utilisez vos adresses enregistrées ci-dessous."
   },
   "bidScreen": {
     "notApprovedTitle": "Compte non approuvé",

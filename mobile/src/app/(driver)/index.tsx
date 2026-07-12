@@ -110,7 +110,10 @@ export default function DriverMarketplaceScreen() {
     try {
       const { data, error } = await datasql
         .from('jobs')
-        .select('*, bids(status), client:users!client_id(first_name, last_name, cached_rating)')
+        // bids must name its FK: jobs↔bids has two relationships (bids.job_id
+        // and jobs.accepted_bid_id), so a bare `bids()` embed is ambiguous
+        // (PGRST201) and the whole market query fails.
+        .select('*, bids!bids_job_id_fkey(status), client:users!client_id(first_name, last_name, cached_rating)')
         .in('status', activeStatuses)
         .order('created_at', { ascending: false });
 

@@ -601,7 +601,8 @@
     "mapTitle": "الخريطة",
     "noResults": "لا توجد نتائج",
     "tryStreet": "جرّب اسم شارع أو مدينة",
-    "confirm": "تأكيد"
+    "confirm": "تأكيد",
+    "searchUnavailable": "البحث غير متاح حاليًا. استخدم عناوينك المحفوظة أدناه."
   },
   "bidScreen": {
     "notApprovedTitle": "حساب غير مفعل",

@@ -25,7 +25,9 @@ export class BookingService {
   static async fetchClientMissions(userId: string, statuses: string[]): Promise<ClientMissionJob[]> {
     const { data, error } = await datasql
       .from('jobs')
-      .select('*, bids(amount)')
+      // Explicit FK: jobs↔bids is ambiguous (bids.job_id vs jobs.accepted_bid_id)
+      // and a bare embed 300s with PGRST201 — this was why missions failed to load.
+      .select('*, bids!bids_job_id_fkey(amount)')
       .eq('client_id', userId)
       .in('status', statuses)
       .order('created_at', { ascending: false });
