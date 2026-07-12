@@ -161,7 +161,7 @@ export default function DriverProfileScreen() {
                   </View>
                   <Text className="text-content text-base font-extrabold">{t('client.language')}</Text>
                 </Row>
-                <View className="bg-inverted/5 px-3 py-1 rounded-lg">
+                <View className="bg-surface-sunken px-3 py-1 rounded-lg">
                   <Text className="text-content-secondary font-black text-xs">
                     {locale === 'fr' ? 'Français' : 'العربية'}
                   </Text>

@@ -122,7 +122,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
                 </Row>
               </Row>
             </View>
-            <View className="bg-inverted/5 px-3 py-1.5 rounded-lg border border-vanz-navy/10">
+            <View className="bg-surface-sunken px-3 py-1.5 rounded-lg border border-line">
               <Text className="text-content font-black text-xs uppercase">{job.load_capacity?.replace('van_', 'Van ')}</Text>
             </View>
           </Row>
@@ -163,7 +163,7 @@ export default function DriverJobSheet({ job, onClose, onBidSuccess }: DriverJob
 
           {job.description ? (
             <View className="bg-vanz-teal/5 p-4 rounded-2xl border border-vanz-teal/10 mb-6">
-              <Text className={`text-vanz-navy/80 text-sm font-medium leading-relaxed ${isRtl ? 'text-right' : ''}`}>
+              <Text className={`text-content-secondary text-sm font-medium leading-relaxed ${isRtl ? 'text-right' : ''}`}>
                 <Text className="font-bold">Note: </Text>{job.description}
               </Text>
             </View>

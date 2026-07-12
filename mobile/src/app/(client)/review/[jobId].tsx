@@ -217,7 +217,7 @@ export default function ReviewScreen() {
       </KeyboardAvoidingView>
 
       {/* Submit */}
-      <View className="absolute bottom-0 w-full p-5 bg-card-glass border-t border-white/50 pb-8 shadow-elevated">
+      <View className="absolute bottom-0 w-full p-5 bg-surface-elevated/95 border-t border-line pb-8 shadow-elevated">
         <TouchableOpacity onPress={handleSubmit} disabled={rating === 0 || submitting} className="w-full h-16 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90">
           <LinearGradient
             colors={rating === 0 || submitting ? ['#E2E8F0', '#CBD5E1'] : [colors.teal, colors.tealDark]}

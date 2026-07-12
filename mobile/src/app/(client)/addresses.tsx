@@ -177,7 +177,7 @@ export default function SavedAddressesScreen() {
       )}
 
       {/* Add button */}
-      <View className="absolute bottom-0 w-full p-5 bg-card-glass border-t border-white/50 pb-8 shadow-elevated">
+      <View className="absolute bottom-0 w-full p-5 bg-surface-elevated/95 border-t border-line pb-8 shadow-elevated">
         <TouchableOpacity onPress={() => setAdding(true)} className="w-full h-16 rounded-2xl overflow-hidden shadow-glow-teal active:opacity-90">
           <LinearGradient colors={[colors.teal, colors.tealDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} className="w-full h-full items-center justify-center flex-row gap-2">
             <Plus size={20} color={colors.white} strokeWidth={2.8} />

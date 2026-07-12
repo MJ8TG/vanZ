@@ -6,10 +6,10 @@ interface PremiumCardProps extends ViewProps {
   className?: string;
 }
 
-/** Glassmorphism container: frosted white surface, soft elevation, hairline border. */
+/** Elevated container: themed surface, soft elevation, hairline border. */
 export default function PremiumCard({ children, className = '', ...rest }: PremiumCardProps) {
   return (
-    <View {...rest} className={`bg-card-glass rounded-3xl shadow-elevated border border-white/50 ${className}`}>
+    <View {...rest} className={`bg-surface-elevated rounded-3xl shadow-elevated border border-line ${className}`}>
       {children}
     </View>
   );

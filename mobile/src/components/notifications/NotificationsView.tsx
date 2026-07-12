@@ -167,7 +167,7 @@ export default function NotificationsView({ resolveHref }: Props) {
                   </View>
                   <View className="flex-1">
                     <Row className="items-center justify-between mb-0.5">
-                      <Text className={`font-extrabold text-base flex-1 ${unread ? 'text-content' : 'text-vanz-navy/80'} ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
+                      <Text className={`font-extrabold text-base flex-1 ${unread ? 'text-content' : 'text-content-secondary'} ${isRtl ? 'text-right' : ''}`} numberOfLines={1}>
                         {item.title}
                       </Text>
                       {unread && <View className="w-2.5 h-2.5 rounded-full bg-vanz-teal ml-2 mr-2" />}

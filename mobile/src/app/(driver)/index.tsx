@@ -313,7 +313,7 @@ export default function DriverMarketplaceScreen() {
             onPress={toggleOnline}
             activeOpacity={0.9}
             className={`rounded-card p-5 shadow-card border ${
-              online ? 'bg-inverted border-vanz-navy' : 'bg-surface-elevated border-line'
+              online ? 'bg-inverted border-vanz-green/50' : 'bg-surface-elevated border-line'
             }`}
           >
             <Row className="items-center">
@@ -389,7 +389,7 @@ export default function DriverMarketplaceScreen() {
           </Row>
           {!online ? (
             <Animated.View entering={FadeInDown.delay(220).springify()} className="bg-surface-elevated border border-line rounded-card p-6 items-center shadow-sm">
-              <View className="w-14 h-14 rounded-full bg-inverted/5 items-center justify-center mb-3">
+              <View className="w-14 h-14 rounded-full bg-surface-sunken items-center justify-center mb-3">
                 <Power size={26} color={c.textPrimary} strokeWidth={2.2} />
               </View>
               <Text className="text-content font-black text-base text-center">{t('driver.onlineCardOff')}</Text>
@@ -517,7 +517,7 @@ function JobFeedCard({
               )}
             </View>
           </Row>
-          <View className="bg-inverted/5 border border-vanz-navy/10 px-2.5 py-1 rounded-lg flex-row items-center gap-1.5">
+          <View className="bg-surface-sunken border border-line px-2.5 py-1 rounded-lg flex-row items-center gap-1.5">
             <Truck size={12} color={c.textPrimary} strokeWidth={2.4} />
             <Text className="text-content text-[11px] font-black">{loadLabel}</Text>
           </View>

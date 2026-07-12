@@ -170,7 +170,7 @@ export default function BidCard({ bid, index, isBestPrice, isFastest, isLive, is
 
         {/* non-open states */}
         {!isLive && bid.status === 'accepted' && (
-          <TouchableOpacity onPress={onChat} className="flex-row items-center justify-center bg-inverted/5 py-2.5 rounded-xl mt-3 active:bg-inverted/10">
+          <TouchableOpacity onPress={onChat} className="flex-row items-center justify-center bg-surface-sunken py-2.5 rounded-xl mt-3 active:bg-line">
             <MessageSquare size={15} color={c.textPrimary} />
             <Text className="text-content font-extrabold text-xs uppercase tracking-wide mx-2">
               {t('bidCard.chatWithDriver')}

@@ -221,7 +221,7 @@ export default function BidScreen() {
       </ScrollView>
 
       {/* Submit Button */}
-      <View className="absolute bottom-0 w-full p-5 bg-card-glass border-t border-white/50 pb-8 shadow-elevated">
+      <View className="absolute bottom-0 w-full p-5 bg-surface-elevated/95 border-t border-line pb-8 shadow-elevated">
         <TouchableOpacity 
           onPress={handleSubmit}
           disabled={loading || !price}

@@ -369,7 +369,7 @@ function Chip({ Icon, label, active, onPress, isRtl }: { Icon: LucideIcon; label
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex-row items-center gap-1 px-3 py-2 rounded-full border ${active ? 'bg-inverted border-vanz-navy' : 'bg-surface-elevated border-line'} ${isRtl ? 'flex-row-reverse' : ''}`}
+      className={`flex-row items-center gap-1 px-3 py-2 rounded-full border ${active ? 'bg-inverted border-vanz-teal/60' : 'bg-surface-elevated border-line'} ${isRtl ? 'flex-row-reverse' : ''}`}
     >
       <Icon size={13} color={active ? colors.yellow : colors.muted} strokeWidth={2.4} />
       <Text className={`text-xs font-bold ${active ? 'text-white' : 'text-content-secondary'}`}>{label}</Text>

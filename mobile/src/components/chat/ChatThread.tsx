@@ -123,7 +123,7 @@ export default function ChatThread({ conversationId, userType }: Props) {
     if (item.type === 'system' || item.sender_type === 'system') {
       return (
         <View className="items-center my-2 px-8">
-          <View className="bg-inverted/5 px-4 py-2 rounded-full">
+          <View className="bg-surface-sunken px-4 py-2 rounded-full">
             <Text className="text-content-secondary text-xs font-bold text-center">{item.content}</Text>
           </View>
         </View>
