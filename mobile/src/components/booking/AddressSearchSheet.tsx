@@ -2,6 +2,7 @@ import { colors } from '@/theme/colors';
 import { useThemeColors } from '@/theme/useThemeColors';
 import { type RefObject, useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,17 +20,28 @@ const ROW_WIDTH = Dimensions.get('window').width - 40;
 
 export type AddressInputTarget = 'pickup' | 'dropoff' | 'mapPreview' | null;
 
+/** Shape produced by the home screen from the user's saved addresses. */
+export type SavedQuickPick = {
+  description: string;
+  label?: string;
+  geometry: { location: { lat: number; lng: number } };
+};
+
 interface Props {
   activeInput: AddressInputTarget;
   onClose: () => void;
   pickup: PlaceSelection | null;
   dropoff: PlaceSelection | null;
-  /** Saved addresses as predefined rows (instant, no Places API call). */
-  savedPredefined: unknown[];
+  /** Saved addresses as quick-pick rows (instant, no Places API call). */
+  savedPredefined: SavedQuickPick[];
   onPlaceSelect: (
     data: { description: string },
     details: { geometry: { location: { lat: number; lng: number } } } | null
   ) => void;
+  /** Saved-address pick: applies the value and closes — no map confirm step.
+   *  The user already knows their own saved address, and mounting the map is
+   *  the single heaviest operation in this flow. */
+  onQuickPick: (sel: PlaceSelection) => void;
   mapRef: RefObject<MapView | null>;
 }
 
@@ -39,7 +51,7 @@ interface Props {
  * client home screen.
  */
 export default function AddressSearchSheet({
-  activeInput, onClose, pickup, dropoff, savedPredefined, onPlaceSelect, mapRef,
+  activeInput, onClose, pickup, dropoff, savedPredefined, onPlaceSelect, onQuickPick, mapRef,
 }: Props) {
   const { t, locale } = useI18n();
   const { isRtl } = useDirection();
@@ -54,10 +66,15 @@ export default function AddressSearchSheet({
     setSearchFailed(false);
   }, [activeInput]);
 
+  // Unmount the Modal entirely rather than toggling `visible`: on Android
+  // (Fabric) the Modal can ignore visible=false when it flips inside a child's
+  // onPress, leaving the sheet stuck open even though state already changed.
+  if (activeInput === null) return null;
+
   return (
     // onRequestClose: without it the Android hardware back button is a no-op
     // inside a RN Modal and users are stuck on this sheet.
-    <Modal visible={activeInput !== null} animationType="slide" onRequestClose={onClose}>
+    <Modal visible animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 bg-surface">
         <LinearGradient
           colors={[colors.navy, colors.navyLight]}
@@ -85,6 +102,48 @@ export default function AddressSearchSheet({
           </View>
         )}
 
+        {/* Saved-address quick-picks, rendered by US — not fed to the lib as
+            predefinedPlaces. The lib nests each row in Pressable-inside-a-
+            horizontal-ScrollView sized for compact 44dp rows; with our tall
+            custom cards its touch targets drift and every row after the first
+            became untappable. Plain TouchableOpacity has no such problem. */}
+        {(activeInput === 'pickup' || activeInput === 'dropoff') && savedPredefined.length > 0 && (
+          <View className="px-5 pt-4">
+            <Text className={`text-content-muted font-black text-xs uppercase tracking-wider mb-2 ${isRtl ? 'text-right' : ''}`}>
+              {t('addressSheet.savedTitle')}
+            </Text>
+            {savedPredefined.map((p) => (
+              <TouchableOpacity
+                key={`${p.label ?? ''}-${p.description}`}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  onQuickPick({
+                    description: p.description,
+                    lat: p.geometry.location.lat,
+                    lng: p.geometry.location.lng,
+                  });
+                }}
+                activeOpacity={0.85}
+                className={`bg-surface-elevated border border-line rounded-2xl px-4 py-3.5 mb-2 flex-row items-center gap-3 active:bg-surface-sunken ${isRtl ? 'flex-row-reverse' : ''}`}
+              >
+                <View className="w-9 h-9 rounded-full bg-vanz-teal/10 items-center justify-center">
+                  <Star size={15} color={colors.teal} strokeWidth={2.4} />
+                </View>
+                <View className="flex-1">
+                  <Text numberOfLines={1} className={`text-content font-bold text-[15px] ${isRtl ? 'text-right' : ''}`}>
+                    {p.label || p.description}
+                  </Text>
+                  {p.label ? (
+                    <Text numberOfLines={1} className={`text-content-muted text-xs mt-0.5 ${isRtl ? 'text-right' : ''}`}>
+                      {p.description}
+                    </Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {(activeInput === 'pickup' || activeInput === 'dropoff') && (
           <GooglePlacesAutocomplete
             placeholder={t('createJob.searchPlaceholder')}
@@ -100,23 +159,20 @@ export default function AddressSearchSheet({
             enablePoweredByContainer={false}
             isRowScrollable={false}
             keyboardShouldPersistTaps="handled"
-            predefinedPlaces={savedPredefined as any}
             textInputProps={{ placeholderTextColor: colors.mist }}
             query={{ key: GOOGLE_MAPS_API_KEY, language: locale, components: 'country:tn' }}
+            // Keep these rows COMPACT: the lib's per-row Pressable/ScrollView
+            // geometry assumes ~44dp rows, and tall custom rows shift the touch
+            // targets off the visuals (saved quick-picks moved out entirely).
             renderRow={(row: any) => {
-              const predefined = row.isPredefinedPlace === true;
-              const main = predefined ? row.label || row.description : row.structured_formatting?.main_text ?? row.description;
-              const sub = predefined ? row.description : row.structured_formatting?.secondary_text;
+              const main = row.structured_formatting?.main_text ?? row.description;
+              const sub = row.structured_formatting?.secondary_text;
               return (
                 <Row className="flex-1 items-center gap-3">
-                  <View className={`w-9 h-9 rounded-full items-center justify-center ${predefined ? 'bg-vanz-teal/10' : 'bg-surface-sunken'}`}>
-                    {predefined
-                      ? <Star size={15} color={colors.teal} strokeWidth={2.4} />
-                      : <MapPin size={15} color={colors.muted} strokeWidth={2.4} />}
-                  </View>
+                  <MapPin size={16} color={colors.muted} strokeWidth={2.4} />
                   <View className="flex-1">
-                    <Text numberOfLines={1} className={`text-content font-bold text-[15px] ${isRtl ? 'text-right' : ''}`}>{main}</Text>
-                    {sub ? <Text numberOfLines={1} className={`text-content-muted text-xs mt-0.5 ${isRtl ? 'text-right' : ''}`}>{sub}</Text> : null}
+                    <Text numberOfLines={1} className={`text-content font-bold text-[14px] ${isRtl ? 'text-right' : ''}`}>{main}</Text>
+                    {sub ? <Text numberOfLines={1} className={`text-content-muted text-xs ${isRtl ? 'text-right' : ''}`}>{sub}</Text> : null}
                   </View>
                 </Row>
               );
@@ -144,8 +200,8 @@ export default function AddressSearchSheet({
               // Spacing must live in `separator`, not a row margin: the lib's
               // touch regions don't account for row margins, so every row after
               // the first became untappable (visuals drifted below hit areas).
-              row: { width: ROW_WIDTH, backgroundColor: c.surfaceElevated, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: c.border },
-              separator: { height: 8, backgroundColor: 'transparent' },
+              row: { width: ROW_WIDTH, backgroundColor: c.surfaceElevated, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: c.border },
+              separator: { height: 6, backgroundColor: 'transparent' },
               description: { fontSize: 15, color: c.textPrimary, fontWeight: '600' },
             }}
           />

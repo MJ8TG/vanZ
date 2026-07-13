@@ -602,7 +602,8 @@
     "noResults": "Aucun résultat",
     "tryStreet": "Essayez un nom de rue ou de ville",
     "confirm": "Confirmer",
-    "searchUnavailable": "Recherche indisponible pour le moment. Utilisez vos adresses enregistrées ci-dessous."
+    "searchUnavailable": "Recherche indisponible pour le moment. Utilisez vos adresses enregistrées ci-dessous.",
+    "savedTitle": "Adresses enregistrées"
   },
   "bidScreen": {
     "notApprovedTitle": "Compte non approuvé",

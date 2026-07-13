@@ -128,6 +128,15 @@ export default function ClientHomeScreen() {
     }, 100);
   };
 
+  // Saved quick-pick inside the sheet: apply and close. No map confirm — the
+  // user knows their own saved address, and the map mount is the heaviest
+  // (and on weak devices, flakiest) step in the flow.
+  const handleQuickPick = (sel: PlaceSelection) => {
+    if (activeInput === 'pickup') setPickup(sel);
+    if (activeInput === 'dropoff') setDropoff(sel);
+    setActiveInput(null);
+  };
+
   const applySaved = (a: SavedAddress) => {
     Haptics.selectionAsync();
     const sel: PlaceSelection = { description: a.address, lat: Number(a.lat), lng: Number(a.lng) };
@@ -359,6 +368,7 @@ export default function ClientHomeScreen() {
         dropoff={dropoff}
         savedPredefined={savedPredefined}
         onPlaceSelect={handlePlaceSelect}
+        onQuickPick={handleQuickPick}
         mapRef={mapRef}
       />
     </KeyboardAvoidingView>
