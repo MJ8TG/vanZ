@@ -3,6 +3,47 @@
 Status as of 2026-08-13. Ordered by risk, not by effort.
 Every finding below was verified against the live database or the source, not inferred.
 
+## Progress
+
+| Item | Status |
+|---|---|
+| P0-1 Revoke anon EXECUTE on money RPCs | **done** — migration 025/027, verified as `anon` and `service_role` |
+| P0-2 Check for exploitation | **done** — no unexplained gains; see P0-5 for what it did uncover |
+| P0-3 Admin dispute refunds | **done** — migration 026 + `POST /api/admin/disputes/adjust` |
+| P0-4 Repo visibility, key rotation, Dependabot | **open — your decision** |
+| P0-5 Clients can rewrite their own job rows | **done** — migration 028, tamper test passes |
+| P0-6 Simulator writes to production from the browser | **done** — route now 404s outside development |
+| **P0-7 The payout pipeline has never executed** | **open — now the top priority** |
+| Phase 1 CI + regression test | not started |
+
+---
+
+## P0-7. The payout pipeline has never run (new top priority)
+
+`wallet_transactions` and `loyalty_transactions` are both empty — zero rows, ever.
+No user of any role has a positive `credit_balance`. Yet 17 jobs are `completed`,
+12 of them carrying a computed `driver_payout` totalling 1,530 TND.
+
+`audit_logs` contains no `status_transition` row with `new_state = 'completed'`.
+Step 4 of `bookingService.completeJob` writes one unconditionally, so that function
+has never run — not once. `updateJobStatus` is typed to accept only
+`en_route | arrived | in_progress`, so it is not the path either. Those jobs were
+written directly to the table, which the `/simulator` page did via `dbCompleteJob`
+(now gated by P0-6, and blocked at the database by P0-5).
+
+So the good news is that the missing payouts are an artefact of dev tooling rather
+than of real drivers going unpaid. The bad news is larger: **the entire wallet and
+payout path is unexercised.** Steps 6 and 7 of `completeJob` — the ledger insert,
+the balance credit, the loyalty award — have never executed against this database,
+and none of those four calls checks its error, so the first real completion could
+fail silently in exactly the way the admin dispute flow did.
+
+Next step: drive one job through `POST /api/jobs/complete` end to end against a
+Supabase branch, and assert that `wallet_transactions` gains a row, `credit_balance`
+moves by the payout, and `audit_logs` records the transition. Then port steps 6 and 7
+onto `apply_wallet_adjustment` (migration 026) so the ledger and the balance can no
+longer diverge, and check every error return.
+
 ---
 
 ## Phase 0 — Stop the bleeding (do today, ~2 hours)
@@ -172,9 +213,15 @@ dashboard or from an angry customer.
 
 ## Sequencing
 
-Phase 0 is a single afternoon and should not wait for the others. Phase 1 is what stops
-Phase 0 from recurring. Phases 2 and 3 can run in parallel once the money paths are locked.
+Revised after the Phase 0 work. **P0-7 now comes before Phase 1.** A marketplace that
+computes payouts correctly but has never once credited one is a harder blocker than
+missing CI, and proving that path works is also the natural first integration test —
+it feeds directly into Phase 2.
 
-Launch gate: **Phase 0 and Phase 1 complete, plus Phase 3's monitoring, backups, and legal.**
-Phase 2 raises confidence and should be underway, but a cash-first launch with a small user
-base can begin while test coverage is still being built — provided Phase 1 CI is green.
+After that, Phase 1 is what stops any of Phase 0 from recurring; the anon-execute hole
+had already been fixed once and came back. Phases 2 and 3 can run in parallel.
+
+Launch gate: **Phase 0 complete (including P0-7), Phase 1 complete, plus Phase 3's
+monitoring, backups, and legal.** Phase 2 raises confidence and should be underway, but a
+cash-first launch with a small user base can begin while test coverage is still being
+built — provided CI is green and one real payout has been observed working.
