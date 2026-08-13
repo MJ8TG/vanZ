@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  static:
+    name: Typecheck and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # --quiet reports errors only. The repo currently carries ~216 warnings
+      # (mostly no-explicit-any); those are tracked as Phase 2 work in
+      # LAUNCH_READINESS.md and must not block a merge, but errors must.
+      - name: Lint
+        run: npx eslint --quiet
+
+  db-permissions:
+    name: Database permission invariants
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for database credentials
+        id: creds
+        run: |
+          if [ -n "${{ secrets.SUPABASE_DB_URL }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SUPABASE_DB_URL is not configured, so the money-RPC permission check did not run. Add it in Settings > Secrets to enable this gate."
+          fi
+
+      # Asserts that anon and authenticated cannot execute the money RPCs, that
+      # the column-lock triggers are enabled, and that SECURITY DEFINER functions
+      # pin search_path. These grants were already lost once to a DROP + recreate
+      # (see scripts/db-permission-check.sql), which is why this is a gate rather
+      # than a convention.
+      - name: Assert money RPCs are not client-reachable
+        if: steps.creds.outputs.present == 'true'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f scripts/db-permission-check.sql

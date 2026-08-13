@@ -13,8 +13,16 @@ Every finding below was verified against the live database or the source, not in
 | P0-4 Repo visibility, key rotation, Dependabot | **open — your decision** |
 | P0-5 Clients can rewrite their own job rows | **done** — migration 028, tamper test passes |
 | P0-6 Simulator writes to production from the browser | **done** — route now 404s outside development |
-| **P0-7 The payout pipeline has never executed** | **open — now the top priority** |
-| Phase 1 CI + regression test | not started |
+| **P0-7 The payout pipeline has never executed** | **partly done** — code hardened (atomic, idempotent, error-checked); still needs one real end-to-end run |
+| P1-1 CI workflow | **done** — `.github/workflows/ci.yml` |
+| P1-2 Permission regression test | **done** — `scripts/db-permission-check.sql`, passing |
+| P1-3 Migration hygiene note | **done** — `AGENTS.md` |
+| Phase 2 test coverage | not started |
+| Phase 3 operational readiness | not started |
+
+To enable the CI permission gate, add a `SUPABASE_DB_URL` secret in the repository
+settings. Without it that job warns and skips rather than failing, so CI stays green
+but the gate is inactive.
 
 ---
 

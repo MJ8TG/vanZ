@@ -29,6 +29,10 @@ const eslintConfig = defineConfig([
     "test-results/**",
     "tests/**",
     "supabase/functions/**",
+    // Scratch copies of the repo created by agent tooling — not project source.
+    ".claude/worktrees/**",
+    "graphify/**",
+    "graphify-out/**",
   ]),
 ]);
 
