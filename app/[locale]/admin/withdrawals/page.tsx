@@ -38,13 +38,25 @@ export default function AdminWithdrawals() {
     if (!confirm(`Valider le virement de ${w.amount} TND pour ${driver.first_name} ?`)) return;
 
     try {
-      const newCredit = driver.credit_balance - w.amount;
-      await supabase.from('users').update({ credit_balance: newCredit }).eq('id', driver.id);
+      // The balance check, ledger row, debit and status change happen together
+      // on the server. The balance shown above is only a hint — the server
+      // re-checks it before paying.
+      const { data: { session } } = await supabase.auth.getSession();
 
-      await supabase.from('withdrawals').update({ 
-        status: 'completed', 
-        processed_at: new Date().toISOString() 
-      }).eq('id', w.id);
+      const res = await fetch('/api/admin/withdrawals/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token ?? ''}`,
+        },
+        body: JSON.stringify({ withdrawal_id: w.id }),
+      });
+
+      const payload = await res.json();
+      if (!res.ok) {
+        alert(payload.error || "La validation du virement a échoué.");
+        return;
+      }
 
       await supabase.functions.invoke('driver-status-change', {
          body: { type: 'withdrawal_success', phone: driver.phone, amount: w.amount }

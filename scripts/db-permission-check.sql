@@ -25,7 +25,8 @@ DECLARE
     'public.complete_job_atomic(uuid,numeric,numeric)',
     'public.apply_wallet_adjustment(uuid,numeric,text,uuid,text)',
     'public.apply_loyalty_award(uuid,integer,text,uuid)',
-    'public.auto_cancel_stale_payments()'
+    'public.auto_cancel_stale_payments()',
+    'public.approve_withdrawal(uuid,uuid)'
   ];
   v_sig        text;
 BEGIN
@@ -87,7 +88,7 @@ BEGIN
         'complete_job_atomic','apply_wallet_adjustment','apply_loyalty_award',
         'auto_cancel_stale_payments','lock_protected_user_columns',
         'lock_protected_job_columns','lock_protected_driver_columns',
-        'lock_protected_bid_columns'
+        'lock_protected_bid_columns','approve_withdrawal'
       )
       AND (p.proconfig IS NULL
            OR NOT EXISTS (SELECT 1 FROM unnest(p.proconfig) cfg

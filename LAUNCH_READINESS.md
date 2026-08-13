@@ -14,6 +14,7 @@ Every finding below was verified against the live database or the source, not in
 | P0-5 Clients can rewrite their own job rows | **done** — migration 028, tamper test passes |
 | P0-8 Drivers can approve themselves | **done** — migration 030, tamper test passes |
 | P0-9 Drivers can rewrite an accepted bid amount | **done** — migration 030, tamper test passes |
+| P0-10 Withdrawal approval could double-pay | **done** — migrations 031/032 + `POST /api/admin/withdrawals/approve` |
 | P0-6 Simulator writes to production from the browser | **done** — route now 404s outside development |
 | **P0-7 The payout pipeline has never executed** | **partly done** — code hardened (atomic, idempotent, error-checked) and a verification script written; **the run itself is still outstanding** |
 | P1-1 CI workflow | **done** — `.github/workflows/ci.yml`, green on Node 24 |
@@ -56,6 +57,40 @@ triggers are now asserted by `scripts/db-permission-check.sql`.
 
 One product decision left open deliberately: editing documents or vehicle details
 after approval arguably ought to reset the driver to `pending` for re-verification.
+
+---
+
+## P0-10. Withdrawal approval could pay a driver twice
+
+`app/[locale]/admin/withdrawals/page.tsx` is how every driver gets paid, and it
+had four defects at once:
+
+1. **Read-then-write on the balance.** It read `credit_balance` in the browser,
+   subtracted in JavaScript, and wrote the result back — the exact pattern
+   `increment_credit_balance` was introduced to replace in 011. Two admins
+   approving at once, or one admin on a stale page, silently overwrite each
+   other: a driver is paid twice while the balance drops once.
+2. **No ledger row.** It debited `credit_balance` without touching
+   `wallet_transactions`, so there was no record a payout had happened.
+3. **No error checks** on either write.
+4. **Wrong order, no transaction.** The debit happened before the withdrawal was
+   marked complete, so a failure in between debits the driver and leaves the
+   request pending — ready to be approved again.
+
+`approve_withdrawal` (031) does the whole thing in one transaction: it locks the
+withdrawal, refuses anything not still `pending`, re-checks the balance against
+the database rather than trusting the browser, writes the ledger row and the
+debit together, marks the withdrawal completed, and records an audit entry. The
+page now calls `POST /api/admin/withdrawals/approve`.
+
+Verified against the live database with a synthetic withdrawal, all rolled back:
+balance 200 → 80, exactly one ledger row, status `completed`, one audit row, a
+replayed approval refused, and a 500 TND request against an 80 TND balance refused.
+
+Migration 032 widens `wallet_transactions_type_check`, which allowed only
+`credit, debit, promo, referral, refund`. Both `'withdrawal'` and `'penalty'`
+were outside it — meaning the *original* dispute page's ledger insert could never
+have succeeded either, independent of the three bugs already found there.
 
 ---
 
