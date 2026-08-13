@@ -1,0 +1,180 @@
+# VanZ — Launch Readiness Plan
+
+Status as of 2026-08-13. Ordered by risk, not by effort.
+Every finding below was verified against the live database or the source, not inferred.
+
+---
+
+## Phase 0 — Stop the bleeding (do today, ~2 hours)
+
+### P0-1. Four money RPCs are callable by anonymous users
+
+**Verified.** `pg_proc.proacl` on the live database shows:
+
+| function | ACL | anon can execute |
+|---|---|---|
+| `increment_credit_balance` | `=X/postgres` + explicit `anon=X` | **yes** |
+| `increment_loyalty_points` | `=X/postgres` + explicit `anon=X` | **yes** |
+| `try_use_promo` | `=X/postgres` + explicit `anon=X` | **yes** |
+| `complete_job_atomic` | `=X/postgres` + explicit `anon=X` | **yes** |
+| `is_admin` | no PUBLIC, no anon | no (correct) |
+
+All four are `SECURITY DEFINER` owned by `postgres`, with no `auth.uid()` check in the
+body ([supabase/011_atomic_helpers.sql](supabase/011_atomic_helpers.sql)). They run as the
+owner, so **row-level security does not apply to them**. Anyone holding the anon key —
+which ships inside every copy of the mobile app and is public by design — can POST to
+`/rest/v1/rpc/increment_credit_balance` with any user id and any amount.
+
+**Root cause is a regression, not an oversight.** Migration `revoke_anon_execute_and_fix_rls`
+(20260428161044) did revoke these grants — `is_admin` still carries that hardening today,
+which proves the migration worked. Then `atomic_helpers_force` (20260607010019) re-created
+the four helpers. `CREATE OR REPLACE` preserves an ACL, but a `DROP` + recreate resets it to
+the Supabase default of PUBLIC EXECUTE. The June migration silently reopened what April closed.
+
+**Fix** — new migration `025_lock_down_atomic_helpers.sql`:
+
+```sql
+-- Defence 1: no direct API access. These are server-only helpers.
+REVOKE EXECUTE ON FUNCTION public.increment_credit_balance(uuid, numeric)  FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.increment_loyalty_points(uuid, integer)  FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.try_use_promo(text, uuid, numeric)       FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.complete_job_atomic(uuid, numeric, numeric) FROM PUBLIC, anon, authenticated;
+
+GRANT EXECUTE ON FUNCTION public.increment_credit_balance(uuid, numeric)   TO service_role;
+GRANT EXECUTE ON FUNCTION public.increment_loyalty_points(uuid, integer)   TO service_role;
+GRANT EXECUTE ON FUNCTION public.try_use_promo(text, uuid, numeric)        TO service_role;
+GRANT EXECUTE ON FUNCTION public.complete_job_atomic(uuid, numeric, numeric) TO service_role;
+
+-- Defence 2: pin search_path (also clears 8 advisor warnings).
+ALTER FUNCTION public.increment_credit_balance(uuid, numeric)   SET search_path = public, pg_temp;
+ALTER FUNCTION public.increment_loyalty_points(uuid, integer)   SET search_path = public, pg_temp;
+ALTER FUNCTION public.try_use_promo(text, uuid, numeric)        SET search_path = public, pg_temp;
+ALTER FUNCTION public.complete_job_atomic(uuid, numeric, numeric) SET search_path = public, pg_temp;
+```
+
+Defence in depth is deliberate: the grant alone already regressed once.
+
+### P0-2. Check whether it was already exploited
+
+Before assuming no harm, reconcile stored balances against the transaction ledger. Any user
+whose `credit_balance` doesn't match the sum of their `wallet_transactions` got credit from
+somewhere other than the app.
+
+```sql
+SELECT u.id, u.credit_balance,
+       COALESCE(SUM(w.amount), 0) AS ledger_total,
+       u.credit_balance - COALESCE(SUM(w.amount), 0) AS discrepancy
+FROM public.users u
+LEFT JOIN public.wallet_transactions w ON w.user_id = u.id
+GROUP BY u.id, u.credit_balance
+HAVING u.credit_balance <> COALESCE(SUM(w.amount), 0)
+ORDER BY discrepancy DESC;
+```
+
+Run the same shape against `loyalty_points` vs `loyalty_transactions`. A clean result closes
+the question. A dirty one means manual reconciliation before launch.
+
+### P0-3. Admin dispute refunds are silently broken
+
+[app/[locale]/admin/disputes/page.tsx:97](app/[locale]/admin/disputes/page.tsx:97) and
+[:107](app/[locale]/admin/disputes/page.tsx:107) call the RPC with `{ user_id, amount }`.
+The function signature is `(p_user_id, p_amount)` — confirmed as the only overload in the
+database. PostgREST resolves overloads by argument name, so these calls have never matched a
+function. Neither call checks the returned error, so they fail with no signal to the operator,
+who sees a success state and assumes the customer was refunded.
+
+Two defects, one line apart: wrong parameter names, and an unchecked `await supabase.rpc(...)`.
+
+This is also a `'use client'` component, so the call goes straight from the browser. Renaming
+the parameters is *not* the fix, because P0-1 revokes browser access. Correct fix: move both
+adjustments into a server route (`app/api/admin/disputes/adjust/route.ts`) that verifies
+`is_admin()`, uses the service-role client, checks the error, and writes an `audit_logs` row.
+
+### P0-4. Repository and credential hygiene
+
+The repo is public (unauthenticated `api.github.com` returns 200) and exposes the schema
+including the vulnerable functions above. Also 31 Dependabot alerts on `main`, 23 high.
+
+- Decide public vs private deliberately. If it stays public, that is a real choice with real
+  consequences, and P0-1 becomes more urgent, not less.
+- Rotate `SUPABASE_SERVICE_ROLE_KEY` and `TWILIO_TOKEN` if they were ever pasted into a
+  chat, an issue, a screenshot, or a commit. Cheap to do, expensive to skip.
+- Triage the 23 high-severity advisories.
+
+---
+
+## Phase 1 — Make the fix permanent (this week, ~1 day)
+
+The Phase 0 hole was closed once and came back. Without this phase it can come back again.
+
+### P1-1. CI that actually gates
+
+No `.github/workflows` exists today. Add one running on every push and PR:
+
+- `npx tsc --noEmit` (currently passes clean — protect that)
+- `npx eslint`
+- `npx playwright test`
+
+### P1-2. A permissions regression test
+
+The single highest-value test in the codebase. Assert the invariant directly:
+
+```sql
+SELECT has_function_privilege('anon', 'public.increment_credit_balance(uuid,numeric)', 'EXECUTE');
+-- must be false
+```
+
+Run it in CI against a branch database, and as a post-deploy check against production. Any
+future migration that drops and recreates these functions fails the build instead of shipping.
+
+### P1-3. Migration hygiene note
+
+Add to [AGENTS.md](AGENTS.md): dropping and recreating a function resets its ACL. Any
+migration that touches a `SECURITY DEFINER` function must re-assert its grants in the same file.
+
+---
+
+## Phase 2 — Make correctness provable (2 weeks)
+
+Right now 57k lines and 13 API routes are covered by one Playwright smoke spec. The system
+may well be correct; nothing demonstrates that it is.
+
+- **Money paths first.** Integration tests for job completion → commission split → driver
+  payout → loyalty award, and for promo redemption including the per-user limit and the
+  concurrent-redemption race that `try_use_promo`'s `FOR UPDATE` exists to prevent.
+- **Authorization tests.** For each of the 13 routes: anonymous, wrong-role, and correct-role.
+  This is where the class of bug in P0-1 lives.
+- **E2E on the two flows that matter**: client books → driver bids → accept → complete;
+  and driver onboarding through first payout.
+- **Reduce the 91 `any` annotations**, starting with `lib/services/` where the money logic
+  lives. A clean typecheck means less than it appears while these remain.
+
+---
+
+## Phase 3 — Operational readiness (before real users)
+
+Not code quality — the things that decide whether you find out about a problem from your
+dashboard or from an angry customer.
+
+- **Error monitoring** (Sentry or equivalent) on web and mobile, with alerts on payment and
+  job-completion failures. Also remove the 10 stray `console.log` calls.
+- **Rate limiting** on auth, booking, and bid endpoints.
+- **Backups**: confirm Supabase PITR is on and actually restore once into a branch. An
+  untested backup is a hypothesis.
+- **Dispute and refund runbook** — a written procedure, since P0-3 shows the tooling can
+  fail quietly.
+- **Legal**: the CGU `.docx` in the repo root needs to be published and linked from signup.
+- **Support channel** and a documented rollback procedure for a bad mobile release.
+- **Load check** on `get_jobs_within_radius`, the PostGIS query every driver hits on a map
+  refresh. Confirm the spatial index is used under realistic row counts.
+
+---
+
+## Sequencing
+
+Phase 0 is a single afternoon and should not wait for the others. Phase 1 is what stops
+Phase 0 from recurring. Phases 2 and 3 can run in parallel once the money paths are locked.
+
+Launch gate: **Phase 0 and Phase 1 complete, plus Phase 3's monitoring, backups, and legal.**
+Phase 2 raises confidence and should be underway, but a cash-first launch with a small user
+base can begin while test coverage is still being built — provided Phase 1 CI is green.

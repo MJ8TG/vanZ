@@ -88,28 +88,35 @@ export default function AdminDisputes() {
       const isFin = actionDef.requiresAmount;
       if (isFin && actionAmount <= 0) return alert("Montant invalide.");
 
-      const clientId = selectedDispute.jobs.client_id;
-      const driverId = selectedDispute.jobs.accepted_bid_id;
-
       let resolutionDesc = actionDef.action;
 
-      if (actionDef.action === 'refund_client') {
-         await supabase.rpc('increment_credit_balance', { user_id: clientId, amount: actionAmount });
-         await supabase.from('wallet_transactions').insert({ user_id: clientId, amount: actionAmount, type: 'refund', job_id: selectedDispute.job_id });
-         resolutionDesc = `Remboursement de ${actionAmount} TND au client.`;
-         
-         // SMS (Stubs)
-         console.log(`[SMS] To Client: Remboursement de ${actionAmount} TND ajouté à votre compte vanZ`);
-         console.log(`[SMS] To Driver: Un remboursement de ${actionAmount} TND a été accordé au client suite au litige job #${selectedDispute.job_id}`);
+      if (actionDef.action === 'refund_client' || actionDef.action === 'deduct_driver') {
+         // Balance changes go through the server: the RPC is service-role only,
+         // and the ledger row plus the balance update must land together.
+         const { data: { session } } = await supabase.auth.getSession();
 
-      } else if (actionDef.action === 'deduct_driver') {
-         // Driver deducting translates to raw negative increment balance logically mapped
-         await supabase.rpc('increment_credit_balance', { user_id: driverId, amount: -Math.abs(actionAmount) });
-         await supabase.from('wallet_transactions').insert({ user_id: driverId, amount: -Math.abs(actionAmount), type: 'penalty', job_id: selectedDispute.job_id });
-         resolutionDesc = `Pénalité de ${actionAmount} TND appliquée au chauffeur.`;
-         
-         console.log(`[SMS] To Driver: Pénalité appliquée: ${actionAmount} TND (Litige #${selectedDispute.job_id})`);
-         console.log(`[SMS] To Client: Votre litige a été résolu en votre faveur.`);
+         const res = await fetch('/api/admin/disputes/adjust', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             Authorization: `Bearer ${session?.access_token ?? ''}`,
+           },
+           body: JSON.stringify({
+             job_id: selectedDispute.job_id,
+             action: actionDef.action,
+             amount: actionAmount,
+           }),
+         });
+
+         const payload = await res.json();
+         if (!res.ok) {
+           alert(payload.error || "L'opération a échoué.");
+           return;
+         }
+
+         resolutionDesc = actionDef.action === 'refund_client'
+           ? `Remboursement de ${actionAmount} TND au client.`
+           : `Pénalité de ${actionAmount} TND appliquée au chauffeur.`;
       }
 
       if (actionDef.action === 'warn_user' && targetId) {
