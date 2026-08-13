@@ -442,37 +442,79 @@ class BookingService {
       });
     }
 
-    // 6. Credit driver wallet atomically (only on the first completion to prevent double credits)
-    if (isFirstCompletion && driverPayout) {
-      await supabase.from("wallet_transactions").insert({
-        user_id: driverId,
-        amount: driverPayout,
-        type: "credit",
-        job_id: jobId,
-        note: `Paiement mission — ${driverPayout} TND (après commission)`,
-      });
+    // 6. Credit the driver.
+    //
+    // Guarded by the presence of the ledger row rather than by isFirstCompletion:
+    // commission is set once by complete_job_atomic, so a payout that failed after
+    // that point would never be retried if it keyed off isFirstCompletion. Keying
+    // off the ledger makes a retry of this endpoint pay a driver who was missed,
+    // and pay nobody twice.
+    //
+    // apply_wallet_adjustment writes the ledger row and the balance in one
+    // transaction, so the two cannot diverge.
+    if (driverPayout) {
+      const { data: existingPayout, error: payoutLookupErr } = await supabase
+        .from("wallet_transactions")
+        .select("id")
+        .eq("job_id", jobId)
+        .eq("user_id", driverId)
+        .eq("type", "credit")
+        .maybeSingle();
 
-      await supabase.rpc("increment_credit_balance", {
-        p_user_id: driverId,
-        p_amount: driverPayout,
-      });
+      if (payoutLookupErr) {
+        logger.error("Failed to check for an existing driver payout", payoutLookupErr, { jobId, driverId });
+        throw payoutLookupErr;
+      }
+
+      if (!existingPayout) {
+        const { error: payoutErr } = await supabase.rpc("apply_wallet_adjustment", {
+          p_user_id: driverId,
+          p_amount: driverPayout,
+          p_type: "credit",
+          p_job_id: jobId,
+          p_note: `Paiement mission — ${driverPayout} TND (après commission)`,
+        });
+
+        if (payoutErr) {
+          logger.error("Failed to credit driver payout", payoutErr, { jobId, driverId, driverPayout });
+          throw payoutErr;
+        }
+
+        logger.info("Driver payout credited", { jobId, driverId, driverPayout });
+      }
     }
 
-    // 7. Award loyalty points atomically
-    if (isFirstCompletion && job.accepted_bid_amount) {
+    // 7. Award loyalty points, guarded the same way. A failure here must not fail
+    // the completion — the job is delivered and the driver is paid — but it must
+    // be visible rather than silent.
+    if (job.accepted_bid_amount) {
       const loyaltyPoints = Math.floor(job.accepted_bid_amount / 10);
-      if (loyaltyPoints > 0) {
-        await supabase.from("loyalty_transactions").insert({
-          user_id: job.client_id,
-          points: loyaltyPoints,
-          type: "earned",
-          job_id: jobId,
-        });
 
-        await supabase.rpc("increment_loyalty_points", {
-          p_user_id: job.client_id,
-          p_points: loyaltyPoints,
-        });
+      if (loyaltyPoints > 0) {
+        const { data: existingAward, error: awardLookupErr } = await supabase
+          .from("loyalty_transactions")
+          .select("id")
+          .eq("job_id", jobId)
+          .eq("user_id", job.client_id)
+          .eq("type", "earned")
+          .maybeSingle();
+
+        if (awardLookupErr) {
+          logger.error("Failed to check for an existing loyalty award", awardLookupErr, { jobId });
+        } else if (!existingAward) {
+          const { error: loyaltyErr } = await supabase.rpc("apply_loyalty_award", {
+            p_user_id: job.client_id,
+            p_points: loyaltyPoints,
+            p_type: "earned",
+            p_job_id: jobId,
+          });
+
+          if (loyaltyErr) {
+            logger.error("Failed to award loyalty points", loyaltyErr, {
+              jobId, clientId: job.client_id, loyaltyPoints,
+            });
+          }
+        }
       }
     }
 
