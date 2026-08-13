@@ -57,17 +57,48 @@ function check(label: string, actual: unknown, expected: unknown) {
   if (!ok) failures.push(label);
 }
 
+/**
+ * public.users.id is a foreign key to auth.users, so a profile cannot exist
+ * without a real auth user. Create the auth user first, then upsert the profile —
+ * upsert rather than insert because the handle_new_user trigger may already have
+ * created the row.
+ */
+async function createTestUser(role: 'client' | 'driver', tag: string) {
+  const email = `payout-test-${role}-${tag}@vanz.invalid`;
+
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password: randomUUID(),
+    email_confirm: true,
+    user_metadata: { first_name: 'PayoutTest', last_name: role, role },
+  });
+  if (error) throw error;
+
+  const id = data.user!.id;
+
+  await supabase.from('users').upsert({
+    id,
+    role,
+    phone: `+2169${Math.floor(1000000 + Math.random() * 8999999)}`,
+    first_name: 'PayoutTest',
+    last_name: role,
+    credit_balance: 0,
+    loyalty_points: 0,
+  }).throwOnError();
+
+  return id;
+}
+
 async function main() {
-  const clientId = randomUUID();
-  const driverId = randomUUID();
+  const tag = randomUUID().slice(0, 8);
+  let clientId: string | undefined;
+  let driverId: string | undefined;
   let jobId: string | undefined;
   let bidId: string | undefined;
 
   try {
-    await supabase.from('users').insert([
-      { id: clientId, role: 'client', first_name: 'PayoutTest', last_name: 'Client', credit_balance: 0, loyalty_points: 0 },
-      { id: driverId, role: 'driver', first_name: 'PayoutTest', last_name: 'Driver', credit_balance: 0, loyalty_points: 0 },
-    ]).throwOnError();
+    clientId = await createTestUser('client', tag);
+    driverId = await createTestUser('driver', tag);
 
     const { data: job } = await supabase.from('jobs').insert({
       client_id: clientId,
@@ -128,9 +159,15 @@ async function main() {
       await supabase.from('audit_logs').delete().eq('entity_id', jobId);
       await supabase.from('jobs').update({ accepted_bid_id: null }).eq('id', jobId);
     }
-    if (bidId)  await supabase.from('bids').delete().eq('id', bidId);
-    if (jobId)  await supabase.from('jobs').delete().eq('id', jobId);
-    await supabase.from('users').delete().in('id', [clientId, driverId]);
+    if (bidId) await supabase.from('bids').delete().eq('id', bidId);
+    if (jobId) await supabase.from('jobs').delete().eq('id', jobId);
+
+    // Deleting the auth user cascades to public.users via users_id_fkey.
+    for (const id of [clientId, driverId]) {
+      if (!id) continue;
+      const { error } = await supabase.auth.admin.deleteUser(id);
+      if (error) console.error(`  could not delete auth user ${id}: ${error.message}`);
+    }
     console.log('Cleanup done.');
   }
 
