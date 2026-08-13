@@ -13,8 +13,8 @@ Every finding below was verified against the live database or the source, not in
 | P0-4 Repo visibility, key rotation, Dependabot | **open — your decision** |
 | P0-5 Clients can rewrite their own job rows | **done** — migration 028, tamper test passes |
 | P0-6 Simulator writes to production from the browser | **done** — route now 404s outside development |
-| **P0-7 The payout pipeline has never executed** | **partly done** — code hardened (atomic, idempotent, error-checked); still needs one real end-to-end run |
-| P1-1 CI workflow | **done** — `.github/workflows/ci.yml` |
+| **P0-7 The payout pipeline has never executed** | **partly done** — code hardened (atomic, idempotent, error-checked) and a verification script written; **the run itself is still outstanding** |
+| P1-1 CI workflow | **done** — `.github/workflows/ci.yml`, green on Node 24 |
 | P1-2 Permission regression test | **done** — `scripts/db-permission-check.sql`, passing |
 | P1-3 Migration hygiene note | **done** — `AGENTS.md` |
 | Phase 2 test coverage | not started |
@@ -46,11 +46,26 @@ the balance credit, the loyalty award — have never executed against this datab
 and none of those four calls checks its error, so the first real completion could
 fail silently in exactly the way the admin dispute flow did.
 
-Next step: drive one job through `POST /api/jobs/complete` end to end against a
-Supabase branch, and assert that `wallet_transactions` gains a row, `credit_balance`
-moves by the payout, and `audit_logs` records the transition. Then port steps 6 and 7
-onto `apply_wallet_adjustment` (migration 026) so the ledger and the balance can no
-longer diverge, and check every error return.
+**Done so far.** Steps 6 and 7 now go through `apply_wallet_adjustment` (026) and
+`apply_loyalty_award` (029), so the ledger row and the balance move in one
+transaction, and both errors are checked. A retry hole was closed at the same time:
+both blocks were gated on `isFirstCompletion`, which is true only the first time
+`complete_job_atomic` sets commission — so a payout that failed after that point
+could never be retried and the driver would never be paid. They are now guarded on
+the presence of the ledger row, making a retry pay a missed driver exactly once.
+
+**Still outstanding: actually running it.** `scripts/verify-payout-flow.ts` drives
+`completeJob` through the real service layer and asserts the payout, the ledger row,
+the loyalty award, the audit row, and idempotency on retry, creating and removing
+its own scratch rows. It refuses to run without `ALLOW_DESTRUCTIVE_TEST=1` because
+it writes rows, so it needs a Supabase branch or a local stack:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+  ALLOW_DESTRUCTIVE_TEST=1 npx tsx scripts/verify-payout-flow.ts
+```
+
+Until that passes somewhere, the payout path remains code that has never run.
 
 ---
 
