@@ -12,10 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 24 matches the environment package-lock.json was generated in
+      # (npm 11). Next 16 requires >=20.9, but installing under npm 10 on a
+      # lockfile written by npm 11 failed here; keep these aligned.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: npm
+
+      - name: Environment
+        run: node -v && npm -v
 
       - run: npm ci
 
