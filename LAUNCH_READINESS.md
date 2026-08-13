@@ -12,6 +12,8 @@ Every finding below was verified against the live database or the source, not in
 | P0-3 Admin dispute refunds | **done** — migration 026 + `POST /api/admin/disputes/adjust` |
 | P0-4 Repo visibility, key rotation, Dependabot | **open — your decision** |
 | P0-5 Clients can rewrite their own job rows | **done** — migration 028, tamper test passes |
+| P0-8 Drivers can approve themselves | **done** — migration 030, tamper test passes |
+| P0-9 Drivers can rewrite an accepted bid amount | **done** — migration 030, tamper test passes |
 | P0-6 Simulator writes to production from the browser | **done** — route now 404s outside development |
 | **P0-7 The payout pipeline has never executed** | **partly done** — code hardened (atomic, idempotent, error-checked) and a verification script written; **the run itself is still outstanding** |
 | P1-1 CI workflow | **done** — `.github/workflows/ci.yml`, green on Node 24 |
@@ -23,6 +25,37 @@ Every finding below was verified against the live database or the source, not in
 To enable the CI permission gate, add a `SUPABASE_DB_URL` secret in the repository
 settings. Without it that job warns and skips rather than failing, so CI stays green
 but the gate is inactive.
+
+---
+
+## P0-8 / P0-9. Self-approval and bid tampering
+
+A sweep of every table's UPDATE policy found the `jobs` problem repeated twice more.
+RLS is enabled on all 24 application tables (only `spatial_ref_sys`, a PostGIS
+system table, is exempt), but four tables let their owner rewrite server-managed
+columns.
+
+**`drivers` was the serious one.** The policy is `USING ((id = auth.uid()) OR
+is_admin())` with no `WITH CHECK`, and `status`, `approved_at` and `approved_by`
+live on that row. So any signed-up driver could set their own status to
+`'approved'` — skipping CIN, licence and insurance verification — then bid on jobs
+and take possession of customers' goods. Verified on the live database and rolled
+back: a driver session moved their own row `approved -> pending -> approved`.
+This is a trust-and-safety hole rather than only a technical one.
+
+**`bids` was narrower.** Its `WITH CHECK` already stops a client rewriting someone
+else's bid (confirmed blocked), but not the driver rewriting their own: an accepted
+bid moved `150.00 -> 99999.00`. Because `jobs.accepted_bid_amount` is protected by
+028 the payout itself is safe, but a driver could still raise their offer between
+the client seeing it and accepting it.
+
+Migration 030 adds `lock_protected_driver_columns` and `lock_protected_bid_columns`
+on the same pattern as 020 and 028. Drivers keep their vehicle details and document
+uploads; a driver may still revise or withdraw a bid while it is `pending`. All four
+triggers are now asserted by `scripts/db-permission-check.sql`.
+
+One product decision left open deliberately: editing documents or vehicle details
+after approval arguably ought to reset the driver to `pending` for re-verification.
 
 ---
 

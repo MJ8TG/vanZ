@@ -53,8 +53,10 @@ BEGIN
   FOR r IN
     SELECT t.expected_table, t.expected_trigger
     FROM (VALUES
-      ('users', 'trg_lock_protected_user_columns'),
-      ('jobs',  'trg_lock_protected_job_columns')
+      ('users',   'trg_lock_protected_user_columns'),
+      ('jobs',    'trg_lock_protected_job_columns'),
+      ('drivers', 'trg_lock_protected_driver_columns'),
+      ('bids',    'trg_lock_protected_bid_columns')
     ) AS t(expected_table, expected_trigger)
   LOOP
     IF NOT EXISTS (
@@ -84,7 +86,8 @@ BEGIN
         'increment_credit_balance','increment_loyalty_points','try_use_promo',
         'complete_job_atomic','apply_wallet_adjustment','apply_loyalty_award',
         'auto_cancel_stale_payments','lock_protected_user_columns',
-        'lock_protected_job_columns'
+        'lock_protected_job_columns','lock_protected_driver_columns',
+        'lock_protected_bid_columns'
       )
       AND (p.proconfig IS NULL
            OR NOT EXISTS (SELECT 1 FROM unnest(p.proconfig) cfg
